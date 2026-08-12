@@ -2,6 +2,7 @@
 	"name": "veyrune-cloud-save",
 	"version": "0.0.1",
 	"private": true,
+	"type": "module",
 	"scripts": {
 		"deploy": "wrangler deploy",
 		"dev": "wrangler dev",
@@ -9,7 +10,7 @@
 		"cf-typegen": "wrangler types wrangler-generated.d.ts",
 		"pretest": "npm run cf-typegen",
 		"type-check": "tsc --noEmit",
-		"test": "node --test test/*.test.mjs && npm run type-check"
+		"test": "node --test test/*.test.mjs && node --experimental-strip-types --test test/*.test.ts && npm run type-check"
 	},
 	"dependencies": {
 		"@cloudflare/codemode": "^0.5.1",
@@ -25,6 +26,9 @@
 	"devDependencies": {
 		"typescript": "6.0.3",
 		"wrangler": "^4.105.0"
+	},
+	"engines": {
+		"node": ">=22"
 	},
 	"overrides": {
 		"@hono/node-server": "^2.0.5"
