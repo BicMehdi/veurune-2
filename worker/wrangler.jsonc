@@ -1,0 +1,36 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "veyrune-cloud-save",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-12",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  /**
+	 * Note: Use secrets to store sensitive data.
+	 * https://developers.cloudflare.com/workers/configuration/secrets/
+	 *
+	 * Commands to set secrets:
+	 * npx wrangler secret put GITHUB_CLIENT_ID
+	 * npx wrangler secret put GITHUB_CLIENT_SECRET
+   * npx wrangler secret put COOKIE_ENCRYPTION_KEY
+   * npx wrangler secret put GITHUB_REPO_TOKEN
+   * npx wrangler secret put ALLOWED_GITHUB_LOGIN
+	 */
+  "kv_namespaces": [
+    {
+      "binding": "OAUTH_KV",
+      "id": "610467e7f274495daf4764d1d4bc43f1"
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true, "head_sampling_rate": 1 },
+    "traces": { "enabled": true, "head_sampling_rate": 0.01 }
+  },
+  "dev": {
+    "port": 8788
+  }
+}
