@@ -1,0 +1,26 @@
+{
+  "persistence_version": 1,
+  "save_id": "VEY-0719R",
+  "parent_save_id": null,
+  "turn": 719,
+  "checkpoint_kind": "technical_recovery",
+  "fiction_advanced": false,
+  "record_time": "2026-08-12T09:27:33Z",
+  "last_event_id": "EVT-0719R-0001",
+  "scene": {
+    "status": "not_loaded",
+    "import_status": "pending_attested_source"
+  },
+  "player_state": {
+    "import_status": "pending_attested_source"
+  },
+  "history": {
+    "status": "partial_reconstruction_pending",
+    "attested_events_imported": 0
+  },
+  "next_expected_save": {
+    "save_id": "VEY-0720",
+    "parent_save_id": "VEY-0719R",
+    "turn": 720
+  }
+}

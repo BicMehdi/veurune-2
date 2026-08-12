@@ -1,0 +1,13 @@
+{
+  "name": "veyrune-persistence",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node rules/validate-save.mjs",
+    "test": "node --test rules/validate-save.test.mjs && npm run validate"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

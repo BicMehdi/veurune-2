@@ -31,3 +31,7 @@ Pour obtenir une sauvegarde GitHub après chaque tour, il faut donc soit :
 ## Conclusion
 
 L’installation initiale peut être réalisée une seule fois sur PC. En revanche, Codex seul ne transforme pas automatiquement une conversation mobile Veyrune en système de sauvegarde GitHub après chaque tour : cette synchronisation doit être automatisée séparément.
+
+## Système de sauvegarde
+
+Le système persistant est décrit dans [`SYSTEM/BOOTSTRAP.md`](SYSTEM/BOOTSTRAP.md). Avant toute reprise ou écriture, exécuter `npm test` pour vérifier la filiation des sauvegardes, les tours, les événements et l’état canonique.

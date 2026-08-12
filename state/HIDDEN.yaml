@@ -1,0 +1,12 @@
+{
+  "persistence_version": 1,
+  "audience": "gm_only",
+  "save_id": "VEY-0719R",
+  "turn": 719,
+  "hidden_state": {
+    "import_status": "pending_attested_source",
+    "secrets": {},
+    "private_agendas": {},
+    "sealed_revelations": {}
+  }
+}
