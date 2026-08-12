@@ -42,8 +42,14 @@ function assertNoHiddenKeys(value, label, pathParts = []) {
   }
 }
 
-function expectedSaveId(turn) {
-  return `VEY-${String(turn).padStart(4, "0")}`;
+function saveSequenceNumber(saveId) {
+  const match = /^VEY-(\d{4})(?:[A-Z]+)?$/.exec(saveId);
+  if (!match) fail(`save_id invalide: ${saveId}`);
+  return Number(match[1]);
+}
+
+function nextSaveId(parentSaveId) {
+  return `VEY-${String(saveSequenceNumber(parentSaveId) + 1).padStart(4, "0")}`;
 }
 
 export function validateCandidate(current, candidate) {
@@ -53,9 +59,17 @@ export function validateCandidate(current, candidate) {
   if (candidate.turn !== current.turn + 1) {
     fail(`turn invalide: ${candidate.turn}; attendu: ${current.turn + 1}`);
   }
-  const expectedId = expectedSaveId(candidate.turn);
-  if (candidate.save_id !== expectedId) {
-    fail(`save_id invalide: ${candidate.save_id}; attendu: ${expectedId}`);
+  const expected = current.next_expected_save;
+  if (!expected) fail("CURRENT.next_expected_save est obligatoire");
+  if (expected.parent_save_id !== current.save_id || expected.turn !== current.turn + 1) {
+    fail("CURRENT.next_expected_save est incohérent avec l’état courant");
+  }
+  const sequentialId = nextSaveId(current.save_id);
+  if (expected.save_id !== sequentialId) {
+    fail(`séquence de sauvegarde invalide: ${expected.save_id}; attendu: ${sequentialId}`);
+  }
+  if (candidate.save_id !== expected.save_id) {
+    fail(`save_id invalide: ${candidate.save_id}; attendu: ${expected.save_id}`);
   }
 }
 
@@ -93,15 +107,19 @@ export function validateRepository(rootDir) {
 
   for (const save of saves.values()) {
     if (save.parent_save_id === null) {
-      if (!(save.save_id === "VEY-0719R" && save.turn === 719 && save.checkpoint_kind === "technical_recovery" && save.fiction_advanced === false)) {
+      if (!(save.save_id === "VEY-0719R" && save.turn === 709 && save.checkpoint_kind === "technical_recovery" && save.recovery_of_save_id === "VEY-0719" && save.fiction_advanced === false)) {
         fail(`checkpoint racine non autorisé: ${save.save_id}`);
       }
       continue;
     }
     const parent = saves.get(save.parent_save_id);
     if (!parent) fail(`${save.save_id}: parent absent: ${save.parent_save_id}`);
-    if (save.turn !== parent.turn + 1) fail(`${save.save_id}: turn doit valoir ${parent.turn + 1}`);
-    if (save.save_id !== expectedSaveId(save.turn)) fail(`${save.save_id}: identifiant attendu: ${expectedSaveId(save.turn)}`);
+    const expectedTurn = save.checkpoint_kind?.startsWith("technical") ? parent.turn : parent.turn + 1;
+    if (save.turn !== expectedTurn) fail(`${save.save_id}: turn doit valoir ${expectedTurn}`);
+    const expectedId = save.checkpoint_kind?.startsWith("technical")
+      ? `${parent.save_id.replace(/[A-Z]+$/, "")}R`
+      : nextSaveId(parent.save_id);
+    if (save.save_id !== expectedId) fail(`${save.save_id}: identifiant attendu: ${expectedId}`);
   }
 
   const terminal = [...saves.values()].sort((a, b) => b.turn - a.turn)[0];

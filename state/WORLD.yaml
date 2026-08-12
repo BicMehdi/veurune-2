@@ -2,7 +2,7 @@
   "persistence_version": 1,
   "audience": "player_visible",
   "save_id": "VEY-0719R",
-  "turn": 719,
+  "turn": 709,
   "world_state": {
     "import_status": "pending_attested_source",
     "known_locations": [],

@@ -2,8 +2,9 @@
   "persistence_version": 1,
   "save_id": "VEY-0719R",
   "parent_save_id": null,
-  "turn": 719,
+  "turn": 709,
   "checkpoint_kind": "technical_recovery",
+  "recovery_of_save_id": "VEY-0719",
   "fiction_advanced": false,
   "record_time": "2026-08-12T09:27:33Z",
   "last_event_id": "EVT-0719R-0001",
@@ -21,6 +22,6 @@
   "next_expected_save": {
     "save_id": "VEY-0720",
     "parent_save_id": "VEY-0719R",
-    "turn": 720
+    "turn": 710
   }
 }

@@ -15,14 +15,15 @@ Ce dépôt est la mémoire persistante de Veyrune. Une reprise ne doit jamais in
 ## État de récupération initial
 
 - checkpoint canonique : `VEY-0719R` ;
-- tour technique : `719` ;
+- sauvegarde canonique récupérée : `VEY-0719`, tour `709` ;
+- tour technique conservé : `709` ;
 - fiction avancée : non ;
 - historique importé : non, reconstruction partielle en attente de sources attestées ;
 - prochaine sauvegarde autorisée : `VEY-0720` ;
 - parent obligatoire de cette prochaine sauvegarde : `VEY-0719R` ;
-- prochain tour obligatoire : `720`.
+- prochain tour obligatoire : `710`.
 
-`VEY-0719R` est un ancrage technique. Il ne prétend pas reconstruire le contenu de `VEY-0719` et ne crée aucun événement fictif ancien.
+`VEY-0719R` est un ancrage technique de récupération de `VEY-0719`. Le suffixe `R` ne modifie pas le tour. Il ne prétend pas reconstruire le contenu de `VEY-0719`, ne crée aucun événement fictif ancien et conserve donc le tour `709`.
 
 ## Écriture d’un nouveau tour
 
@@ -30,7 +31,7 @@ Ce dépôt est la mémoire persistante de Veyrune. Une reprise ne doit jamais in
 2. Résoudre le tour sans contrôler Mehdi et sans exposer de secret MJ.
 3. Préparer les événements atomiques avec `event_id`, `save_id`, `parent_save_id`, `turn`, `event_time` et `record_time`.
 4. Ajouter les événements à la fin du fichier JSONL de la tranche concernée. Ne jamais modifier les lignes antérieures ; une correction est un nouvel événement.
-5. Créer `saves/<save_id>.yaml` avec le parent égal au `save_id` courant et un tour égal au tour courant plus un.
+5. Créer `saves/<save_id>.yaml` avec le parent égal au `save_id` courant, un tour égal au tour courant plus un et l’identifiant de sauvegarde explicitement suivant dans la séquence. Le numéro du tour ne sert jamais à calculer l’identifiant de sauvegarde.
 6. Mettre à jour `CURRENT.yaml`, `WORLD.yaml` et, côté MJ seulement, `HIDDEN.yaml` dans la même modification atomique.
 7. Exécuter `npm test`. Une erreur de parent, de tour, de secret ou d’append-only bloque le commit.
 8. Commit et push seulement après validation réussie.
