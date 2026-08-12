@@ -74,15 +74,26 @@ export async function loadGame(env: GitHubEnv) {
   const currentText = await readFile(env, "state/CURRENT.yaml", headSha);
   const current = parseDocument(currentText, "state/CURRENT.yaml");
   const eventPath = eventFileForTurn(current.turn as number);
-  const [world, hidden, bootstrap, persistence, events] = await Promise.all([
+  const [world, hidden, bootstrap, persistence, narrationRules, events] = await Promise.all([
     readFile(env, "state/WORLD.yaml", headSha),
     readFile(env, "state/HIDDEN.yaml", headSha),
     readFile(env, "SYSTEM/BOOTSTRAP.md", headSha),
     readFile(env, "rules/PERSISTENCE.md", headSha),
+    readFile(env, "rules/NARRATION_DARK_FANTASY.md", headSha),
     readFile(env, eventPath, headSha, true),
   ]);
   const recentEvents = events.split(/\r?\n/).filter(Boolean).slice(-50).join("\n");
-  return { headSha, current: currentText, world, hidden, bootstrap, persistence, recentEvents, eventPath };
+  return {
+    headSha,
+    current: currentText,
+    world,
+    hidden,
+    bootstrap,
+    persistence,
+    narration_rules: narrationRules,
+    recentEvents,
+    eventPath,
+  };
 }
 
 export async function commitTurn(env: GitHubEnv, payload: unknown) {

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "validate": "node rules/validate-save.mjs",
-    "test": "node --test rules/validate-save.test.mjs worker/test/*.test.mjs && npm run validate",
+    "test": "node --test rules/validate-save.test.mjs rules/narration.test.mjs worker/test/*.test.mjs && npm run validate",
     "test:worker": "npm --prefix worker test"
   },
   "engines": {

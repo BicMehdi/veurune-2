@@ -13,6 +13,7 @@ const PUBLIC_DOCUMENTS: Record<string, { title: string; path: string }> = {
   world: { title: "Projection joueur du monde", path: "state/WORLD.yaml" },
   bootstrap: { title: "Procédure de reprise canonique", path: "SYSTEM/BOOTSTRAP.md" },
   persistence: { title: "Règles de persistance", path: "rules/PERSISTENCE.md" },
+  narration: { title: "Règles permanentes de narration Dark Fantasy", path: "rules/NARRATION_DARK_FANTASY.md" },
 };
 
 function textResult(text: string) {
@@ -32,7 +33,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   const server = new McpServer(
     { name: "veyrune-cloud-save", version: "1.0.0" },
     {
-      instructions: "Mémoire canonique de Veyrune. Avant une reprise ou un tour, appeler load_game. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale. Ne jamais annoncer un tour comme acquis si save_turn échoue. Ne jamais révéler hidden au joueur.",
+      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale. Ne jamais annoncer un tour comme acquis si save_turn échoue. Ne jamais révéler hidden au joueur.",
     },
   );
 
@@ -72,7 +73,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "load_game",
     {
-      description: "Use this before resuming Veyrune or resolving a new turn. Loads rules, current state, recent events, player projection, and GM-only unresolved state from canonical GitHub main.",
+      description: "Use this before resuming Veyrune or resolving a new turn. Loads persistence and permanent Dark Fantasy narration rules, current state, recent events, player projection, and GM-only unresolved state from canonical GitHub main.",
       inputSchema: z.object({}),
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true, idempotentHint: true },
     },

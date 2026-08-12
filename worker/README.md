@@ -5,11 +5,13 @@ Serveur MCP personnel qui permet à ChatGPT mobile de charger et sauvegarder Vey
 ## Outils exposés
 
 - `search` et `fetch` : consultation des documents canoniques visibles joueur ;
-- `load_game` : chargement des règles, de l’état courant, des événements récents et de l’état MJ ;
+- `load_game` : chargement des règles de persistance et de narration, de l’état courant, des événements récents et de l’état MJ ;
 - `save_turn` : validation puis commit Git atomique d’un nouveau tour ;
 - `check_health` : vérification authentifiée de GitHub et de l’état courant.
 
 `save_turn` refuse les parents ou commits périmés, les tours discontinus, un mauvais `save_id`, les secrets dans les projections joueur, les reconstructions historiques injectées et toute modification non append-only du journal.
+
+Le champ `narration_rules` est lu depuis `rules/NARRATION_DARK_FANTASY.md` au même commit GitHub que le reste du canon. Le MJ l’applique avant de résoudre le tour.
 
 ## Tests de non-régression
 
