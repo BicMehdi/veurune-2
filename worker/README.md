@@ -11,6 +11,18 @@ Serveur MCP personnel qui permet à ChatGPT mobile de charger et sauvegarder Vey
 
 `save_turn` refuse les parents ou commits périmés, les tours discontinus, un mauvais `save_id`, les secrets dans les projections joueur, les reconstructions historiques injectées et toute modification non append-only du journal.
 
+## Tests de non-régression
+
+`npm test` exécute notamment :
+
+- une simulation locale de 200 sauvegardes consécutives, de `VEY-0720 / tour 710` à `VEY-0919 / tour 909` ;
+- les changements automatiques de journaux `0700-0799`, `0800-0899` et `0900-0999` ;
+- le refus de deux sauvegardes concurrentes fondées sur le même état ;
+- le refus d’un `HEAD` GitHub périmé avant toute écriture ;
+- la création atomique des cinq fichiers d’un tour et la mise à jour de `main` sans `force`.
+
+Ces simulations utilisent uniquement des données en mémoire et ne créent aucun tour narratif dans le dépôt canonique.
+
 ## Développement
 
 ```powershell
