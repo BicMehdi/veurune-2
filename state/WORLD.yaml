@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0720",
-  "turn": 710,
+  "save_id": "VEY-0721",
+  "turn": 711,
   "canonical_source": {
     "type": "player_supplied_save_capsule",
     "save_id": "VEY-0719",
@@ -25,8 +25,8 @@
   },
   "last_action": {
     "actor": "Mehdi",
-    "dialogue": "Tu sais ce que tu as fait ?",
-    "intent": "confront_contact_about_consequences"
+    "dialogue": "Tu t’es attaqué à moi.",
+    "intent": "accuse_contact_of_attack"
   },
   "observed_test_result": {
     "dice": [
@@ -94,14 +94,15 @@
     "intent": "unknown",
     "latest_response": {
       "exact_dialogue": [
-        "Laquelle de mes actions ?",
-        "Tu as éventré des relais, laissé des hommes derrière toi et traversé Valdorne avec mon nom à la bouche.",
-        "Si tu veux une réponse, cesse de me faire deviner ton accusation."
+        "Non.",
+        "Tu es vivant, armé, devant moi. Ceux que tu as laissés derrière toi ne peuvent pas tous en dire autant.",
+        "Alors donne-moi un fait. Un lieu. Un ordre. Quelque chose de plus solide que ton ressentiment."
       ],
+      "denies_personal_attack": true,
       "identity_confirmation": false,
       "identity_denial": false,
       "hostile_action_started": false,
-      "demands_specific_accusation": true
+      "demands_specific_evidence": true
     }
   },
   "bridge_site": {
@@ -445,7 +446,7 @@
       "contact_identity_test_inconclusive": true,
       "Aveline_outside_direct_meeting": true,
       "bound_runner_with_Aveline": true,
-      "specify_accusation_to_bridge_contact": true
+      "specify_attack_event_or_order": true
     },
     "broader": {
       "Maison_des_Saules_not_secured": true,
