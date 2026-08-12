@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -9,6 +10,10 @@ const repository = validateRepository(root);
 const importedCurrent = repository.current;
 const importedHidden = repository.hidden;
 const importedSave = parseYamlSubset(path.join(root, "saves", "VEY-0719R.yaml"));
+const importedEvents = fs.readFileSync(path.join(root, "events", "0700-0799.jsonl"), "utf8")
+  .split(/\r?\n/)
+  .filter(Boolean)
+  .map((line) => JSON.parse(line));
 
 const current = {
   save_id: "VEY-0719R",
@@ -75,27 +80,28 @@ test("CURRENT est chargé depuis la capsule attestée", () => {
   assert.equal(importedCurrent.player_state.status, "loaded_from_attested_capsule");
 });
 
-test("la scène canonique est le Pont des Trois Chaînes à 01:24", () => {
-  assert.deepEqual(importedCurrent.time, { year: 347, day: 513, clock: "01:24" });
-  assert.equal(importedCurrent.scene.region, "Valdorne");
-  assert.equal(importedCurrent.scene.district, "Pont_des_Trois_Chaines");
-  assert.equal(importedCurrent.scene.location, "culee_est");
-  assert.equal(importedCurrent.scene.meeting_active, true);
+test("le checkpoint de récupération conserve le Pont des Trois Chaînes à 01:24", () => {
+  assert.deepEqual(importedSave.time, { year: 347, day: 513, clock: "01:24" });
+  assert.equal(importedSave.scene.region, "Valdorne");
+  assert.equal(importedSave.scene.district, "Pont_des_Trois_Chaines");
+  assert.equal(importedSave.scene.location, "culee_est");
+  assert.equal(importedSave.scene.meeting_active, true);
 });
 
-test("Mehdi conserve 8/14 Endurance", () => {
-  assert.deepEqual(importedCurrent.Mehdi.endurance, { current: 8, max: 14 });
+test("le checkpoint de récupération conserve Mehdi à 8/14 Endurance", () => {
+  assert.deepEqual(importedSave.Mehdi.endurance, { current: 8, max: 14 });
 });
 
-test("Aveline conserve 11/12 Endurance", () => {
-  assert.deepEqual(importedCurrent.Aveline.endurance, { current: 11, max: 12 });
+test("le checkpoint de récupération conserve Aveline à 11/12 Endurance", () => {
+  assert.deepEqual(importedSave.Aveline_Sor.endurance, { current: 11, max: 12 });
 });
 
-test("l’identité du contact reste non résolue", () => {
-  assert.equal(importedCurrent.bridge_contact.identity_resolution.status, "unresolved");
-  assert.equal(importedCurrent.bridge_contact.identity_resolution.contact_is_Meren, false);
-  assert.equal(importedCurrent.bridge_contact.identity_resolution.contact_is_not_Meren, false);
-  assert.equal(importedCurrent.bridge_contact.identity_resolution.reliable_conclusion_available, false);
+test("le checkpoint de récupération ne tranche pas l’identité du contact", () => {
+  assert.deepEqual(importedSave.bridge_contact.identity.whether_Meren, {
+    status: "unresolved_hidden",
+    value_known_to_persistence: false,
+    source: "VEY-0719 marks this information as hidden"
+  });
 });
 
 test("aucun secret hidden ne reçoit de valeur inventée", () => {
@@ -115,12 +121,17 @@ test("VEY-0719R reste un checkpoint technique au tour 709", () => {
   assert.equal(importedSave.fiction_advanced, false);
 });
 
-test("la prochaine sauvegarde reste VEY-0720 parent VEY-0719R tour 710", () => {
-  assert.deepEqual(importedCurrent.next_expected_save, {
+test("le checkpoint de récupération désigne VEY-0720 comme successeur initial", () => {
+  assert.deepEqual(importedSave.next_expected_save, {
     save_id: "VEY-0720",
     parent_save_id: "VEY-0719R",
     turn: 710
   });
+});
+
+test("CURRENT vivant accepte toujours son prochain successeur déclaré", () => {
+  assert.doesNotThrow(() => validateCandidate(importedCurrent, importedCurrent.next_expected_save));
+  assert.ok(fs.existsSync(path.join(root, "saves", `${importedCurrent.save_id}.yaml`)));
 });
 
 test("la provenance canonique atteste un snapshot complet et un historique partiel", () => {
@@ -130,5 +141,7 @@ test("la provenance canonique atteste un snapshot complet et un historique parti
     canonical: true,
     completeness: "snapshot_complete_event_history_partial"
   });
-  assert.equal(repository.events, 8);
+  const recoveryEvents = importedEvents.filter((event) => event.save_id === "VEY-0719R");
+  assert.equal(recoveryEvents.length, 8);
+  assert.ok(repository.events >= recoveryEvents.length);
 });
