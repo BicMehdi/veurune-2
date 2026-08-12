@@ -75,6 +75,19 @@ export function parseDocument(text, label) {
   }
 }
 
+function existingEventIds(text) {
+  const ids = new Set();
+  const events = [];
+  for (const [index, line] of text.split(/\r?\n/).filter(Boolean).entries()) {
+    const event = fields(parseDocument(line, `journal existant ligne ${index + 1}`), ["event_id"], `journal existant ligne ${index + 1}`);
+    if (typeof event.event_id !== "string" || !event.event_id) fail(`journal existant ligne ${index + 1}: event_id invalide`);
+    if (ids.has(event.event_id)) fail(`journal existant: event_id dupliqué ${event.event_id}`);
+    ids.add(event.event_id);
+    events.push(event);
+  }
+  return { ids, events };
+}
+
 export function validateTurnPayload(baseCurrentValue, existingEventsText, payloadValue) {
   const base = fields(baseCurrentValue, ["save_id", "turn", "last_event_id", "next_expected_save"], "CURRENT distant");
   const payload = fields(payloadValue, ["expected_head_sha", "expected_current_save_id", "save", "current", "world", "hidden", "events"], "save_turn");
@@ -105,10 +118,20 @@ export function validateTurnPayload(baseCurrentValue, existingEventsText, payloa
   if (next.save_id !== nextSaveId(save.save_id) || next.parent_save_id !== save.save_id || next.turn !== save.turn + 1) fail("prochaine sauvegarde incohérente");
 
   if (!Array.isArray(payload.events) || payload.events.length === 0 || payload.events.length > 50) fail("events doit contenir entre 1 et 50 événements atomiques");
+  const existingJournal = existingEventIds(existingEventsText || "");
+  if (eventFileForTurn(base.turn) === eventFileForTurn(save.turn)) {
+    const lastExisting = existingJournal.events.at(-1);
+    if (!lastExisting || lastExisting.event_id !== base.last_event_id) {
+      fail(`journal existant incohérent: dernier événement attendu ${base.last_event_id}`);
+    }
+  } else if (existingJournal.events.length > 0) {
+    fail("le nouveau fichier de tranche événementielle doit être vide");
+  }
   const eventIds = new Set();
   for (const [index, value] of payload.events.entries()) {
     const event = fields(value, ["event_id", "save_id", "parent_save_id", "turn", "event_time", "record_time"], `events[${index}]`);
     if (typeof event.event_id !== "string" || !event.event_id) fail(`events[${index}].event_id invalide`);
+    if (existingJournal.ids.has(event.event_id)) fail(`event_id déjà présent dans le journal: ${event.event_id}`);
     if (eventIds.has(event.event_id)) fail(`event_id dupliqué dans le tour: ${event.event_id}`);
     eventIds.add(event.event_id);
     if (event.save_id !== save.save_id || event.parent_save_id !== save.parent_save_id || event.turn !== save.turn) fail(`${event.event_id}: filiation incohérente`);

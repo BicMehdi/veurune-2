@@ -214,7 +214,7 @@ export function generateCSRFProtection(): CSRFProtectionResult {
  * @returns Object containing clearCookie header to invalidate the token
  * @throws {OAuthError} If CSRF token is missing or mismatched
  */
-export function validateCSRFToken(formData: FormData, request: Request): ValidateCSRFResult {
+export async function validateCSRFToken(formData: FormData, request: Request): Promise<ValidateCSRFResult> {
 	const csrfCookieName = "__Host-CSRF_TOKEN";
 
 	const tokenFromForm = formData.get("csrf_token");
@@ -232,7 +232,7 @@ export function validateCSRFToken(formData: FormData, request: Request): Validat
 		throw new OAuthError("invalid_request", "Missing CSRF token cookie", 400);
 	}
 
-	if (tokenFromForm !== tokenFromCookie) {
+	if (!(await timingSafeStringEqual(tokenFromForm, tokenFromCookie))) {
 		throw new OAuthError("invalid_request", "CSRF token mismatch", 400);
 	}
 
@@ -350,7 +350,7 @@ export async function validateOAuthState(
 	const hashArray = Array.from(new Uint8Array(hashBuffer));
 	const stateHash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 
-	if (stateHash !== consentedStateHash) {
+	if (!(await timingSafeStringEqual(stateHash, consentedStateHash))) {
 		throw new OAuthError(
 			"invalid_request",
 			"State token does not match session - possible CSRF attack detected",
@@ -436,7 +436,7 @@ export interface ApprovalDialogOptions {
 	 * Arbitrary state data to pass through the approval flow
 	 * Will be encoded in the form and returned when approval is complete
 	 */
-	state: Record<string, any>;
+	state: Record<string, unknown>;
 	/**
 	 * CSRF token to include in the form
 	 */
@@ -865,4 +865,13 @@ async function importKey(secret: string): Promise<CryptoKey> {
 		false,
 		["sign", "verify"],
 	);
+}
+
+async function timingSafeStringEqual(left: string, right: string): Promise<boolean> {
+	const encoder = new TextEncoder();
+	const [leftHash, rightHash] = await Promise.all([
+		crypto.subtle.digest("SHA-256", encoder.encode(left)),
+		crypto.subtle.digest("SHA-256", encoder.encode(right)),
+	]);
+	return crypto.subtle.timingSafeEqual(leftHash, rightHash);
 }

@@ -75,5 +75,26 @@ test("refuse un secret dans la projection joueur", () => {
 test("refuse une reconstruction historique injectée comme nouveau tour", () => {
   const { base, payload } = fixture();
   payload.events[0].historical_reconstruction = true;
-  assert.throws(() => validateTurnPayload(base, "", payload), /ne peut pas être une reconstruction/);
+  assert.throws(
+    () => validateTurnPayload(base, '{"event_id":"EVT-0719R-0008"}\n', payload),
+    /ne peut pas être une reconstruction/,
+  );
+});
+
+test("refuse de réutiliser un event_id déjà présent", () => {
+  const { base, payload } = fixture();
+  payload.events[0].event_id = "EVT-0719R-0008";
+  payload.current.last_event_id = "EVT-0719R-0008";
+  assert.throws(
+    () => validateTurnPayload(base, '{"event_id":"EVT-0719R-0008"}\n', payload),
+    /event_id déjà présent/,
+  );
+});
+
+test("refuse un journal existant qui ne correspond pas à CURRENT", () => {
+  const { base, payload } = fixture();
+  assert.throws(
+    () => validateTurnPayload(base, '{"event_id":"EVT-0719R-0007"}\n', payload),
+    /dernier événement attendu EVT-0719R-0008/,
+  );
 });

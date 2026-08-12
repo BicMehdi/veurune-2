@@ -78,11 +78,12 @@ export async function fetchUpstreamAuthToken({
 		error_description?: unknown;
 	};
 	if (typeof body.access_token !== "string" || body.access_token.length === 0) {
-		console.error("GitHub OAuth token exchange failed", {
+		console.error(JSON.stringify({
+			message: "GitHub OAuth token exchange failed",
 			error: typeof body.error === "string" ? body.error : "unknown_error",
 			error_description:
 				typeof body.error_description === "string" ? body.error_description : undefined,
-		});
+		}));
 		return [null, new Response("GitHub authorization failed", { status: 400 })];
 	}
 	return [body.access_token, null];

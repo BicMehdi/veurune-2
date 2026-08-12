@@ -1,7 +1,7 @@
-import { env } from "cloudflare:workers";
 import type { AuthRequest, OAuthHelpers } from "@cloudflare/workers-oauth-provider";
 import { Hono } from "hono";
 import { Octokit } from "octokit";
+import type { VeyruneEnv } from "./env";
 import { fetchUpstreamAuthToken, getUpstreamAuthorizeUrl, type Props } from "./utils";
 import {
 	addApprovedClient,
@@ -15,7 +15,7 @@ import {
 	validateOAuthState,
 } from "./workers-oauth-utils";
 
-const app = new Hono<{ Bindings: Env & { OAUTH_PROVIDER: OAuthHelpers } }>();
+const app = new Hono<{ Bindings: VeyruneEnv & { OAUTH_PROVIDER: OAuthHelpers } }>();
 
 app.get("/health", (c) => c.json({ status: "ok", service: "veyrune-cloud-save" }));
 
@@ -27,11 +27,11 @@ app.get("/authorize", async (c) => {
 	}
 
 	// Check if client is already approved
-	if (await isClientApproved(c.req.raw, clientId, env.COOKIE_ENCRYPTION_KEY)) {
+	if (await isClientApproved(c.req.raw, clientId, c.env.COOKIE_ENCRYPTION_KEY)) {
 		// Skip approval dialog but still create secure state and bind to session
 		const { stateToken } = await createOAuthState(oauthReqInfo, c.env.OAUTH_KV);
 		const { setCookie: sessionBindingCookie } = await bindStateToSession(stateToken);
-		return redirectToGithub(c.req.raw, stateToken, { "Set-Cookie": sessionBindingCookie });
+		return redirectToGithub(c.req.raw, c.env, stateToken, { "Set-Cookie": sessionBindingCookie });
 	}
 
 	// Generate CSRF protection for the approval form
@@ -56,7 +56,7 @@ app.post("/authorize", async (c) => {
 		const formData = await c.req.raw.formData();
 
 		// Validate CSRF token
-		validateCSRFToken(formData, c.req.raw);
+		await validateCSRFToken(formData, c.req.raw);
 
 		// Extract state from form data
 		const encodedState = formData.get("state");
@@ -91,33 +91,36 @@ app.post("/authorize", async (c) => {
 		headers.append("Set-Cookie", approvedClientCookie);
 		headers.append("Set-Cookie", sessionBindingCookie);
 
-		return redirectToGithub(c.req.raw, stateToken, Object.fromEntries(headers));
-	} catch (error: any) {
-		console.error("POST /authorize error:", error);
+		return redirectToGithub(c.req.raw, c.env, stateToken, headers);
+	} catch (error: unknown) {
+		console.error(JSON.stringify({ route: "POST /authorize", error: errorMessage(error) }));
 		if (error instanceof OAuthError) {
 			return error.toResponse();
 		}
 		// Unexpected non-OAuth error
-		return c.text(`Internal server error: ${error.message}`, 500);
+		return c.text("Internal server error", 500);
 	}
 });
 
 async function redirectToGithub(
 	request: Request,
+	workerEnv: VeyruneEnv,
 	stateToken: string,
-	headers: Record<string, string> = {},
+	headers: HeadersInit = {},
 ) {
+	const responseHeaders = new Headers(headers);
+	responseHeaders.set(
+		"location",
+		getUpstreamAuthorizeUrl({
+			client_id: workerEnv.GITHUB_CLIENT_ID,
+			redirect_uri: new URL("/callback", request.url).href,
+			scope: "read:user",
+			state: stateToken,
+			upstream_url: "https://github.com/login/oauth/authorize",
+		}),
+	);
 	return new Response(null, {
-		headers: {
-			...headers,
-			location: getUpstreamAuthorizeUrl({
-				client_id: env.GITHUB_CLIENT_ID,
-				redirect_uri: new URL("/callback", request.url).href,
-				scope: "read:user",
-				state: stateToken,
-				upstream_url: "https://github.com/login/oauth/authorize",
-			}),
-		},
+		headers: responseHeaders,
 		status: 302,
 	});
 }
@@ -148,7 +151,8 @@ app.get("/callback", async (c) => {
 		const result = await validateOAuthState(c.req.raw, c.env.OAUTH_KV);
 		oauthReqInfo = result.oauthReqInfo;
 		clearSessionCookie = result.clearCookie;
-	} catch (error: any) {
+	} catch (error: unknown) {
+		console.error(JSON.stringify({ route: "GET /callback", error: errorMessage(error) }));
 		if (error instanceof OAuthError) {
 			return error.toResponse();
 		}
@@ -173,6 +177,10 @@ app.get("/callback", async (c) => {
 	// Fetch the user info from GitHub
 	const user = await new Octokit({ auth: accessToken }).rest.users.getAuthenticated();
 	const { login, name, email } = user.data;
+	if (login.toLowerCase() !== c.env.ALLOWED_GITHUB_LOGIN.toLowerCase()) {
+		console.error(JSON.stringify({ route: "GET /callback", error: "github_login_not_allowed", login }));
+		return c.text("GitHub account not allowed", 403);
+	}
 
 	// Return back to the MCP client a new token
 	const { redirectTo } = await c.env.OAUTH_PROVIDER.completeAuthorization({
@@ -202,5 +210,9 @@ app.get("/callback", async (c) => {
 		headers,
 	});
 });
+
+function errorMessage(error: unknown): string {
+	return error instanceof Error ? error.message : String(error);
+}
 
 export { app as GitHubHandler };

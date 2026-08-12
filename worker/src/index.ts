@@ -2,18 +2,11 @@ import OAuthProvider from "@cloudflare/workers-oauth-provider";
 import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler, getMcpAuthContext } from "agents/mcp/server";
 import { z } from "zod";
-import { canonicalUrl, commitTurn, getHeadSha, loadGame, readFile, type GitHubEnv } from "./github";
+import { canonicalUrl, commitTurn, getHeadSha, loadGame, readFile } from "./github";
 import { GitHubHandler } from "./github-handler";
+import type { VeyruneEnv } from "./env";
 import { eventFileForTurn, parseDocument } from "./validation.mjs";
 import type { Props } from "./utils";
-
-interface Env extends GitHubEnv {
-  OAUTH_KV: KVNamespace;
-  GITHUB_CLIENT_ID: string;
-  GITHUB_CLIENT_SECRET: string;
-  COOKIE_ENCRYPTION_KEY: string;
-  ALLOWED_GITHUB_LOGIN: string;
-}
 
 const PUBLIC_DOCUMENTS: Record<string, { title: string; path: string }> = {
   current: { title: "État canonique courant de Veyrune", path: "state/CURRENT.yaml" },
@@ -26,7 +19,7 @@ function textResult(text: string) {
   return { content: [{ type: "text" as const, text }] };
 }
 
-function assertOwner(env: Env) {
+function assertOwner(env: VeyruneEnv) {
   const props = getMcpAuthContext()?.props as Props | undefined;
   const login = props?.login;
   if (!login) throw new Error("identité GitHub absente");
@@ -35,7 +28,7 @@ function assertOwner(env: Env) {
   }
 }
 
-function createVeyruneServer(env: Env) {
+function createVeyruneServer(env: VeyruneEnv) {
   const server = new McpServer(
     { name: "veyrune-cloud-save", version: "1.0.0" },
     {
@@ -134,16 +127,16 @@ function createVeyruneServer(env: Env) {
 }
 
 const apiHandler = {
-  fetch(request: Request, env: Env, ctx: ExecutionContext) {
+  fetch(request: Request, env: VeyruneEnv, ctx: ExecutionContext) {
     return createMcpHandler(() => createVeyruneServer(env), { route: "/mcp" })(request, env, ctx);
   },
 };
 
-export default new OAuthProvider<Env>({
+export default new OAuthProvider<VeyruneEnv>({
   apiHandler,
   apiRoute: "/mcp",
   authorizeEndpoint: "/authorize",
   clientRegistrationEndpoint: "/register",
-  defaultHandler: GitHubHandler as ExportedHandler<Env>,
+  defaultHandler: GitHubHandler as ExportedHandler<VeyruneEnv>,
   tokenEndpoint: "/token",
 });
