@@ -18,12 +18,13 @@ Ce dépôt est la mémoire persistante de Veyrune. Une reprise ne doit jamais in
 - sauvegarde canonique récupérée : `VEY-0719`, tour `709` ;
 - tour technique conservé : `709` ;
 - fiction avancée : non ;
-- historique importé : non, reconstruction partielle en attente de sources attestées ;
+- source canonique principale : capsule `VEY_SAVE_V2` / `VEY-0719` fournie directement par le joueur ;
+- snapshot importé : complet ; historique événementiel reconstruit : partiel et limité aux faits récents attestés ;
 - prochaine sauvegarde autorisée : `VEY-0720` ;
 - parent obligatoire de cette prochaine sauvegarde : `VEY-0719R` ;
 - prochain tour obligatoire : `710`.
 
-`VEY-0719R` est un ancrage technique de récupération de `VEY-0719`. Le suffixe `R` ne modifie pas le tour. Il ne prétend pas reconstruire le contenu de `VEY-0719`, ne crée aucun événement fictif ancien et conserve donc le tour `709`.
+`VEY-0719R` est un ancrage technique de récupération de `VEY-0719`. Le suffixe `R` ne modifie pas le tour. Le snapshot complet vient de la capsule attestée ; le journal ne reconstruit que les événements récents qu’elle établit directement. Aucun événement causal ancien n’est déduit. Le checkpoint conserve donc le tour `709`.
 
 ## Écriture d’un nouveau tour
 

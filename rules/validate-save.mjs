@@ -30,6 +30,24 @@ function validateInstant(value, label) {
   }
 }
 
+function validateEventTime(value, label) {
+  if (typeof value === "string") return validateInstant(value, label);
+  if (!value || typeof value !== "object" || !Number.isInteger(value.year) || value.year < 1 || !Number.isInteger(value.day) || value.day < 1 || !/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value.clock)) {
+    fail(`${label}: date UTC ISO-8601 ou temps de campagne {year, day, clock} attendu`);
+  }
+}
+
+function assertNoHiddenMarkers(value, label, pathParts = []) {
+  if (value === "hidden") fail(`${label}: marqueur hidden interdit dans une projection joueur: ${pathParts.join(".")}`);
+  if (Array.isArray(value)) {
+    value.forEach((entry, index) => assertNoHiddenMarkers(entry, label, [...pathParts, index]));
+    return;
+  }
+  if (!value || typeof value !== "object") return;
+  if (value.status === "unresolved_hidden") fail(`${label}: enregistrement MJ interdit dans une projection joueur: ${pathParts.join(".")}`);
+  for (const [key, child] of Object.entries(value)) assertNoHiddenMarkers(child, label, [...pathParts, key]);
+}
+
 function assertNoHiddenKeys(value, label, pathParts = []) {
   if (Array.isArray(value)) {
     value.forEach((entry, index) => assertNoHiddenKeys(entry, label, [...pathParts, index]));
@@ -85,7 +103,16 @@ export function validateRepository(rootDir) {
   validateInstant(current.record_time, "CURRENT.record_time");
   assertNoHiddenKeys(current, "CURRENT");
   assertNoHiddenKeys(world, "WORLD");
+  assertNoHiddenMarkers(current, "CURRENT");
+  assertNoHiddenMarkers(world, "WORLD");
   if (hidden.audience !== "gm_only") fail("HIDDEN.audience doit valoir gm_only");
+  if (!Array.isArray(hidden.unresolved_secrets) || hidden.unresolved_secrets.length === 0) fail("HIDDEN.unresolved_secrets doit conserver les emplacements secrets non résolus");
+  for (const secret of hidden.unresolved_secrets) {
+    if (secret.status !== "unresolved_hidden" || secret.value_known_to_persistence !== false || secret.source !== "VEY-0719 marks this information as hidden") {
+      fail(`HIDDEN: valeur secrète inventée ou enregistrement invalide pour ${secret.path ?? "chemin inconnu"}`);
+    }
+  }
+  if (!Array.isArray(hidden.invented_secret_values) || hidden.invented_secret_values.length !== 0) fail("HIDDEN contient une valeur secrète inventée");
   if (world.audience !== "player_visible") fail("WORLD.audience doit valoir player_visible");
   for (const projection of [[world, "WORLD"], [hidden, "HIDDEN"]]) {
     if (projection[0].save_id !== current.save_id || projection[0].turn !== current.turn) {
@@ -99,7 +126,7 @@ export function validateRepository(rootDir) {
   for (const name of saveFiles) {
     const save = parseYamlSubset(path.join(savesDir, name));
     requireFields(save, ["save_id", "parent_save_id", "turn", "event_time", "record_time", "fiction_advanced"], name);
-    validateInstant(save.event_time, `${name}.event_time`);
+    validateEventTime(save.event_time, `${name}.event_time`);
     validateInstant(save.record_time, `${name}.record_time`);
     if (saves.has(save.save_id)) fail(`save_id dupliqué: ${save.save_id}`);
     saves.set(save.save_id, save);
@@ -136,7 +163,7 @@ export function validateRepository(rootDir) {
       let event;
       try { event = JSON.parse(lines[index]); } catch (error) { fail(`${name}:${index + 1}: JSON invalide`); }
       requireFields(event, ["event_id", "save_id", "parent_save_id", "turn", "event_time", "record_time"], `${name}:${index + 1}`);
-      validateInstant(event.event_time, `${event.event_id}.event_time`);
+      validateEventTime(event.event_time, `${event.event_id}.event_time`);
       validateInstant(event.record_time, `${event.event_id}.record_time`);
       if (eventIds.has(event.event_id)) fail(`event_id dupliqué: ${event.event_id}`);
       eventIds.add(event.event_id);
@@ -152,7 +179,7 @@ export function validateRepository(rootDir) {
     }
   }
   if (!lastEvent || lastEvent.event_id !== current.last_event_id) fail("CURRENT.last_event_id ne correspond pas au dernier événement");
-  return { current, saves: saves.size, events: eventIds.size };
+  return { current, world, hidden, saves: saves.size, events: eventIds.size };
 }
 
 const invokedDirectly = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
