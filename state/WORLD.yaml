@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0719R",
-  "turn": 709,
+  "save_id": "VEY-0720",
+  "turn": 710,
   "canonical_source": {
     "type": "player_supplied_save_capsule",
     "save_id": "VEY-0719",
@@ -12,7 +12,7 @@
   "time": {
     "year": 347,
     "day": 513,
-    "clock": "01:24"
+    "clock": "01:25"
   },
   "scene": {
     "region": "Valdorne",
@@ -24,14 +24,9 @@
     "meeting_active": true
   },
   "last_action": {
-    "dialogue": [
-      "Tu n’es pas Meren."
-    ],
-    "intent": {
-      "test_contact_reaction": true,
-      "force_identity_confirmation": false,
-      "attack": false
-    }
+    "actor": "Mehdi",
+    "dialogue": "Tu sais ce que tu as fait ?",
+    "intent": "confront_contact_about_consequences"
   },
   "observed_test_result": {
     "dice": [
@@ -96,7 +91,18 @@
     },
     "concealed_weapons": "unknown",
     "stats": "unknown",
-    "intent": "unknown"
+    "intent": "unknown",
+    "latest_response": {
+      "exact_dialogue": [
+        "Laquelle de mes actions ?",
+        "Tu as éventré des relais, laissé des hommes derrière toi et traversé Valdorne avec mon nom à la bouche.",
+        "Si tu veux une réponse, cesse de me faire deviner ton accusation."
+      ],
+      "identity_confirmation": false,
+      "identity_denial": false,
+      "hostile_action_started": false,
+      "demands_specific_accusation": true
+    }
   },
   "bridge_site": {
     "known_environment": {
@@ -438,7 +444,8 @@
       "bridge_security_unknown": true,
       "contact_identity_test_inconclusive": true,
       "Aveline_outside_direct_meeting": true,
-      "bound_runner_with_Aveline": true
+      "bound_runner_with_Aveline": true,
+      "specify_accusation_to_bridge_contact": true
     },
     "broader": {
       "Maison_des_Saules_not_secured": true,
