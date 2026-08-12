@@ -1,0 +1,1210 @@
+{
+  "persistence_version": 1,
+  "save_id": "VEY-0719R",
+  "parent_save_id": null,
+  "recovery_of_save_id": "VEY-0719",
+  "turn": 709,
+  "checkpoint_kind": "technical_recovery",
+  "fiction_advanced": false,
+  "event_time": {
+    "year": 347,
+    "day": 513,
+    "clock": "01:24"
+  },
+  "record_time": "2026-08-12T10:17:45Z",
+  "last_event_id": "EVT-0719R-0008",
+  "canonical_source": {
+    "type": "player_supplied_save_capsule",
+    "save_id": "VEY-0719",
+    "canonical": true,
+    "completeness": "snapshot_complete_event_history_partial"
+  },
+  "canonical_state_ref": "state/CURRENT.yaml",
+  "world_state_ref": "state/WORLD.yaml",
+  "hidden_state_ref": "state/HIDDEN.yaml",
+  "meta": {
+    "campaign": "cendres-avarre",
+    "ruleset": "veyrune-3.5",
+    "runtime_rules": "V3.2.2",
+    "mortality_mode": "FER_NOIR_STRICT",
+    "save_id": "VEY-0719",
+    "parent_save_id": "VEY-0718",
+    "turn": 709,
+    "canonical": true
+  },
+  "integrity": {
+    "continuity_status": "valid",
+    "chronology_status": "valid",
+    "epistemic_status": "valid",
+    "npc_autonomy_status": "valid",
+    "knowledge_firewall_status": "valid",
+    "player_agency_status": "strict",
+    "dice_status": "strict",
+    "no_fudging": true
+  },
+  "time": {
+    "year": 347,
+    "day": 513,
+    "clock": "01:24"
+  },
+  "scene": {
+    "region": "Valdorne",
+    "district": "Pont_des_Trois_Chaines",
+    "location": "culee_est",
+    "time_of_day": "night",
+    "combat_active": false,
+    "tactical_alert": "very_high",
+    "meeting_active": true
+  },
+  "player_declared_action": {
+    "dialogue": [
+      "Tu n’es pas Meren."
+    ],
+    "intent": {
+      "test_contact_reaction": true,
+      "force_identity_confirmation": false,
+      "attack": false
+    }
+  },
+  "reaction_read": {
+    "dice": [
+      7,
+      5
+    ],
+    "instinct": 1,
+    "vigilance": 2,
+    "total": 15,
+    "DD": 17,
+    "margin": -2,
+    "result": "narrow_reversal",
+    "observed": {
+      "possible_minor_eye_tension": true
+    },
+    "reliable_conclusion": {
+      "contact_is_Meren": false,
+      "contact_is_not_Meren": false,
+      "deception_detected": false
+    },
+    "interpretation": {
+      "reaction_is_ambiguous": true,
+      "could_be_annoyance_or_concealment_or_other": true
+    }
+  },
+  "bridge_contact": {
+    "status": {
+      "alive": true,
+      "conscious": true,
+      "visible": true,
+      "hostile_action_started": false,
+      "weapon_visible_in_hands": false
+    },
+    "apparent_description": {
+      "gender": "male",
+      "age": "approximately_40_plus",
+      "hair": "dark_with_gray",
+      "clothing": "sober_travel_coat"
+    },
+    "position": {
+      "under_east_arch": true,
+      "near_low_river_parapet": true,
+      "approximately_8m_from_Mehdi": true
+    },
+    "response": {
+      "refuses_to_confirm_or_deny_identity": true,
+      "remains_composed": true,
+      "does_not_attack": true
+    },
+    "dialogue": [
+      "C’est possible.",
+      "C’est aussi possible que je sois Meren et que je trouve amusant que tu aies détruit plusieurs relais simplement pour venir m’expliquer qui je suis.",
+      "Si ton premier objectif était de me tester, considère que tu l’as fait.",
+      "Maintenant, Mehdi... tu as risqué beaucoup pour arriver ici.",
+      "Alors soit tu continues à jouer avec mon nom, soit tu poses enfin la question qui justifiait tout ça."
+    ],
+    "identity": {
+      "whether_Meren": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "true_identity": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "exact_role": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "affiliation": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "relation_to_Sarel": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "relation_to_Fer": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    },
+    "concealed_weapons": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "stats": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "intent": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    }
+  },
+  "bridge_site": {
+    "known_environment": {
+      "east_abutment": true,
+      "paved_path_to_water": true,
+      "closed_maintenance_door": true,
+      "two_stair_routes_to_bridge": true,
+      "small_moored_boat_below": true,
+      "no_visible_open_guard": true,
+      "no_obvious_crossbowman": true
+    },
+    "hidden": {
+      "watchers": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "guards": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "traps": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "maintenance_door_contents": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "boat_true_status": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "alternate_escape_routes": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "reinforcements": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    }
+  },
+  "M_reply": {
+    "exact_text": "Pont des Trois Chaînes. Culée est. 01 h 25. Mehdi seul. Pas de prisonnier. Pas de messager. Tu parles. Je décide si je reste. — M.",
+    "current_compliance": {
+      "Mehdi_visible_alone": true,
+      "prisoner_present": false,
+      "messenger_present": false,
+      "Aveline_visible": false
+    },
+    "authenticity": {
+      "author_identity": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "whether_current_contact_wrote_it": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "whether_M_is_Meren": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    }
+  },
+  "Meren": {
+    "alias_known": "Meren",
+    "true_identity": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "affiliation": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "motive": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "current_location": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "whether_current_bridge_contact_is_Meren": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "Mehdi_goal": {
+      "ask_questions": true,
+      "immediate_declared_kill_intent": false,
+      "believes_chain_of_events_originates_from_Meren": true
+    }
+  },
+  "Mehdi": {
+    "status": {
+      "alive": true,
+      "conscious": true,
+      "combat_capable": true
+    },
+    "endurance": {
+      "current": 8,
+      "max": 14
+    },
+    "defense": 13,
+    "protection": 3,
+    "resolution": {
+      "current": 2,
+      "max": 2
+    },
+    "fatigue": 0,
+    "corruption": 0,
+    "reaction_available": true,
+    "exposed": false,
+    "current_posture": {
+      "highly_wary": true,
+      "Yared_drawn": true,
+      "no_preemptive_attack": true,
+      "testing_contact_identity": true
+    },
+    "wounds": {
+      "superficial_hip_cut": true,
+      "superficial_crossbow_flank_wound": true,
+      "superficial_upper_arm_cut": true,
+      "superficial_flank_blade_cut": true,
+      "moderate_flank_torso_blade_wound": {
+        "grave": false,
+        "permanent": false
+      }
+    },
+    "capabilities": {
+      "vigor": 5,
+      "address": 1,
+      "instinct": 1,
+      "reason": 0,
+      "will": 2,
+      "presence": 1
+    },
+    "masteries": {
+      "melee": 3,
+      "athletics": 3,
+      "intimidation": 2,
+      "vigilance": 2,
+      "survival": 1,
+      "research": 0,
+      "stealth": 0,
+      "influence": 0,
+      "tir": 0,
+      "commandement": 0
+    },
+    "techniques": [
+      "heavy_strike",
+      "sweep",
+      "guard_break",
+      "engagement",
+      "fermer_la_porte"
+    ],
+    "equipment": {
+      "Yared": {
+        "type": "greatsword",
+        "damage": 5,
+        "condition": 2,
+        "drawn": true
+      },
+      "reinforced_mail": {
+        "protection": 3,
+        "condition": 2
+      },
+      "utility_knife": {
+        "sheathed": true
+      },
+      "key_network_items": {
+        "dark_wooden_piece": {
+          "marking": "three_short_marks_joined_by_oblique_cut",
+          "meaning": {
+            "status": "unresolved_hidden",
+            "value_known_to_persistence": false,
+            "source": "VEY-0719 marks this information as hidden"
+          }
+        },
+        "Mira_marked_scrap": {
+          "marking": "circle_crossed_by_two_vertical_lines",
+          "meaning": {
+            "status": "unresolved_hidden",
+            "value_known_to_persistence": false,
+            "source": "VEY-0719 marks this information as hidden"
+          }
+        },
+        "Veilleuse_copper_plate": {
+          "marking": "three_dots_in_triangle",
+          "known_use": "contact_signal_template",
+          "deeper_meaning": {
+            "status": "unresolved_hidden",
+            "value_known_to_persistence": false,
+            "source": "VEY-0719 marks this information as hidden"
+          }
+        },
+        "courier_message": {
+          "text": "Saule perdu. Bas compromis. Fermer Verre et Ronce. S. seulement après confirmation."
+        },
+        "Fer_reply": {
+          "text": "Pont des Trois Chaînes. Culée est. 01 h 25. Mehdi seul. Pas de prisonnier. Pas de messager. Tu parles. Je décide si je reste. — M."
+        }
+      },
+      "confiscated_weapons": {
+        "Veilleuse_narrow_knife": true,
+        "Mira_short_blade": true,
+        "Mira_flat_knife": true,
+        "rear_runner_work_knife": true,
+        "first_fugitive_narrow_blade": true,
+        "first_fugitive_boot_knife": true
+      },
+      "other_items": {
+        "Mira_brass_key": true,
+        "iron_keys": 2,
+        "steel_awl": true,
+        "network_documents": true,
+        "gray_chalk": true,
+        "black_wax": true,
+        "fine_cord_lengths": 2
+      }
+    },
+    "resources": {
+      "personal_crowns": 246,
+      "medicine": 2,
+      "rations": 0,
+      "water_days": 0,
+      "T9_g": 10
+    },
+    "unallocated_recovered_money": {
+      "first_fugitive": "7c 5s",
+      "Mira": "4c 9s",
+      "Veilleuse_claimant": "9c 8s",
+      "rear_rooftop_fugitive": "3c 4s"
+    },
+    "unresolved_split_with_Aveline": {
+      "jointly_relevant_recent_crowns": 230,
+      "split_decided": false
+    }
+  },
+  "Aveline_Sor": {
+    "status": {
+      "alive": true,
+      "conscious": true,
+      "combat_capable": true
+    },
+    "endurance": {
+      "current": 11,
+      "max": 12
+    },
+    "defense": 15,
+    "protection": 3,
+    "fatigue": 0,
+    "reaction_available": true,
+    "capabilities": {
+      "vigor": 2,
+      "address": 3,
+      "instinct": 2,
+      "reason": 1,
+      "will": 2,
+      "presence": 1
+    },
+    "masteries": {
+      "melee": 4,
+      "athletics": 3,
+      "vigilance": 3,
+      "stealth": 0,
+      "influence": 0
+    },
+    "techniques": [
+      "angle_vivant",
+      "interception_d_amorce"
+    ],
+    "current_position": {
+      "outside_direct_meeting_zone": true,
+      "exact_position": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "with_bound_runner": true,
+      "not_visible_beside_Mehdi": true
+    },
+    "knowledge": {
+      "cannot_hear_exact_current_exchange": true,
+      "knows_meeting_location_and_conditions": true
+    },
+    "current_behavior": {
+      "guards_runner": true,
+      "operational": true,
+      "autonomous": true,
+      "no_mockery": true,
+      "no_sarcasm": true
+    },
+    "relationship_with_Mehdi": {
+      "trust": 10,
+      "respect": 7,
+      "fear": 9,
+      "desire": 10,
+      "resentment": 3,
+      "suspicion": 6,
+      "mutual_explicit_love": true,
+      "romantic_exclusivity": true,
+      "sexual_exclusivity": true,
+      "completed_greater_intimacy_count": 8,
+      "current_conflict": {
+        "resolved": false,
+        "severity": "moderate",
+        "operationally_deferred": true,
+        "values_conflict_still_present": true
+      },
+      "pending_private_conversation": {
+        "active": true,
+        "original_subject_from_Mehdi": "unknown_to_Aveline",
+        "values_conflict_discussion_pending": true
+      },
+      "companion_pact": {
+        "id": "COMPAGNONS_ARMES_RECIPROQUES_01",
+        "active": true,
+        "reciprocal": true,
+        "autonomous": true
+      }
+    }
+  },
+  "rear_rooftop_fugitive": {
+    "status": {
+      "alive": true,
+      "conscious": true,
+      "restrained": true,
+      "searched": true,
+      "disarmed": true,
+      "combat_capability": "severely_limited",
+      "with_Aveline": true
+    },
+    "identity": {
+      "true_identity": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "likely_message_runner": true,
+      "exact_role": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "affiliation": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    }
+  },
+  "Ilyne_claimed": {
+    "claimed_name": "Ilyne",
+    "true_name_verified": false,
+    "last_known_location": "door_XI",
+    "current_activity": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "true_identity": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "exact_role": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "affiliation": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "Meren_connection": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    }
+  },
+  "Veilleuse_claimant": {
+    "last_known": {
+      "alive": true,
+      "released_by_Mehdi": true,
+      "departed_alone": true
+    },
+    "promise_honored": true,
+    "current_location": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "true_identity": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "exact_role": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "affiliation": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    }
+  },
+  "Mira_Veln_claimed": {
+    "last_known": {
+      "alive": true,
+      "conscious": true,
+      "bound": true,
+      "disarmed": true,
+      "lower_leg_fracture": true,
+      "mobility_severely_impaired": true,
+      "left_at_Maison_des_Saules_descent": true
+    },
+    "current_exact_status": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "actual_identity": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "true_role": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    }
+  },
+  "crossbow_defender_at_Maison": {
+    "last_known": {
+      "alive": true,
+      "conscious": true,
+      "grave_closed_lower_leg_fracture": true,
+      "crossbow_out_of_reach": true
+    },
+    "current_exact_status": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "identity": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    }
+  },
+  "first_captured_fugitive": {
+    "last_known": {
+      "alive": true,
+      "conscious": true,
+      "bound": true,
+      "disarmed": true,
+      "courtyard_wall_at_Maison_des_Saules": true
+    },
+    "current_exact_status": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "identity": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "role": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    }
+  },
+  "Maison_des_Saules": {
+    "status": "breached_not_secured",
+    "party_currently_absent": true,
+    "unresolved_search_targets": {
+      "brass_cabinet": {
+        "unopened": true,
+        "claimed_recent_relay_records": true
+      },
+      "closed_upper_room": {
+        "unsearched": true,
+        "claimed_dead_archives": true
+      },
+      "hidden_desk_compartment": {
+        "unverified": true,
+        "claimed_pending_or_destroyable_messages": true
+      }
+    },
+    "hazards": {
+      "lower_warning_line": {
+        "intact_last_known": true,
+        "function": {
+          "status": "unresolved_hidden",
+          "value_known_to_persistence": false,
+          "source": "VEY-0719 marks this information as hidden"
+        }
+      },
+      "upper_floor_ring": {
+        "detected": true,
+        "function": {
+          "status": "unresolved_hidden",
+          "value_known_to_persistence": false,
+          "source": "VEY-0719 marks this information as hidden"
+        }
+      }
+    },
+    "current_site_state": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "remaining_occupancy": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    }
+  },
+  "second_building": {
+    "secured": false,
+    "first_occupant_status": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "gravely_wounded_second_occupant_status": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    }
+  },
+  "other_unresolved_people": {
+    "Deren_Voss_claimed": {
+      "last_known_alive": true,
+      "bound": true,
+      "current_status": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    },
+    "first_storage_woman": {
+      "last_known_alive": true,
+      "bound": true,
+      "current_status": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    },
+    "Calven_Rhos_claimed": {
+      "last_known_alive": true,
+      "grave_bleeding_wound": true,
+      "left_without_aid": true,
+      "survival": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    },
+    "recovery_bag": {
+      "searched": false,
+      "contents": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    },
+    "original_direct_site": {
+      "known_dead": 2,
+      "survivor_states": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    }
+  },
+  "dead_drop": {
+    "location": "lower_lock_old_gauge_post",
+    "current_status": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "collection": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    },
+    "response": {
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false,
+      "source": "VEY-0719 marks this information as hidden"
+    }
+  },
+  "first_storage_intelligence": {
+    "codes": [
+      "9 / Cendre / reçu",
+      "4 / Verre / transmis",
+      "11 / Fer / attendu",
+      "Ronce suspendue"
+    ],
+    "interpretation": {
+      "Fer": {
+        "number": 11,
+        "passage": "strongly_supported",
+        "bridge_meeting_reached": true
+      },
+      "Cendre": {
+        "unresolved": true
+      }
+    }
+  },
+  "economy": {
+    "personal_crowns": 246,
+    "rich_threshold_crowns": 2000,
+    "unresolved_joint_split_with_Aveline": 230,
+    "sous_per_crown": 12,
+    "crowns_per_silver_mark": 20
+  },
+  "QT": {
+    "Mehdi_status": {
+      "external_proven_contractor": true,
+      "formal_member": false,
+      "oath_taken": false
+    },
+    "QT_02": {
+      "complete": true,
+      "Corven_Drahl_alive": true,
+      "reward": 60
+    },
+    "QT_03": {
+      "complete": true,
+      "Teren_alive_in_QT_custody": true,
+      "Oren_alive_in_QT_custody": true,
+      "total_paid": 110
+    },
+    "Varek": {
+      "identity": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "rank": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "wealth": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    }
+  },
+  "densification": {
+    "current_vigor": 5,
+    "first_densification": {
+      "V3_to_V4": "complete",
+      "sequenced_T9": true
+    },
+    "second_densification": {
+      "V4_to_V5": "complete",
+      "asynchronous_C_B_A_bridge": true,
+      "stable": true
+    },
+    "T9_usable_g": 10,
+    "structural_bottlenecks": [
+      "tendon_insertions",
+      "joint_interfaces",
+      "deep_support_networks",
+      "regional_force_distribution"
+    ],
+    "armature_research": {
+      "active": true,
+      "funding_route": "money",
+      "exact_budget": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "exact_protocol": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "exact_materials": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "exact_specialists": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "exact_T9_requirement": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    },
+    "third_densification": {
+      "not_started": true,
+      "V6_guaranteed": false
+    }
+  },
+  "other_relationships": {
+    "Sive": {
+      "trust": 10,
+      "respect": 9,
+      "fear": 4,
+      "interest": 10,
+      "dependence": 4,
+      "intimacy": 2,
+      "location": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    },
+    "Lysa": {
+      "relationship": "close_companionship",
+      "location": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    },
+    "Aldren": {
+      "moral_conflict_unresolved": true,
+      "location": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    }
+  },
+  "open_threads": {
+    "immediate": {
+      "ask_bridge_contact_actual_questions": true,
+      "determine_whether_contact_is_Meren": "unresolved",
+      "bridge_security_unknown": true,
+      "contact_identity_test_inconclusive": true,
+      "Aveline_outside_direct_meeting": true,
+      "bound_runner_with_Aveline": true
+    },
+    "broader": {
+      "Maison_des_Saules_not_secured": true,
+      "brass_cabinet_unopened": true,
+      "closed_upper_room_unsearched": true,
+      "hidden_desk_compartment_unverified": true,
+      "Mira_current_status_hidden": true,
+      "first_fugitive_current_status_hidden": true,
+      "crossbow_defender_current_status_hidden": true,
+      "dead_drop_status_hidden": true,
+      "recovery_bag_unsearched": true,
+      "second_building_not_secured": true,
+      "Aveline_private_conversation_pending": true,
+      "split_230_unresolved": true,
+      "armature_research_active": true,
+      "fourth_furnace": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    }
+  },
+  "hidden_state": {
+    "preserved": true,
+    "bridge_contact": {
+      "whether_Meren": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "true_identity": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "exact_role": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "affiliation": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "concealed_weapons": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "stats": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "intent": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "truthful_reaction_to_test": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    },
+    "bridge_site": {
+      "watchers": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "guards": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "traps": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "boat_true_status": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "maintenance_door_contents": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "alternate_escape_routes": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "reinforcements": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    },
+    "Meren": {
+      "true_identity": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "affiliation": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "current_location": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "motive": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    },
+    "claimed_Sarel": {
+      "true_identity": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "whether_actual_Sarel": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "exact_role": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "affiliation": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "Meren_connection": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    },
+    "other": {
+      "leak_source": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "internal_traitor": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "fourth_furnace": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "Varek_identity_rank_wealth": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "armature_details": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "Sive_location": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "Lysa_location": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      },
+      "Aldren_location": {
+        "status": "unresolved_hidden",
+        "value_known_to_persistence": false,
+        "source": "VEY-0719 marks this information as hidden"
+      }
+    }
+  },
+  "mechanics": {
+    "version": "V3.2.2",
+    "core": {
+      "formula": "2d10 + Capacité + Maîtrise + modificateurs"
+    },
+    "social_read": {
+      "method": "Instinct + Vigilance",
+      "total": 15,
+      "DD": 17,
+      "margin": -2,
+      "result": "narrow_reversal",
+      "consequence": "no_reliable_identity_tell"
+    },
+    "combat": {
+      "active": false,
+      "Mehdi_reaction_available": true,
+      "Fermer_la_porte_available": true,
+      "Aveline_reaction_available": true
+    },
+    "information_limits": {
+      "ambiguous_reaction_does_not_confirm_identity": true,
+      "refusal_to_confirm_or_deny_does_not_prove_identity": true,
+      "no_visible_hostility_does_not_guarantee_safety": true
+    },
+    "no_world_scaling": true,
+    "no_plot_armor": true,
+    "symmetric_rules": true
+  },
+  "interactive_novel_mode": {
+    "active": true,
+    "Mehdi_routine_autonomy_allowed": true,
+    "key_decisions_reserved_to_player": true,
+    "player_authorized": {
+      "test_contact_by_asserting_he_is_not_Meren": true
+    },
+    "not_invented": {
+      "belief_that_contact_is_not_Meren": true,
+      "attack": true,
+      "threat": true,
+      "trust_contact": true,
+      "specific_question_beyond_identity_test": true
+    },
+    "reserved_now": {
+      "ask_actual_questions": "player_choice",
+      "demand_proof_of_identity": "player_choice",
+      "attack_or_threaten": "player_choice",
+      "leave_meeting": "player_choice",
+      "any_irreversible_action": "player_choice"
+    }
+  },
+  "FER_NOIR_STRICT": {
+    "Mehdi_permadeath": true,
+    "Aveline_permadeath": true,
+    "companion_permadeath": true,
+    "NPC_deaths_irreversible": true,
+    "permanent_mutilation_possible": true,
+    "no_rewind_or_fudge": true
+  },
+  "gm_commitments": [
+    "Mehdi states 'Tu n’es pas Meren' as a test rather than an established fact.",
+    "The attempt to read the man's reaction resolves at 15 vs DD17, a narrow failure.",
+    "Mehdi notices only an ambiguous minor facial tension and obtains no reliable conclusion.",
+    "The man neither confirms nor denies being Meren.",
+    "No hidden identity information is leaked from the failed test.",
+    "No combat begins and no weapon is raised by the contact.",
+    "Aveline remains outside the direct meeting zone with the bound runner and cannot hear the exact exchange.",
+    "All bridge security, hidden observers, concealed weapons, the contact's true identity, and Meren's true identity remain hidden."
+  ],
+  "history": {
+    "status": "partial_reconstruction",
+    "note": "Snapshot canonique complet importé ; seuls les événements récents directement attestés ont été reconstruits."
+  },
+  "next_expected_save": {
+    "save_id": "VEY-0720",
+    "parent_save_id": "VEY-0719R",
+    "turn": 710
+  }
+}

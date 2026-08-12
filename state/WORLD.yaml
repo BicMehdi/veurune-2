@@ -1,0 +1,493 @@
+{
+  "persistence_version": 1,
+  "audience": "player_visible",
+  "save_id": "VEY-0719R",
+  "turn": 709,
+  "canonical_source": {
+    "type": "player_supplied_save_capsule",
+    "save_id": "VEY-0719",
+    "canonical": true,
+    "completeness": "snapshot_complete_event_history_partial"
+  },
+  "time": {
+    "year": 347,
+    "day": 513,
+    "clock": "01:24"
+  },
+  "scene": {
+    "region": "Valdorne",
+    "district": "Pont_des_Trois_Chaines",
+    "location": "culee_est",
+    "time_of_day": "night",
+    "combat_active": false,
+    "tactical_alert": "very_high",
+    "meeting_active": true
+  },
+  "last_action": {
+    "dialogue": [
+      "Tu n’es pas Meren."
+    ],
+    "intent": {
+      "test_contact_reaction": true,
+      "force_identity_confirmation": false,
+      "attack": false
+    }
+  },
+  "observed_test_result": {
+    "dice": [
+      7,
+      5
+    ],
+    "instinct": 1,
+    "vigilance": 2,
+    "total": 15,
+    "DD": 17,
+    "margin": -2,
+    "result": "narrow_reversal",
+    "observed": {
+      "possible_minor_eye_tension": true
+    },
+    "reliable_conclusion": {
+      "contact_is_Meren": false,
+      "contact_is_not_Meren": false,
+      "deception_detected": false
+    },
+    "interpretation": {
+      "reaction_is_ambiguous": true,
+      "could_be_annoyance_or_concealment_or_other": true
+    }
+  },
+  "bridge_contact": {
+    "status": {
+      "alive": true,
+      "conscious": true,
+      "visible": true,
+      "hostile_action_started": false,
+      "weapon_visible_in_hands": false
+    },
+    "apparent_description": {
+      "gender": "male",
+      "age": "approximately_40_plus",
+      "hair": "dark_with_gray",
+      "clothing": "sober_travel_coat"
+    },
+    "position": {
+      "under_east_arch": true,
+      "near_low_river_parapet": true,
+      "approximately_8m_from_Mehdi": true
+    },
+    "response": {
+      "refuses_to_confirm_or_deny_identity": true,
+      "remains_composed": true,
+      "does_not_attack": true
+    },
+    "dialogue": [
+      "C’est possible.",
+      "C’est aussi possible que je sois Meren et que je trouve amusant que tu aies détruit plusieurs relais simplement pour venir m’expliquer qui je suis.",
+      "Si ton premier objectif était de me tester, considère que tu l’as fait.",
+      "Maintenant, Mehdi... tu as risqué beaucoup pour arriver ici.",
+      "Alors soit tu continues à jouer avec mon nom, soit tu poses enfin la question qui justifiait tout ça."
+    ],
+    "identity": {
+      "whether_Meren": "unresolved",
+      "true_identity": "unresolved",
+      "exact_role": "unresolved",
+      "affiliation": "unresolved"
+    },
+    "concealed_weapons": "unknown",
+    "stats": "unknown",
+    "intent": "unknown"
+  },
+  "bridge_site": {
+    "known_environment": {
+      "east_abutment": true,
+      "paved_path_to_water": true,
+      "closed_maintenance_door": true,
+      "two_stair_routes_to_bridge": true,
+      "small_moored_boat_below": true,
+      "no_visible_open_guard": true,
+      "no_obvious_crossbowman": true
+    },
+    "security_status": "unknown"
+  },
+  "M_reply": {
+    "exact_text": "Pont des Trois Chaînes. Culée est. 01 h 25. Mehdi seul. Pas de prisonnier. Pas de messager. Tu parles. Je décide si je reste. — M.",
+    "current_compliance": {
+      "Mehdi_visible_alone": true,
+      "prisoner_present": false,
+      "messenger_present": false,
+      "Aveline_visible": false
+    },
+    "authenticity": "unresolved"
+  },
+  "Mehdi": {
+    "status": {
+      "alive": true,
+      "conscious": true,
+      "combat_capable": true
+    },
+    "endurance": {
+      "current": 8,
+      "max": 14
+    },
+    "defense": 13,
+    "protection": 3,
+    "resolution": {
+      "current": 2,
+      "max": 2
+    },
+    "fatigue": 0,
+    "corruption": 0,
+    "reaction_available": true,
+    "exposed": false,
+    "current_posture": {
+      "highly_wary": true,
+      "Yared_drawn": true,
+      "no_preemptive_attack": true,
+      "testing_contact_identity": true
+    },
+    "wounds": {
+      "superficial_hip_cut": true,
+      "superficial_crossbow_flank_wound": true,
+      "superficial_upper_arm_cut": true,
+      "superficial_flank_blade_cut": true,
+      "moderate_flank_torso_blade_wound": {
+        "grave": false,
+        "permanent": false
+      }
+    },
+    "capabilities": {
+      "vigor": 5,
+      "address": 1,
+      "instinct": 1,
+      "reason": 0,
+      "will": 2,
+      "presence": 1
+    },
+    "masteries": {
+      "melee": 3,
+      "athletics": 3,
+      "intimidation": 2,
+      "vigilance": 2,
+      "survival": 1,
+      "research": 0,
+      "stealth": 0,
+      "influence": 0,
+      "tir": 0,
+      "commandement": 0
+    },
+    "techniques": [
+      "heavy_strike",
+      "sweep",
+      "guard_break",
+      "engagement",
+      "fermer_la_porte"
+    ],
+    "equipment": {
+      "Yared": {
+        "type": "greatsword",
+        "damage": 5,
+        "condition": 2,
+        "drawn": true
+      },
+      "reinforced_mail": {
+        "protection": 3,
+        "condition": 2
+      },
+      "utility_knife": {
+        "sheathed": true
+      },
+      "key_network_items": {
+        "dark_wooden_piece": {
+          "marking": "three_short_marks_joined_by_oblique_cut"
+        },
+        "Mira_marked_scrap": {
+          "marking": "circle_crossed_by_two_vertical_lines"
+        },
+        "Veilleuse_copper_plate": {
+          "marking": "three_dots_in_triangle",
+          "known_use": "contact_signal_template"
+        },
+        "courier_message": {
+          "text": "Saule perdu. Bas compromis. Fermer Verre et Ronce. S. seulement après confirmation."
+        },
+        "Fer_reply": {
+          "text": "Pont des Trois Chaînes. Culée est. 01 h 25. Mehdi seul. Pas de prisonnier. Pas de messager. Tu parles. Je décide si je reste. — M."
+        }
+      },
+      "confiscated_weapons": {
+        "Veilleuse_narrow_knife": true,
+        "Mira_short_blade": true,
+        "Mira_flat_knife": true,
+        "rear_runner_work_knife": true,
+        "first_fugitive_narrow_blade": true,
+        "first_fugitive_boot_knife": true
+      },
+      "other_items": {
+        "Mira_brass_key": true,
+        "iron_keys": 2,
+        "steel_awl": true,
+        "network_documents": true,
+        "gray_chalk": true,
+        "black_wax": true,
+        "fine_cord_lengths": 2
+      }
+    },
+    "resources": {
+      "personal_crowns": 246,
+      "medicine": 2,
+      "rations": 0,
+      "water_days": 0,
+      "T9_g": 10
+    },
+    "unallocated_recovered_money": {
+      "first_fugitive": "7c 5s",
+      "Mira": "4c 9s",
+      "Veilleuse_claimant": "9c 8s",
+      "rear_rooftop_fugitive": "3c 4s"
+    },
+    "unresolved_split_with_Aveline": {
+      "jointly_relevant_recent_crowns": 230,
+      "split_decided": false
+    }
+  },
+  "Aveline": {
+    "status": {
+      "alive": true,
+      "conscious": true,
+      "combat_capable": true
+    },
+    "endurance": {
+      "current": 11,
+      "max": 12
+    },
+    "defense": 15,
+    "protection": 3,
+    "fatigue": 0,
+    "current_position": {
+      "outside_direct_meeting_zone": true,
+      "exact_position": "unknown",
+      "with_bound_runner": true,
+      "not_visible_beside_Mehdi": true
+    },
+    "knowledge": {
+      "cannot_hear_exact_current_exchange": true,
+      "knows_meeting_location_and_conditions": true
+    },
+    "current_behavior": {
+      "guards_runner": true,
+      "operational": true,
+      "autonomous": true,
+      "no_mockery": true,
+      "no_sarcasm": true
+    },
+    "known_relationship_facts": {
+      "mutual_explicit_love": true,
+      "romantic_exclusivity": true,
+      "sexual_exclusivity": true,
+      "current_conflict": {
+        "resolved": false,
+        "severity": "moderate",
+        "operationally_deferred": true,
+        "values_conflict_still_present": true
+      },
+      "pending_private_conversation": {
+        "active": true,
+        "original_subject_from_Mehdi": "unknown_to_Aveline",
+        "values_conflict_discussion_pending": true
+      },
+      "companion_pact": {
+        "id": "COMPAGNONS_ARMES_RECIPROQUES_01",
+        "active": true,
+        "reciprocal": true,
+        "autonomous": true
+      }
+    }
+  },
+  "known_people": {
+    "bound_runner": {
+      "last_observed_status": {
+        "alive": true,
+        "conscious": true,
+        "restrained": true,
+        "searched": true,
+        "disarmed": true,
+        "combat_capability": "severely_limited",
+        "with_Aveline": true
+      },
+      "identity": "unresolved"
+    },
+    "Ilyne": {
+      "name_status": "claimed",
+      "claimed_name": "Ilyne",
+      "true_name_verified": false,
+      "last_known_location": "door_XI",
+      "current_activity": "unknown"
+    },
+    "Veilleuse_claimant": {
+      "last_known": {
+        "alive": true,
+        "released_by_Mehdi": true,
+        "departed_alone": true
+      },
+      "promise_honored": true,
+      "current_location": "unknown"
+    },
+    "Mira_Veln_claimed": {
+      "name_status": "claimed",
+      "last_known": {
+        "alive": true,
+        "conscious": true,
+        "bound": true,
+        "disarmed": true,
+        "lower_leg_fracture": true,
+        "mobility_severely_impaired": true,
+        "left_at_Maison_des_Saules_descent": true
+      },
+      "current_exact_status": "unknown"
+    },
+    "Sarel": {
+      "name_status": "claimed",
+      "identity_verified": false,
+      "true_identity": "unresolved"
+    }
+  },
+  "known_places": {
+    "Maison_des_Saules": {
+      "status": "breached_not_secured",
+      "party_currently_absent": true,
+      "unresolved_search_targets": {
+        "brass_cabinet": {
+          "unopened": true,
+          "claimed_recent_relay_records": true
+        },
+        "closed_upper_room": {
+          "unsearched": true,
+          "claimed_dead_archives": true
+        },
+        "hidden_desk_compartment": {
+          "unverified": true,
+          "claimed_pending_or_destroyable_messages": true
+        }
+      },
+      "current_site_state": "unknown"
+    },
+    "second_building": {
+      "secured": false,
+      "occupant_states": "unknown"
+    }
+  },
+  "economy": {
+    "personal_crowns": 246,
+    "rich_threshold_crowns": 2000,
+    "unresolved_joint_split_with_Aveline": 230,
+    "sous_per_crown": 12,
+    "crowns_per_silver_mark": 20
+  },
+  "QT": {
+    "Mehdi_status": {
+      "external_proven_contractor": true,
+      "formal_member": false,
+      "oath_taken": false
+    },
+    "QT_02": {
+      "complete": true,
+      "Corven_Drahl_alive": true,
+      "reward": 60
+    },
+    "QT_03": {
+      "complete": true,
+      "Teren_alive_in_QT_custody": true,
+      "Oren_alive_in_QT_custody": true,
+      "total_paid": 110
+    },
+    "Varek": "unresolved"
+  },
+  "densification": {
+    "current_vigor": 5,
+    "first_densification": {
+      "V3_to_V4": "complete",
+      "sequenced_T9": true
+    },
+    "second_densification": {
+      "V4_to_V5": "complete",
+      "asynchronous_C_B_A_bridge": true,
+      "stable": true
+    },
+    "T9_usable_g": 10,
+    "structural_bottlenecks": [
+      "tendon_insertions",
+      "joint_interfaces",
+      "deep_support_networks",
+      "regional_force_distribution"
+    ],
+    "armature_research": {
+      "active": true,
+      "funding_route": "money",
+      "details": "unknown"
+    },
+    "third_densification": {
+      "not_started": true,
+      "V6_guaranteed": false
+    }
+  },
+  "open_threads": {
+    "immediate": {
+      "ask_bridge_contact_actual_questions": true,
+      "determine_whether_contact_is_Meren": "unresolved",
+      "bridge_security_unknown": true,
+      "contact_identity_test_inconclusive": true,
+      "Aveline_outside_direct_meeting": true,
+      "bound_runner_with_Aveline": true
+    },
+    "broader": {
+      "Maison_des_Saules_not_secured": true,
+      "brass_cabinet_unopened": true,
+      "closed_upper_room_unsearched": true,
+      "hidden_desk_compartment_unverified": true,
+      "Mira_current_status_hidden": true,
+      "first_fugitive_current_status_hidden": true,
+      "crossbow_defender_current_status_hidden": true,
+      "dead_drop_status_hidden": true,
+      "recovery_bag_unsearched": true,
+      "second_building_not_secured": true,
+      "Aveline_private_conversation_pending": true,
+      "split_230_unresolved": true,
+      "armature_research_active": true
+    }
+  },
+  "mechanics": {
+    "version": "V3.2.2",
+    "core": {
+      "formula": "2d10 + Capacité + Maîtrise + modificateurs"
+    },
+    "social_read": {
+      "method": "Instinct + Vigilance",
+      "total": 15,
+      "DD": 17,
+      "margin": -2,
+      "result": "narrow_reversal",
+      "consequence": "no_reliable_identity_tell"
+    },
+    "combat": {
+      "active": false,
+      "Mehdi_reaction_available": true,
+      "Fermer_la_porte_available": true,
+      "Aveline_reaction_available": true
+    },
+    "information_limits": {
+      "ambiguous_reaction_does_not_confirm_identity": true,
+      "refusal_to_confirm_or_deny_does_not_prove_identity": true,
+      "no_visible_hostility_does_not_guarantee_safety": true
+    },
+    "no_world_scaling": true,
+    "no_plot_armor": true,
+    "symmetric_rules": true
+  },
+  "information_firewall": {
+    "contact_identity_unresolved": true,
+    "Ilyne_is_claimed_name_only": true,
+    "Sarel_is_unverified": true,
+    "abandoned_prisoners_and_sites_current_states_unknown": true
+  }
+}
