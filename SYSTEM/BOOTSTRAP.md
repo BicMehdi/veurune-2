@@ -4,7 +4,7 @@ Ce dépôt est la mémoire persistante de Veyrune. Une reprise ne doit jamais in
 
 ## Ordre exact de chargement
 
-1. Charger tous les fichiers de `rules/` et appliquer leurs invariants avant de lire l’état de jeu.
+1. Charger `rules/PERSISTENCE.md`, puis `rules/NARRATION_DARK_FANTASY.md`, et appliquer leurs invariants avant de lire l’état de jeu. La narration Dark Fantasy est permanente.
 2. Exécuter `npm run validate`. Interrompre la reprise si la validation échoue.
 3. Charger `state/CURRENT.yaml` comme unique état canonique courant visible par le joueur et résoudre sa projection publique référencée dans `state/WORLD.yaml`.
 4. Charger les événements récents depuis le fichier `events/` correspondant au tour courant : au minimum les six derniers tours disponibles, ou toute la scène active si elle est plus courte. Ne jamais réécrire ni supprimer une ligne passée.

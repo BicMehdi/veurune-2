@@ -36,6 +36,10 @@ L’installation initiale peut être réalisée une seule fois sur PC. En revanc
 
 Le système persistant est décrit dans [`SYSTEM/BOOTSTRAP.md`](SYSTEM/BOOTSTRAP.md). Avant toute reprise ou écriture, exécuter `npm test` pour vérifier la filiation des sauvegardes, les tours, les événements et l’état canonique.
 
+## Règles du maître de jeu
+
+Le mode permanent « Dark Fantasy brutal équilibré » est défini dans [`rules/NARRATION_DARK_FANTASY.md`](rules/NARRATION_DARK_FANTASY.md). `load_game` le charge au même commit que l’état canonique. Le fichier [`SYSTEM/CHATGPT_PROJECT_SOURCE.md`](SYSTEM/CHATGPT_PROJECT_SOURCE.md) est le bootstrap court à ajouter aux Sources du projet ChatGPT ; il renvoie toujours vers GitHub `main` au lieu de dupliquer le canon.
+
 ## Sauvegarde cloud depuis ChatGPT mobile
 
 Le dossier [`worker/`](worker/) contient le serveur MCP personnel destiné à relier un chat ChatGPT normal au dépôt :

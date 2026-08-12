@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { commitTurn, type GitHubEnv } from "../src/github.ts";
+import { commitTurn, loadGame, type GitHubEnv } from "../src/github.ts";
 
 const EXPECTED_HEAD = "a".repeat(40);
 const ACTUAL_HEAD = "b".repeat(40);
@@ -11,6 +11,37 @@ const env: GitHubEnv = {
   GITHUB_REPO: "veurune-2",
   GITHUB_BRANCH: "main",
 };
+
+test("charge les règles de narration au même commit que tout le canon", async (t) => {
+  const requests: string[] = [];
+  t.mock.method(globalThis, "fetch", async (input) => {
+    const url = String(input);
+    requests.push(url);
+
+    if (url.endsWith("/git/ref/heads/main")) return Response.json({ object: { sha: EXPECTED_HEAD } });
+    if (url.includes("/contents/state/CURRENT.yaml")) {
+      return new Response(JSON.stringify({ save_id: "VEY-0721", turn: 711 }));
+    }
+    if (url.includes("/contents/state/WORLD.yaml")) return new Response("world");
+    if (url.includes("/contents/state/HIDDEN.yaml")) return new Response("hidden");
+    if (url.includes("/contents/SYSTEM/BOOTSTRAP.md")) return new Response("bootstrap");
+    if (url.includes("/contents/rules/PERSISTENCE.md")) return new Response("persistence");
+    if (url.includes("/contents/rules/NARRATION_DARK_FANTASY.md")) return new Response("dark-rules");
+    if (url.includes("/contents/events/0700-0799.jsonl")) {
+      return new Response('{"event_id":"EVT-0721-0001"}\n');
+    }
+    throw new Error(`requête inattendue: ${url}`);
+  });
+
+  const result = await loadGame(env);
+
+  assert.equal(result.headSha, EXPECTED_HEAD);
+  assert.equal(result.narration_rules, "dark-rules");
+  assert.equal(result.persistence, "persistence");
+  assert.equal(result.current, JSON.stringify({ save_id: "VEY-0721", turn: 711 }));
+  assert.equal(result.recentEvents, '{"event_id":"EVT-0721-0001"}');
+  assert.ok(requests.slice(1).every((url) => url.endsWith(`ref=${EXPECTED_HEAD}`)));
+});
 
 function payload() {
   return {
