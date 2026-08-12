@@ -35,3 +35,11 @@ L’installation initiale peut être réalisée une seule fois sur PC. En revanc
 ## Système de sauvegarde
 
 Le système persistant est décrit dans [`SYSTEM/BOOTSTRAP.md`](SYSTEM/BOOTSTRAP.md). Avant toute reprise ou écriture, exécuter `npm test` pour vérifier la filiation des sauvegardes, les tours, les événements et l’état canonique.
+
+## Sauvegarde cloud depuis ChatGPT mobile
+
+Le dossier [`worker/`](worker/) contient le serveur MCP personnel destiné à relier un chat ChatGPT normal au dépôt :
+
+`ChatGPT mobile → plugin Veyrune → Cloudflare Worker → GitHub main`
+
+Une fois déployé et installé comme plugin personnel, il fonctionne avec le PC éteint. Le Worker charge le canon avec `load_game` et crée une transaction Git atomique avec `save_turn`. Une écriture est refusée si le commit GitHub, le parent, le tour ou la prochaine sauvegarde attendue ne correspondent plus à l’état chargé.

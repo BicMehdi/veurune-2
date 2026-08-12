@@ -19,6 +19,12 @@ jobs:
         with:
           node-version: 22
       - run: npm test
+      - name: Install cloud save dependencies
+        working-directory: worker
+        run: npm ci
+      - name: Test and type-check cloud save
+        working-directory: worker
+        run: npm test
       - name: Enforce append-only event journal
         if: github.event_name == 'pull_request'
         run: node rules/check-append-only.mjs "${{ github.event.pull_request.base.sha }}"
