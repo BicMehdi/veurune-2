@@ -5,7 +5,7 @@ import { z } from "zod";
 import { canonicalUrl, checkSaveStatus, commitTurn, fetchMasterSection, getHeadSha, loadGame, readFile, searchMaster } from "./github";
 import { GitHubHandler } from "./github-handler";
 import type { VeyruneEnv } from "./env";
-import { rollDice } from "./dice";
+import { issueDiceRoll } from "./dice.ts";
 import { eventFileForTurn, parseDocument, validateHiddenState, validateMehdiSheet } from "./validation.mjs";
 import type { Props } from "./utils";
 
@@ -147,12 +147,14 @@ function createVeyruneServer(env: VeyruneEnv) {
         count: z.number().int().min(1).max(10).default(2),
         sides: z.number().int().min(2).max(100).default(10),
         label: z.string().max(120).optional(),
+        expected_head_sha: z.string().regex(/^[0-9a-f]{40}$/i).describe("headSha reçu de load_game; lie le jet au canon chargé."),
+        expected_save_id: z.string().describe("save_id suivant reçu de CURRENT.next_expected_save; lie le jet au tour à sauvegarder."),
       }),
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: false },
     },
-    async ({ count, sides, label }) => {
+    async ({ count, sides, label, expected_head_sha, expected_save_id }) => {
       assertOwner(env);
-      return textResult(JSON.stringify(rollDice(count, sides, label)));
+      return textResult(JSON.stringify(await issueDiceRoll(count, sides, label, expected_head_sha, expected_save_id, env.COOKIE_ENCRYPTION_KEY)));
     },
   );
 

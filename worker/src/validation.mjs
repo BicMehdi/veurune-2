@@ -164,6 +164,7 @@ export function validateMehdiSheet(value, label = "MEHDI_SHEET") {
   const sheet = fields(value, [
     "save_id", "turn", "audience", "authority", "ruleset", "formula",
     "endurance", "defense", "protection", "resolution", "capabilities", "masteries",
+    "techniques", "mechanical_equipment", "wounds", "resources",
   ], label);
   if (sheet.audience !== "player_visible") fail(`${label}.audience doit valoir player_visible`);
   if (sheet.authority !== "current_mechanical_projection") fail(`${label}.authority invalide`);
@@ -184,6 +185,11 @@ export function validateMehdiSheet(value, label = "MEHDI_SHEET") {
   const masteries = object(sheet.masteries, `${label}.masteries`);
   for (const [key, score] of Object.entries(masteries)) {
     if (!Number.isInteger(score) || score < 0 || score > 5) fail(`${label}.masteries.${key}: score 0 à 5 attendu`);
+  }
+  if (!Array.isArray(sheet.techniques)) fail(`${label}.techniques: tableau attendu`);
+  for (const key of ["mechanical_equipment", "wounds", "resources"]) object(sheet[key], `${label}.${key}`);
+  for (const [key, quantity] of Object.entries(sheet.resources)) {
+    if (typeof quantity !== "number" || !Number.isFinite(quantity) || quantity < 0) fail(`${label}.resources.${key}: nombre positif ou nul attendu`);
   }
   assertPlayerVisible(sheet, label);
   return sheet;

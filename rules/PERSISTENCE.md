@@ -21,7 +21,7 @@
 19. `MEHDI_PROFILE` reste descriptif, sourcé et révisable ; il ne prescrit jamais un choix majeur. `NARRATIVE_MEMORY` est un index de rappel et ne remplace jamais les événements.
 20. Une réponse réseau absente après `save_turn` se résout par `check_save_status`, jamais par une nouvelle supposition de tour.
 21. `state/MEHDI_SHEET.yaml` est la projection mécanique courante visible du protagoniste. Elle reste synchronisée avec `CURRENT` et ne change que par événement mécanique explicite.
-22. Tout hasard mécanique provient de `roll_dice`. Son `roll_id`, ses dés et son résultat exact sont repris dans l’événement du test ; aucun résultat ne peut être ajusté après génération.
+22. Tout hasard mécanique provient de `roll_dice`. Son `roll_id`, son `roll_receipt`, ses dés et son résultat exact sont repris dans l’événement du test ; le serveur lie le reçu au `headSha` et au `save_id` attendus et refuse toute modification ou réutilisation.
 23. Un jet public conserve formule, valeurs, DD ou défense, total, marge, degré et conséquence. Une opposition secrète conserve son détail uniquement dans `HIDDEN` et ne publie que les éléments perceptibles.
 
 Les fichiers `.yaml` de ce dépôt utilisent le sous-ensemble JSON de YAML 1.2. Ils restent des documents YAML valides tout en permettant une validation reproductible avec Node.js sans bibliothèque externe.

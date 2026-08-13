@@ -1,7 +1,10 @@
 import { eventFileForTurn, materializeTurnPayload, parseDocument, validateTurnPayload } from "./validation.mjs";
+import { verifyEventRollReceipts } from "./dice.ts";
 
 export interface GitHubEnv {
   GITHUB_REPO_TOKEN: string;
+  DICE_RECEIPT_KEY?: string;
+  COOKIE_ENCRYPTION_KEY?: string;
   GITHUB_OWNER?: string;
   GITHUB_REPO?: string;
   GITHUB_BRANCH?: string;
@@ -203,6 +206,8 @@ export async function commitTurn(env: GitHubEnv, payload: unknown) {
     console.warn({ operation: "save_turn", status: "conflict", expected_head_sha: expectedHead, actual_head_sha: actualHead, save_id: candidateSaveId });
     throw new Error(`conflit de continuité: HEAD attendu ${expectedHead}, HEAD actuel ${actualHead}`);
   }
+
+  await verifyEventRollReceipts(candidateEvents, env.DICE_RECEIPT_KEY || env.COOKIE_ENCRYPTION_KEY || "", expectedHead, candidateSaveId);
 
   const eventPath = eventFileForTurn(candidateSave.turn as number);
   const [baseCurrentText, baseWorldText, baseHiddenText, baseProfileText, baseMemoryText, baseSheetText, existingEvents, existingSave] = await Promise.all([

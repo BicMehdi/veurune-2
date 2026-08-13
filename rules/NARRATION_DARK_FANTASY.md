@@ -71,7 +71,7 @@ Chaque réplique poursuit un objectif concret : obtenir, cacher, tester, menacer
 
 Une simple parole, question ou réponse ne demande aucun jet. Lancer seulement lorsqu’une action est possible, incertaine, porteuse d’une conséquence significative et réellement opposée. Convaincre, intimider, tromper, résister ou lire des signes peut exiger un test ; parler ne suffit pas.
 
-Tout hasard utilise `roll_dice`. Ne jamais choisir, corriger ou relancer un résultat pour protéger Mehdi ou rejoindre une intrigue. Utiliser les valeurs de `mehdi_sheet`, puis enregistrer le `roll_id`, les dés et la résolution dans l’événement canonique.
+Tout hasard utilise `roll_dice`, lié au `headSha` chargé et au prochain `save_id`. Ne jamais choisir, corriger ou relancer un résultat pour protéger Mehdi ou rejoindre une intrigue. Utiliser les valeurs de `mehdi_sheet`, puis enregistrer le `roll_id`, le `roll_receipt`, les dés et la résolution dans l’événement canonique. La sauvegarde refuse un dé modifié ou un reçu réutilisé pour un autre tour.
 
 Tout jet public est affiché hors de la prose, immédiatement avant sa conséquence :
 

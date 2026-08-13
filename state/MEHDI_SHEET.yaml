@@ -70,7 +70,62 @@
     "reinforced_mail": {
       "protection": 3,
       "condition": 2
+    },
+    "utility_knife": {
+      "sheathed": true
+    },
+    "key_network_items": {
+      "dark_wooden_piece": {
+        "marking": "three_short_marks_joined_by_oblique_cut"
+      },
+      "Mira_marked_scrap": {
+        "marking": "circle_crossed_by_two_vertical_lines"
+      },
+      "Veilleuse_copper_plate": {
+        "marking": "three_dots_in_triangle",
+        "known_use": "contact_signal_template"
+      },
+      "courier_message": {
+        "text": "Saule perdu. Bas compromis. Fermer Verre et Ronce. S. seulement après confirmation."
+      },
+      "Fer_reply": {
+        "text": "Pont des Trois Chaînes. Culée est. 01 h 25. Mehdi seul. Pas de prisonnier. Pas de messager. Tu parles. Je décide si je reste. — M."
+      }
+    },
+    "confiscated_weapons": {
+      "Veilleuse_narrow_knife": true,
+      "Mira_short_blade": true,
+      "Mira_flat_knife": true,
+      "rear_runner_work_knife": true,
+      "first_fugitive_narrow_blade": true,
+      "first_fugitive_boot_knife": true
+    },
+    "other_items": {
+      "Mira_brass_key": true,
+      "iron_keys": 2,
+      "steel_awl": true,
+      "network_documents": true,
+      "gray_chalk": true,
+      "black_wax": true,
+      "fine_cord_lengths": 2
     }
+  },
+  "resources": {
+    "personal_crowns": 246,
+    "medicine": 2,
+    "rations": 0,
+    "water_days": 0,
+    "T9_g": 10
+  },
+  "unallocated_recovered_money": {
+    "first_fugitive": "7c 5s",
+    "Mira": "4c 9s",
+    "Veilleuse_claimant": "9c 8s",
+    "rear_rooftop_fugitive": "3c 4s"
+  },
+  "unresolved_split_with_Aveline": {
+    "jointly_relevant_recent_crowns": 230,
+    "split_decided": false
   },
   "wounds": {
     "superficial_hip_cut": true,

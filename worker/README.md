@@ -6,7 +6,7 @@ Serveur MCP personnel qui permet à ChatGPT mobile de charger et sauvegarder Vey
 
 - `search` et `fetch` : consultation des documents canoniques visibles joueur ;
 - `load_game` : chargement des règles de persistance et de narration, de l’état courant, des événements récents et de l’état MJ ;
-- `roll_dice` : génération impartiale des dés, sans avancer la fiction ;
+- `roll_dice` : génération impartiale des dés, liée au canon chargé et accompagnée d’un reçu vérifié par `save_turn`, sans avancer la fiction ;
 - `search_master` et `fetch_master_section` : consultation ciblée du Master MJ sans charger ses 154 Ko à chaque tour ;
 - `save_turn` : validation puis commit Git atomique d’un nouveau tour ;
 - `check_save_status` : résolution idempotente d’une réponse réseau perdue après un commit ;
@@ -85,7 +85,7 @@ Les fichiers `.dev.vars*` et `.env*` sont ignorés par Git. Ne jamais y placer u
    npx wrangler secret put ALLOWED_GITHUB_LOGIN
    ```
 
-   `ALLOWED_GITHUB_LOGIN` doit valoir `BicMehdi`. Utiliser une longue valeur aléatoire pour `COOKIE_ENCRYPTION_KEY`.
+   `ALLOWED_GITHUB_LOGIN` doit valoir `BicMehdi`. Utiliser une longue valeur aléatoire pour `COOKIE_ENCRYPTION_KEY` ; une sous-clé distincte en est dérivée par le Worker pour signer les reçus de dés.
 
 7. Redéployer puis tester `https://veyrune-cloud-save.<compte>.workers.dev/health` et le MCP à l’adresse terminée par `/mcp`.
 

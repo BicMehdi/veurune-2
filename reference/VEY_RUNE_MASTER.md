@@ -2069,11 +2069,11 @@ Le validateur local et le Worker partagent les invariants de `HIDDEN`. Les pushe
 
 ## `MECH-SHEET-PERSISTENT` — Fiche actuelle de Mehdi
 
-`state/MEHDI_SHEET.yaml` restaure techniquement les valeurs attestées par le dernier snapshot complet `VEY-0724`, tour 714, après vérification des événements jusqu’au tour courant. Cette restauration ne modifie aucune valeur, n’ajoute aucun progrès et n’avance pas la fiction. La fiche devient ensuite une projection atomique : chaque tour la synchronise, et tout changement exige un événement mécanique explicite.
+`state/MEHDI_SHEET.yaml` restaure techniquement les valeurs attestées par le dernier snapshot complet `VEY-0724`, tour 714, après vérification des événements jusqu’au tour courant. Cette restauration ne modifie aucune valeur, n’ajoute aucun progrès et n’avance pas la fiction. La fiche devient ensuite une projection atomique : chaque tour la synchronise, et tout changement exige un événement mécanique explicite. Elle conserve également ressources, argent, partage non résolu et objets attestés afin qu’une fiche dite courante ne perde pas silencieusement l’inventaire du personnage.
 
 ## `MECH-RANDOM-SERVER` — Dés impartiaux
 
-`roll_dice` produit les dés au moyen du générateur cryptographique du Worker, sans créer de tour. Le MJ reprend exactement le `roll_id` et les valeurs obtenues dans l’événement du test. Il ne choisit, ne corrige et ne relance jamais les dés pour obtenir une issue narrative.
+`roll_dice` produit les dés au moyen du générateur cryptographique du Worker, sans créer de tour. Le jet est lié au `headSha` chargé et au prochain `save_id`, puis signé par un `roll_receipt`. Le MJ reprend exactement le reçu, le `roll_id` et les valeurs obtenues dans l’événement du test. `save_turn` refuse un dé modifié, un reçu falsifié ou un reçu réutilisé pour un autre tour. Le MJ ne choisit, ne corrige et ne relance jamais les dés pour obtenir une issue narrative.
 
 ## `MECH-PUBLIC-DISPLAY` — Jets visibles
 

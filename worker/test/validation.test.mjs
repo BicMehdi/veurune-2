@@ -95,6 +95,7 @@ test("le mode complet legacy conserve les secrets et les mémoires omis", () => 
     endurance: { current: 8, max: 14 }, defense: 13, protection: 3, resolution: { current: 2, max: 2 },
     capabilities: { vigor: 5, address: 1, instinct: 1, reason: 0, will: 2, presence: 1 },
     masteries: { melee: 3, athletics: 3 },
+    techniques: ["heavy_strike"], mechanical_equipment: { Yared: { damage: 5 } }, wounds: {}, resources: { personal_crowns: 246 },
   };
   const save = {
     save_id: "VEY-0720",
@@ -149,6 +150,7 @@ test("valide les bornes de la fiche mécanique de Mehdi", () => {
     endurance: { current: 8, max: 14 }, defense: 13, protection: 3, resolution: { current: 2, max: 2 },
     capabilities: { vigor: 5, address: 1, instinct: 1, reason: 0, will: 2, presence: 1 },
     masteries: { melee: 3, athletics: 3, intimidation: 2 },
+    techniques: ["heavy_strike"], mechanical_equipment: { Yared: { damage: 5 } }, wounds: {}, resources: { personal_crowns: 246 },
   };
   assert.doesNotThrow(() => validateMehdiSheet(sheet));
   assert.throws(() => validateMehdiSheet({ ...sheet, masteries: { melee: 6 } }), /score 0 à 5 attendu/);

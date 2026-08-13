@@ -26,7 +26,7 @@ Le projet conserve également :
 
 - le profil descriptif et révisable de Mehdi ;
 - sa fiche mécanique actuelle, synchronisée à chaque tour ;
-- des jets impartiaux générés par le Worker et affichés clairement dans la narration ;
+- des jets impartiaux générés par le Worker, liés au tour par un reçu vérifiable et affichés clairement dans la narration ;
 - une mémoire narrative par chapitres de 50 tours ;
 - le Master consolidé complet avec recherche ciblée par section ;
 - un registre MJ caché protégé contre les suppressions silencieuses ;

@@ -7,6 +7,7 @@ const ACTUAL_HEAD = "b".repeat(40);
 
 const env: GitHubEnv = {
   GITHUB_REPO_TOKEN: "test-token-never-sent",
+  DICE_RECEIPT_KEY: "test-receipt-key",
   GITHUB_OWNER: "BicMehdi",
   GITHUB_REPO: "veurune-2",
   GITHUB_BRANCH: "main",
@@ -129,6 +130,7 @@ test("met à jour main en fast-forward et jamais avec force", async (t) => {
       endurance: { current: 8, max: 14 }, defense: 13, protection: 3, resolution: { current: 2, max: 2 },
       capabilities: { vigor: 5, address: 1, instinct: 1, reason: 0, will: 2, presence: 1 },
       masteries: { melee: 3, athletics: 3 },
+      techniques: ["heavy_strike"], mechanical_equipment: { Yared: { damage: 5 } }, wounds: {}, resources: { personal_crowns: 246 },
     }));
     if (url.includes("/contents/events/0700-0799.jsonl")) return new Response('{"event_id":"EVT-0719R-0008"}\n');
     if (url.includes("/contents/saves/VEY-0720.yaml")) return new Response("not found", { status: 404 });
@@ -199,6 +201,7 @@ test("reconstruit un checkpoint complet depuis un patch compact", async (t) => {
         endurance: { current: 8, max: 14 }, defense: 13, protection: 3, resolution: { current: 2, max: 2 },
         capabilities: { vigor: 5, address: 1, instinct: 1, reason: 0, will: 2, presence: 1 },
         masteries: { melee: 3, athletics: 3 },
+        techniques: ["heavy_strike"], mechanical_equipment: { Yared: { damage: 5 } }, wounds: {}, resources: { personal_crowns: 246 },
       }));
     }
     if (url.includes("/contents/events/0700-0799.jsonl")) return new Response('{"event_id":"EVT-0719R-0008"}\n');

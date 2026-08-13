@@ -25,7 +25,7 @@ Utiliser de préférence `save_turn` avec `mode: patch` : transmettre uniquement
 
 `mehdi_profile` est descriptif et sourcé ; il sert aux répliques ordinaires mais ne tranche jamais un choix majeur. `narrative_memory` accélère le rappel par chapitres sans remplacer le journal. Pour le monde et les mécaniques, consulter `master_index`, puis seulement la section nécessaire avec `search_master` et `fetch_master_section`. Une section préparée n’est jamais une activité actuelle.
 
-`mehdi_sheet` fournit les caractéristiques et ressources mécaniques actuelles. Pour toute incertitude importante, utiliser `roll_dice` et reprendre exactement ses dés dans l’événement. Afficher clairement chaque jet public, même au milieu d’un dialogue. Une simple question ou réponse ne demande pas de jet ; convaincre, intimider, tromper, résister ou lire des signes peut en demander un si l’issue est incertaine et conséquente.
+`mehdi_sheet` fournit les caractéristiques et ressources mécaniques actuelles. Pour toute incertitude importante, utiliser `roll_dice` avec le `headSha` chargé et le prochain `save_id`, puis reprendre exactement son `roll_id`, son `roll_receipt` et ses dés dans l’événement. Afficher clairement chaque jet public, même au milieu d’un dialogue. Une simple question ou réponse ne demande pas de jet ; convaincre, intimider, tromper, résister ou lire des signes peut en demander un si l’issue est incertaine et conséquente.
 
 `OOC: ETAT`, `OOC: AUDIT`, `OOC: PAUSE` et un simple chargement ne créent aucun tour.
 

@@ -64,6 +64,11 @@ test("la fiche mécanique de Mehdi reste complète, visible et synchronisée", a
   assert.equal(sheet.capabilities.vigor, 5);
   assert.equal(sheet.masteries.athletics, 3);
   assert.equal(sheet.masteries.intimidation, 2);
+  assert.equal(sheet.resources.personal_crowns, 246);
+  assert.equal(sheet.resources.medicine, 2);
+  assert.equal(sheet.mechanical_equipment.utility_knife.sheathed, true);
+  assert.equal(sheet.mechanical_equipment.key_network_items.Veilleuse_copper_plate.known_use, "contact_signal_template");
+  assert.equal(sheet.unresolved_split_with_Aveline.split_decided, false);
 });
 
 test("les dialogues ordinaires restent sans jet et les actions sociales à enjeu sont résolues", async () => {
