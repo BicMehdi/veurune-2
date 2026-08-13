@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0725",
-  "turn": 715,
+  "save_id": "VEY-0726",
+  "turn": 716,
   "time": {
     "year": 347,
     "day": 513,
@@ -20,26 +20,25 @@
   "last_action": {
     "actor": "bridge_contact",
     "dialogue_sequence": [
-      "Là, tu viens de me donner une accusation, pas une question.",
-      "Tu dis qu’une cargaison que tu escortais a été attaquée par mes hommes. Très bien. Ne me donne pas la réponse que tu veux entendre.",
-      "Demande-moi le détail que tu crois que Meren seul devrait connaître."
+      "Là. Pas plus près.",
+      "Marquée comment ?"
     ],
-    "intent": "request_specific_identity_verification_detail"
+    "intent": "preserve_separation_and_request_mark_detail"
   },
   "bridge_contact": {
     "response": {
-      "remains_composed": true,
+      "reacts_to_Mehdi_approach": true,
+      "preserves_separation": true,
+      "does_not_leave_meeting": true,
       "does_not_attack": true,
       "identity_confirmed": false,
       "identity_denied": false,
-      "identity_verification_challenge_active": true,
-      "does_not_claim_cargo_attack_knowledge": true,
-      "asks_for_specific_verification_detail": true
+      "does_not_confirm_caravan_marking": true,
+      "asks_how_caravan_was_marked": true
     },
     "dialogue": [
-      "Là, tu viens de me donner une accusation, pas une question.",
-      "Tu dis qu’une cargaison que tu escortais a été attaquée par mes hommes. Très bien. Ne me donne pas la réponse que tu veux entendre.",
-      "Demande-moi le détail que tu crois que Meren seul devrait connaître."
+      "Là. Pas plus près.",
+      "Marquée comment ?"
     ],
     "identity": {
       "whether_Meren": "unresolved",
@@ -52,12 +51,16 @@
     "immediate": {
       "identity_verification_question_in_progress": true,
       "cargo_attack_claim_by_Mehdi": true,
+      "caravan_marking_claim_by_Mehdi": true,
       "cargo_attack_objective_details_unresolved": true,
-      "contact_knowledge_of_cargo_attack_unresolved": true
+      "caravan_marking_objective_details_unresolved": true,
+      "contact_knowledge_of_cargo_attack_unresolved": true,
+      "contact_knowledge_of_caravan_marking_unresolved": true
     }
   },
   "information_firewall": {
     "contact_identity_unresolved": true,
-    "cargo_attack_objective_details_unresolved": true
+    "cargo_attack_objective_details_unresolved": true,
+    "caravan_marking_objective_details_unresolved": true
   }
 }
