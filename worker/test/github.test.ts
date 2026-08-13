@@ -80,7 +80,7 @@ test("refuse un HEAD périmé avant toute écriture GitHub", async (t) => {
   const requests: Array<{ url: string; method: string }> = [];
   t.mock.method(globalThis, "fetch", async (input, init) => {
     requests.push({ url: String(input), method: init?.method || "GET" });
-    return Response.json({ object: { sha: ACTUAL_HEAD } });
+    return Response.json({ commit: { sha: ACTUAL_HEAD, commit: { tree: { sha: "base-tree" } } } });
   });
 
   await assert.rejects(
@@ -88,21 +88,22 @@ test("refuse un HEAD périmé avant toute écriture GitHub", async (t) => {
     new RegExp(`HEAD attendu ${EXPECTED_HEAD}, HEAD actuel ${ACTUAL_HEAD}`),
   );
   assert.deepEqual(requests, [{
-    url: "https://api.github.com/repos/BicMehdi/veurune-2/git/ref/heads/main",
+    url: "https://api.github.com/repos/BicMehdi/veurune-2/branches/main",
     method: "GET",
   }]);
 });
 
 test("met à jour main en fast-forward et jamais avec force", async (t) => {
   const requests: Array<{ url: string; method: string; body?: string | null }> = [];
-  let blobIndex = 0;
   t.mock.method(globalThis, "fetch", async (input, init) => {
     const url = String(input);
     const method = init?.method || "GET";
     const body = typeof init?.body === "string" ? init.body : null;
     requests.push({ url, method, body });
 
-    if (url.endsWith("/git/ref/heads/main")) return Response.json({ object: { sha: EXPECTED_HEAD } });
+    if (url.endsWith("/branches/main")) {
+      return Response.json({ commit: { sha: EXPECTED_HEAD, commit: { tree: { sha: "base-tree" } } } });
+    }
     if (url.includes("/contents/state/CURRENT.yaml")) {
       return new Response(JSON.stringify({
         save_id: "VEY-0719R",
@@ -113,8 +114,6 @@ test("met à jour main en fast-forward et jamais avec force", async (t) => {
     }
     if (url.includes("/contents/events/0700-0799.jsonl")) return new Response('{"event_id":"EVT-0719R-0008"}\n');
     if (url.includes("/contents/saves/VEY-0720.yaml")) return new Response("not found", { status: 404 });
-    if (url.endsWith(`/git/commits/${EXPECTED_HEAD}`)) return Response.json({ tree: { sha: "base-tree" } });
-    if (url.endsWith("/git/blobs")) return Response.json({ sha: `blob-${++blobIndex}` });
     if (url.endsWith("/git/trees")) return Response.json({ sha: "new-tree" });
     if (url.endsWith("/git/commits")) return Response.json({ sha: "c".repeat(40) });
     if (url.endsWith("/git/refs/heads/main")) return Response.json({ object: { sha: "c".repeat(40) } });
@@ -134,5 +133,71 @@ test("met à jour main en fast-forward et jamais avec force", async (t) => {
   assert.ok(patch);
   assert.equal(patch.url, "https://api.github.com/repos/BicMehdi/veurune-2/git/refs/heads/main");
   assert.deepEqual(JSON.parse(patch.body || "{}"), { sha: "c".repeat(40), force: false });
-  assert.equal(requests.filter((request) => request.method === "POST" && request.url.endsWith("/git/blobs")).length, 5);
+  assert.equal(requests.filter((request) => request.method === "POST" && request.url.endsWith("/git/blobs")).length, 0);
+  const treeRequest = requests.find((request) => request.method === "POST" && request.url.endsWith("/git/trees"));
+  assert.ok(treeRequest);
+  const treeBody = JSON.parse(treeRequest.body || "{}");
+  assert.equal(treeBody.base_tree, "base-tree");
+  assert.equal(treeBody.tree.length, 5);
+  assert.ok(treeBody.tree.every((entry) => typeof entry.content === "string" && !("sha" in entry)));
+});
+
+test("reconstruit un checkpoint complet depuis un patch compact", async (t) => {
+  const requests: Array<{ url: string; method: string; body?: string | null }> = [];
+  t.mock.method(globalThis, "fetch", async (input, init) => {
+    const url = String(input);
+    const method = init?.method || "GET";
+    const body = typeof init?.body === "string" ? init.body : null;
+    requests.push({ url, method, body });
+
+    if (url.endsWith("/branches/main")) {
+      return Response.json({ commit: { sha: EXPECTED_HEAD, commit: { tree: { sha: "base-tree" } } } });
+    }
+    if (url.includes("/contents/state/CURRENT.yaml")) {
+      return new Response(JSON.stringify({
+        save_id: "VEY-0719R",
+        turn: 709,
+        last_event_id: "EVT-0719R-0008",
+        next_expected_save: { save_id: "VEY-0720", parent_save_id: "VEY-0719R", turn: 710 },
+        scene: { location: "bridge", weather: { rain: true, wind: "low" } },
+      }));
+    }
+    if (url.includes("/contents/state/WORLD.yaml")) {
+      return new Response(JSON.stringify({ save_id: "VEY-0719R", turn: 709, audience: "player_visible", known: { bridge: true } }));
+    }
+    if (url.includes("/contents/state/HIDDEN.yaml")) {
+      return new Response(JSON.stringify({ save_id: "VEY-0719R", turn: 709, audience: "gm_only", clocks: { M: 1 } }));
+    }
+    if (url.includes("/contents/events/0700-0799.jsonl")) return new Response('{"event_id":"EVT-0719R-0008"}\n');
+    if (url.includes("/contents/saves/VEY-0720.yaml")) return new Response("not found", { status: 404 });
+    if (url.endsWith("/git/trees")) return Response.json({ sha: "new-tree" });
+    if (url.endsWith("/git/commits")) return Response.json({ sha: "c".repeat(40) });
+    if (url.endsWith("/git/refs/heads/main")) return Response.json({ object: { sha: "c".repeat(40) } });
+    throw new Error(`requete inattendue: ${method} ${url}`);
+  });
+
+  await commitTurn(env, {
+    mode: "patch",
+    expected_head_sha: EXPECTED_HEAD,
+    expected_current_save_id: "VEY-0719R",
+    save_id: "VEY-0720",
+    turn: 710,
+    event_time: { year: 347, day: 513, clock: "01:26" },
+    record_time: "2026-08-12T12:00:00Z",
+    current_patch: { scene: { weather: { wind: "strong" } } },
+    world_patch: { known: { gate: true } },
+    hidden_patch: { clocks: { M: 2 } },
+    events: [{ event_id: "EVT-0720-0001", type: "dialogue" }],
+  });
+
+  const treeRequest = requests.find((request) => request.method === "POST" && request.url.endsWith("/git/trees"));
+  assert.ok(treeRequest);
+  const entries = JSON.parse(treeRequest.body || "{}").tree;
+  const document = (path: string) => JSON.parse(entries.find((entry) => entry.path === path).content);
+  const current = document("state/CURRENT.yaml");
+  assert.deepEqual(current.scene, { location: "bridge", weather: { rain: true, wind: "strong" } });
+  assert.deepEqual(document("state/WORLD.yaml").known, { bridge: true, gate: true });
+  assert.deepEqual(document("state/HIDDEN.yaml").clocks, { M: 2 });
+  assert.deepEqual(document("saves/VEY-0720.yaml"), current);
+  assert.equal(requests.filter((request) => request.url.endsWith("/git/blobs")).length, 0);
 });

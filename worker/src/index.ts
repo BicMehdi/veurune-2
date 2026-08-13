@@ -16,6 +16,48 @@ const PUBLIC_DOCUMENTS: Record<string, { title: string; path: string }> = {
   narration: { title: "Règles permanentes de narration Dark Fantasy", path: "rules/NARRATION_DARK_FANTASY.md" },
 };
 
+const eventTimeSchema = z.union([
+  z.string(),
+  z.object({
+    year: z.number().int().positive(),
+    day: z.number().int().positive(),
+    clock: z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/),
+  }),
+]);
+
+const fullSaveTurnSchema = z.object({
+  mode: z.literal("full").optional(),
+  expected_head_sha: z.string().regex(/^[0-9a-f]{40}$/i),
+  expected_current_save_id: z.string(),
+  save: z.record(z.string(), z.unknown()),
+  current: z.record(z.string(), z.unknown()),
+  world: z.record(z.string(), z.unknown()),
+  hidden: z.record(z.string(), z.unknown()),
+  events: z.array(z.record(z.string(), z.unknown())).min(1).max(50),
+});
+
+const patchSaveTurnSchema = z.object({
+  mode: z.literal("patch"),
+  expected_head_sha: z.string().regex(/^[0-9a-f]{40}$/i),
+  expected_current_save_id: z.string(),
+  save_id: z.string().describe("Identifiant next_expected_save chargé par load_game."),
+  turn: z.number().int().nonnegative().describe("Tour next_expected_save chargé par load_game."),
+  event_time: eventTimeSchema,
+  record_time: z.string().describe("Horodatage UTC ISO-8601 de l'enregistrement."),
+  current_patch: z.record(z.string(), z.unknown()).describe(
+    "Uniquement les changements de CURRENT. Fusion récursive; null supprime une clé; un tableau remplace le tableau entier. Omettre tout élément inchangé.",
+  ),
+  world_patch: z.record(z.string(), z.unknown()).describe(
+    "Uniquement les changements visibles du monde. Ne jamais inclure de secret. Même sémantique de fusion.",
+  ),
+  hidden_patch: z.record(z.string(), z.unknown()).describe(
+    "Uniquement les changements MJ cachés. Même sémantique de fusion.",
+  ),
+  events: z.array(z.record(z.string(), z.unknown())).min(1).max(50).describe(
+    "Événements atomiques nouveaux. Fournir event_id et les faits; le serveur ajoute automatiquement filiation, tour et horodatages.",
+  ),
+});
+
 function textResult(text: string) {
   return { content: [{ type: "text" as const, text }] };
 }
@@ -31,7 +73,7 @@ function assertOwner(env: VeyruneEnv) {
 
 function createVeyruneServer(env: VeyruneEnv) {
   const server = new McpServer(
-    { name: "veyrune-cloud-save", version: "1.0.0" },
+    { name: "veyrune-cloud-save", version: "1.1.0" },
     {
       instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale. Ne jamais annoncer un tour comme acquis si save_turn échoue. Ne jamais révéler hidden au joueur.",
     },
@@ -86,16 +128,8 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "save_turn",
     {
-      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Atomically validates and commits the save, projections, hidden state, and append-only events to GitHub main. If it fails, the narrative turn is not committed.",
-      inputSchema: z.object({
-        expected_head_sha: z.string().regex(/^[0-9a-f]{40}$/i),
-        expected_current_save_id: z.string(),
-        save: z.record(z.string(), z.unknown()),
-        current: z.record(z.string(), z.unknown()),
-        world: z.record(z.string(), z.unknown()),
-        hidden: z.record(z.string(), z.unknown()),
-        events: z.array(z.record(z.string(), z.unknown())).min(1).max(50),
-      }),
+      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch: send only changed facts; the server reconstructs and validates the complete checkpoint without losing untouched depth. Legacy full mode remains accepted. Atomically commits the complete save, projections, hidden state, and append-only events to GitHub main. If it fails, the narrative turn is not committed.",
+      inputSchema: z.union([patchSaveTurnSchema, fullSaveTurnSchema]),
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true, idempotentHint: false },
     },
     async (payload) => {

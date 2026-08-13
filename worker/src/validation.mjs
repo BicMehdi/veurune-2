@@ -67,6 +67,107 @@ function jsonDocument(value) {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
 
+function mergePatch(targetValue, patchValue) {
+  if (!patchValue || typeof patchValue !== "object" || Array.isArray(patchValue)) return patchValue;
+  const target = targetValue && typeof targetValue === "object" && !Array.isArray(targetValue)
+    ? { ...targetValue }
+    : {};
+  for (const [key, value] of Object.entries(patchValue)) {
+    if (value === null) delete target[key];
+    else target[key] = mergePatch(target[key], value);
+  }
+  return target;
+}
+
+function rejectReservedKeys(patch, reserved, label) {
+  const record = object(patch, label);
+  for (const key of Object.keys(record)) {
+    if (reserved.has(key)) fail(`${label}: champ géré par le serveur interdit: ${key}`);
+  }
+  return record;
+}
+
+const CURRENT_SERVER_KEYS = new Set([
+  "save_id", "parent_save_id", "turn", "checkpoint_kind", "fiction_advanced",
+  "event_time", "record_time", "last_event_id", "next_expected_save",
+]);
+const PROJECTION_SERVER_KEYS = new Set(["save_id", "turn", "audience"]);
+const EVENT_SERVER_KEYS = new Set(["save_id", "parent_save_id", "turn", "event_time", "record_time"]);
+
+export function materializeTurnPayload(baseCurrentValue, baseWorldValue, baseHiddenValue, payloadValue) {
+  const payload = object(payloadValue, "save_turn");
+  if (payload.mode !== "patch") return payloadValue;
+
+  const base = fields(baseCurrentValue, ["save_id", "turn", "next_expected_save"], "CURRENT distant");
+  const fast = fields(payload, [
+    "expected_head_sha", "expected_current_save_id", "save_id", "turn", "event_time", "record_time",
+    "current_patch", "world_patch", "hidden_patch", "events",
+  ], "save_turn patch");
+  const currentPatch = rejectReservedKeys(fast.current_patch, CURRENT_SERVER_KEYS, "current_patch");
+  const worldPatch = rejectReservedKeys(fast.world_patch, PROJECTION_SERVER_KEYS, "world_patch");
+  const hiddenPatch = rejectReservedKeys(fast.hidden_patch, PROJECTION_SERVER_KEYS, "hidden_patch");
+  if (!Array.isArray(fast.events) || fast.events.length === 0 || fast.events.length > 50) {
+    fail("events doit contenir entre 1 et 50 événements atomiques");
+  }
+
+  instant(fast.record_time, "record_time");
+  eventTime(fast.event_time, "event_time");
+  const saveId = nextSaveId(base.save_id);
+  const turn = base.turn + 1;
+  const parentSaveId = base.save_id;
+  if (fast.save_id !== saveId) fail(`save_id patch invalide: ${fast.save_id}; attendu ${saveId}`);
+  if (fast.turn !== turn) fail(`turn patch invalide: ${fast.turn}; attendu ${turn}`);
+  const events = fast.events.map((value, index) => {
+    const event = rejectReservedKeys(value, EVENT_SERVER_KEYS, `events[${index}]`);
+    return {
+      ...event,
+      save_id: saveId,
+      parent_save_id: parentSaveId,
+      turn,
+      event_time: fast.event_time,
+      record_time: fast.record_time,
+    };
+  });
+  const lastEvent = fields(events.at(-1), ["event_id"], "dernier événement");
+  const current = {
+    ...mergePatch(base, currentPatch),
+    save_id: saveId,
+    parent_save_id: parentSaveId,
+    turn,
+    checkpoint_kind: "narrative_turn",
+    fiction_advanced: true,
+    event_time: fast.event_time,
+    record_time: fast.record_time,
+    last_event_id: lastEvent.event_id,
+    next_expected_save: {
+      save_id: nextSaveId(saveId),
+      parent_save_id: saveId,
+      turn: turn + 1,
+    },
+  };
+  const world = {
+    ...mergePatch(baseWorldValue, worldPatch),
+    save_id: saveId,
+    turn,
+    audience: "player_visible",
+  };
+  const hidden = {
+    ...mergePatch(baseHiddenValue, hiddenPatch),
+    save_id: saveId,
+    turn,
+    audience: "gm_only",
+  };
+  return {
+    expected_head_sha: fast.expected_head_sha,
+    expected_current_save_id: fast.expected_current_save_id,
+    save: current,
+    current,
+    world,
+    hidden,
+    events,
+  };
+}
+
 export function parseDocument(text, label) {
   try {
     return JSON.parse(text);

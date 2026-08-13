@@ -21,6 +21,8 @@ Avant `LANCER VEYRUNE`, avant une reprise et avant de résoudre un nouveau tour 
 
 Après chaque vrai tour narratif résolu, appeler exactement une fois `save_turn` avant d'afficher la narration finale. Si la sauvegarde échoue, ne pas annoncer le tour comme canonique et recharger l'état.
 
+Utiliser de préférence `save_turn` avec `mode: patch` : transmettre uniquement les faits modifiés dans `current_patch`, `world_patch` et `hidden_patch`. Une valeur `null` supprime explicitement une clé, tandis qu'un tableau fourni remplace le tableau entier. Le serveur reconstruit puis valide les documents complets avant le commit ; ce mode accélère l'écriture sans résumer ni retirer les informations inchangées.
+
 `OOC: ETAT`, `OOC: AUDIT`, `OOC: PAUSE` et un simple chargement ne créent aucun tour.
 
 ## Ordre de priorité

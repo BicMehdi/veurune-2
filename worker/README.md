@@ -11,6 +11,12 @@ Serveur MCP personnel qui permet à ChatGPT mobile de charger et sauvegarder Vey
 
 `save_turn` refuse les parents ou commits périmés, les tours discontinus, un mauvais `save_id`, les secrets dans les projections joueur, les reconstructions historiques injectées et toute modification non append-only du journal.
 
+## Sauvegarde rapide sans perte
+
+Le mode recommandé `save_turn({ mode: "patch", ... })` envoie seulement les changements du tour. Le Worker recharge les projections au même commit GitHub, applique une fusion récursive (`null` supprime une clé et un tableau remplace le tableau entier), reconstruit le checkpoint complet, puis exécute les validations ordinaires. Le dépôt continue donc de contenir des snapshots complets : seule la quantité transmise par le MJ diminue.
+
+L'écriture GitHub utilise une création d'arbre avec contenu intégré. Les cinq fichiers canoniques restent réunis dans un commit atomique, mais cinq appels séparés de création de blobs et une lecture supplémentaire du commit ont été supprimés du chemin critique.
+
 Le champ `narration_rules` est lu depuis `rules/NARRATION_DARK_FANTASY.md` au même commit GitHub que le reste du canon. Le MJ l’applique avant de résoudre le tour.
 
 ## Tests de non-régression

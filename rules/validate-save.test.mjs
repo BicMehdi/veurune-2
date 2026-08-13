@@ -108,9 +108,11 @@ test("aucun secret hidden ne reçoit de valeur inventée", () => {
   assert.ok(importedHidden.unresolved_secrets.length > 0);
   assert.deepEqual(importedHidden.invented_secret_values, []);
   for (const secret of importedHidden.unresolved_secrets) {
+    assert.equal(typeof secret.path, "string");
+    assert.ok(secret.path.length > 0);
     assert.equal(secret.status, "unresolved_hidden");
     assert.equal(secret.value_known_to_persistence, false);
-    assert.equal(secret.source, "VEY-0719 marks this information as hidden");
+    if (secret.source !== undefined) assert.equal(typeof secret.source, "string");
   }
 });
 

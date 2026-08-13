@@ -1,4 +1,4 @@
-import { eventFileForTurn, parseDocument, validateTurnPayload } from "./validation.mjs";
+import { eventFileForTurn, materializeTurnPayload, parseDocument, validateTurnPayload } from "./validation.mjs";
 
 export interface GitHubEnv {
   GITHUB_REPO_TOKEN: string;
@@ -41,20 +41,21 @@ function encodePath(path: string) {
   return path.split("/").map(encodeURIComponent).join("/");
 }
 
-function utf8Base64(text: string) {
-  const bytes = new TextEncoder().encode(text);
-  let binary = "";
-  for (let index = 0; index < bytes.length; index += 0x8000) {
-    binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000));
-  }
-  return btoa(binary);
-}
-
 export async function getHeadSha(env: GitHubEnv) {
   const { owner, repo, branch } = configuration(env);
   const response = await github(env, `/repos/${owner}/${repo}/git/ref/heads/${encodeURIComponent(branch)}`);
   const body = await response.json<Json>();
   return (body.object as Json).sha as string;
+}
+
+async function getHeadSnapshot(env: GitHubEnv) {
+  const { owner, repo, branch } = configuration(env);
+  const response = await github(env, `/repos/${owner}/${repo}/branches/${encodeURIComponent(branch)}`);
+  const body = await response.json<Json>();
+  const commit = body.commit as Json;
+  const commitDetails = commit.commit as Json;
+  const tree = commitDetails.tree as Json;
+  return { headSha: commit.sha as string, treeSha: tree.sha as string };
 }
 
 export async function readFile(env: GitHubEnv, path: string, ref?: string, missingIsEmpty = false) {
@@ -99,34 +100,41 @@ export async function loadGame(env: GitHubEnv) {
 export async function commitTurn(env: GitHubEnv, payload: unknown) {
   const input = payload as Json;
   const expectedHead = input.expected_head_sha as string;
-  const actualHead = await getHeadSha(env);
+  const { headSha: actualHead, treeSha: baseTree } = await getHeadSnapshot(env);
   if (actualHead !== expectedHead) throw new Error(`conflit de continuité: HEAD attendu ${expectedHead}, HEAD actuel ${actualHead}`);
 
-  const save = input.save as Json;
-  const eventPath = eventFileForTurn(save.turn as number);
-  const [baseCurrentText, existingEvents, existingSave] = await Promise.all([
+  const patchMode = input.mode === "patch";
+  const candidateSave = patchMode ? input : input.save as Json;
+  const eventPath = eventFileForTurn(candidateSave.turn as number);
+  const [baseCurrentText, baseWorldText, baseHiddenText, existingEvents, existingSave] = await Promise.all([
     readFile(env, "state/CURRENT.yaml", actualHead),
+    patchMode ? readFile(env, "state/WORLD.yaml", actualHead) : Promise.resolve("{}"),
+    patchMode ? readFile(env, "state/HIDDEN.yaml", actualHead) : Promise.resolve("{}"),
     readFile(env, eventPath, actualHead, true),
-    readFile(env, `saves/${String(save.save_id)}.yaml`, actualHead, true),
+    readFile(env, `saves/${String(candidateSave.save_id)}.yaml`, actualHead, true),
   ]);
-  if (existingSave) throw new Error(`la sauvegarde ${String(save.save_id)} existe déjà`);
-  const transaction = validateTurnPayload(parseDocument(baseCurrentText, "CURRENT distant"), existingEvents, payload);
+  if (existingSave) throw new Error(`la sauvegarde ${String(candidateSave.save_id)} existe déjà`);
+  const baseCurrent = parseDocument(baseCurrentText, "CURRENT distant");
+  const materializedPayload = materializeTurnPayload(
+    baseCurrent,
+    parseDocument(baseWorldText, "WORLD distant"),
+    parseDocument(baseHiddenText, "HIDDEN distant"),
+    payload,
+  );
+  const transaction = validateTurnPayload(baseCurrent, existingEvents, materializedPayload);
   const { owner, repo, branch } = configuration(env);
 
-  const commitResponse = await github(env, `/repos/${owner}/${repo}/git/commits/${actualHead}`);
-  const baseCommit = await commitResponse.json<Json>();
-  const baseTree = ((baseCommit.tree as Json).sha) as string;
-  const treeEntries = await Promise.all(Object.entries(transaction.files).map(async ([path, content]) => {
-    const blobResponse = await github(env, `/repos/${owner}/${repo}/git/blobs`, {
-      method: "POST",
-      body: JSON.stringify({ content: utf8Base64(content), encoding: "base64" }),
-    });
-    const blob = await blobResponse.json<Json>();
-    return { path, mode: "100644", type: "blob", sha: blob.sha };
-  }));
   const treeResponse = await github(env, `/repos/${owner}/${repo}/git/trees`, {
     method: "POST",
-    body: JSON.stringify({ base_tree: baseTree, tree: treeEntries }),
+    body: JSON.stringify({
+      base_tree: baseTree,
+      tree: Object.entries(transaction.files).map(([path, content]) => ({
+        path,
+        mode: "100644",
+        type: "blob",
+        content,
+      })),
+    }),
   });
   const tree = await treeResponse.json<Json>();
   const newCommitResponse = await github(env, `/repos/${owner}/${repo}/git/commits`, {

@@ -108,7 +108,7 @@ export function validateRepository(rootDir) {
   if (hidden.audience !== "gm_only") fail("HIDDEN.audience doit valoir gm_only");
   if (!Array.isArray(hidden.unresolved_secrets) || hidden.unresolved_secrets.length === 0) fail("HIDDEN.unresolved_secrets doit conserver les emplacements secrets non résolus");
   for (const secret of hidden.unresolved_secrets) {
-    if (secret.status !== "unresolved_hidden" || secret.value_known_to_persistence !== false || secret.source !== "VEY-0719 marks this information as hidden") {
+    if (typeof secret.path !== "string" || !secret.path || secret.status !== "unresolved_hidden" || secret.value_known_to_persistence !== false) {
       fail(`HIDDEN: valeur secrète inventée ou enregistrement invalide pour ${secret.path ?? "chemin inconnu"}`);
     }
   }

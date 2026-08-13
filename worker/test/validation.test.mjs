@@ -1,8 +1,76 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { eventFileForTurn, nextSaveId, validateTurnPayload } from "../src/validation.mjs";
+import { eventFileForTurn, materializeTurnPayload, nextSaveId, validateTurnPayload } from "../src/validation.mjs";
 
 const timestamp = "2026-08-12T12:00:00Z";
+
+test("materialise un patch compact sans perdre les donnees inchangees", () => {
+  const base = {
+    save_id: "VEY-0719R",
+    turn: 709,
+    last_event_id: "EVT-0719R-0008",
+    next_expected_save: { save_id: "VEY-0720", parent_save_id: "VEY-0719R", turn: 710 },
+    scene: { location: "bridge", tension: "high", weather: { rain: true, wind: "low" } },
+    stale: "remove-me",
+  };
+  const patch = {
+    mode: "patch",
+    expected_head_sha: "a".repeat(40),
+    expected_current_save_id: "VEY-0719R",
+    save_id: "VEY-0720",
+    turn: 710,
+    event_time: { year: 347, day: 513, clock: "01:26" },
+    record_time: timestamp,
+    current_patch: { scene: { weather: { wind: "strong" } }, stale: null },
+    world_patch: { district: { alert: "high" } },
+    hidden_patch: { antagonist: { clock: 2 } },
+    events: [{ event_id: "EVT-0720-0001", type: "dialogue" }],
+  };
+  const world = { save_id: "VEY-0719R", turn: 709, audience: "player_visible", district: { name: "Fours", alert: "low" } };
+  const hidden = { save_id: "VEY-0719R", turn: 709, audience: "gm_only", antagonist: { name: "M", clock: 1 } };
+
+  const materialized = materializeTurnPayload(base, world, hidden, patch);
+  assert.deepEqual(materialized.current.scene, {
+    location: "bridge",
+    tension: "high",
+    weather: { rain: true, wind: "strong" },
+  });
+  assert.ok(!("stale" in materialized.current));
+  assert.deepEqual(materialized.world.district, { name: "Fours", alert: "high" });
+  assert.deepEqual(materialized.hidden.antagonist, { name: "M", clock: 2 });
+  assert.equal(materialized.save, materialized.current);
+  assert.deepEqual(materialized.events[0], {
+    event_id: "EVT-0720-0001",
+    type: "dialogue",
+    save_id: "VEY-0720",
+    parent_save_id: "VEY-0719R",
+    turn: 710,
+    event_time: { year: 347, day: 513, clock: "01:26" },
+    record_time: timestamp,
+  });
+  assert.doesNotThrow(() => validateTurnPayload(base, '{"event_id":"EVT-0719R-0008"}\n', materialized));
+});
+
+test("refuse les champs de continuite geres par le serveur dans un patch", () => {
+  const base = {
+    save_id: "VEY-0719R",
+    turn: 709,
+    next_expected_save: { save_id: "VEY-0720", parent_save_id: "VEY-0719R", turn: 710 },
+  };
+  assert.throws(() => materializeTurnPayload(base, {}, {}, {
+    mode: "patch",
+    expected_head_sha: "a".repeat(40),
+    expected_current_save_id: "VEY-0719R",
+    save_id: "VEY-0720",
+    turn: 710,
+    event_time: { year: 347, day: 513, clock: "01:26" },
+    record_time: timestamp,
+    current_patch: { save_id: "forged" },
+    world_patch: {},
+    hidden_patch: {},
+    events: [{ event_id: "EVT-0720-0001" }],
+  }), /champ g.r. par le serveur interdit: save_id/);
+});
 
 function fixture() {
   const base = {

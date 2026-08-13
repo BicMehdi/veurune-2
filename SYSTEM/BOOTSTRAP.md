@@ -28,6 +28,8 @@ Ce dépôt est la mémoire persistante de Veyrune. Une reprise ne doit jamais in
 
 ## Écriture d’un nouveau tour
 
+Avec Veyrune Cloud Save, préférer `save_turn` en `mode: patch`. Envoyer uniquement les modifications du tour ; le serveur conserve les champs absents, applique les suppressions explicites marquées `null`, reconstruit les quatre documents complets et exécute ensuite exactement les mêmes validations de continuité, de visibilité et d’append-only que le mode complet.
+
 1. Partir de `state/CURRENT.yaml` validé.
 2. Résoudre le tour sans contrôler Mehdi et sans exposer de secret MJ.
 3. Préparer les événements atomiques avec `event_id`, `save_id`, `parent_save_id`, `turn`, `event_time` et `record_time`.
