@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0721",
-  "turn": 711,
+  "save_id": "VEY-0722",
+  "turn": 712,
   "canonical_source": {
     "type": "player_supplied_save_capsule",
     "save_id": "VEY-0719",
@@ -25,8 +25,11 @@
   },
   "last_action": {
     "actor": "Mehdi",
-    "dialogue": "Tu t’es attaqué à moi.",
-    "intent": "accuse_contact_of_attack"
+    "dialogue_sequence": [
+      "Tu as attaqué le mauvais groupe",
+      "J’ai l’impression que tu me prends pour un imbecile honnêtement car je ne sais même pas à qui je parle réellement d’où le fait le fait que je parle à demi mot donc prouve moi que tu es meren"
+    ],
+    "intent": "demand_proof_contact_is_Meren"
   },
   "observed_test_result": {
     "dice": [
@@ -74,14 +77,13 @@
     "response": {
       "refuses_to_confirm_or_deny_identity": true,
       "remains_composed": true,
-      "does_not_attack": true
+      "does_not_attack": true,
+      "latest_player_demand_pending_response": true
     },
     "dialogue": [
-      "C’est possible.",
-      "C’est aussi possible que je sois Meren et que je trouve amusant que tu aies détruit plusieurs relais simplement pour venir m’expliquer qui je suis.",
-      "Si ton premier objectif était de me tester, considère que tu l’as fait.",
-      "Maintenant, Mehdi... tu as risqué beaucoup pour arriver ici.",
-      "Alors soit tu continues à jouer avec mon nom, soit tu poses enfin la question qui justifiait tout ça."
+      "Non.",
+      "Tu es vivant, armé, devant moi. Ceux que tu as laissés derrière toi ne peuvent pas tous en dire autant.",
+      "Alors donne-moi un fait. Un lieu. Un ordre. Quelque chose de plus solide que ton ressentiment."
     ],
     "identity": {
       "whether_Meren": "unresolved",
@@ -98,11 +100,10 @@
         "Tu es vivant, armé, devant moi. Ceux que tu as laissés derrière toi ne peuvent pas tous en dire autant.",
         "Alors donne-moi un fait. Un lieu. Un ordre. Quelque chose de plus solide que ton ressentiment."
       ],
-      "denies_personal_attack": true,
       "identity_confirmation": false,
       "identity_denial": false,
       "hostile_action_started": false,
-      "demands_specific_evidence": true
+      "latest_player_demand_pending_response": true
     }
   },
   "bridge_site": {
@@ -190,72 +191,12 @@
       "engagement",
       "fermer_la_porte"
     ],
-    "equipment": {
-      "Yared": {
-        "type": "greatsword",
-        "damage": 5,
-        "condition": 2,
-        "drawn": true
-      },
-      "reinforced_mail": {
-        "protection": 3,
-        "condition": 2
-      },
-      "utility_knife": {
-        "sheathed": true
-      },
-      "key_network_items": {
-        "dark_wooden_piece": {
-          "marking": "three_short_marks_joined_by_oblique_cut"
-        },
-        "Mira_marked_scrap": {
-          "marking": "circle_crossed_by_two_vertical_lines"
-        },
-        "Veilleuse_copper_plate": {
-          "marking": "three_dots_in_triangle",
-          "known_use": "contact_signal_template"
-        },
-        "courier_message": {
-          "text": "Saule perdu. Bas compromis. Fermer Verre et Ronce. S. seulement après confirmation."
-        },
-        "Fer_reply": {
-          "text": "Pont des Trois Chaînes. Culée est. 01 h 25. Mehdi seul. Pas de prisonnier. Pas de messager. Tu parles. Je décide si je reste. — M."
-        }
-      },
-      "confiscated_weapons": {
-        "Veilleuse_narrow_knife": true,
-        "Mira_short_blade": true,
-        "Mira_flat_knife": true,
-        "rear_runner_work_knife": true,
-        "first_fugitive_narrow_blade": true,
-        "first_fugitive_boot_knife": true
-      },
-      "other_items": {
-        "Mira_brass_key": true,
-        "iron_keys": 2,
-        "steel_awl": true,
-        "network_documents": true,
-        "gray_chalk": true,
-        "black_wax": true,
-        "fine_cord_lengths": 2
-      }
-    },
     "resources": {
       "personal_crowns": 246,
       "medicine": 2,
       "rations": 0,
       "water_days": 0,
       "T9_g": 10
-    },
-    "unallocated_recovered_money": {
-      "first_fugitive": "7c 5s",
-      "Mira": "4c 9s",
-      "Veilleuse_claimant": "9c 8s",
-      "rear_rooftop_fugitive": "3c 4s"
-    },
-    "unresolved_split_with_Aveline": {
-      "jointly_relevant_recent_crowns": 230,
-      "split_decided": false
     }
   },
   "Aveline": {
@@ -446,7 +387,7 @@
       "contact_identity_test_inconclusive": true,
       "Aveline_outside_direct_meeting": true,
       "bound_runner_with_Aveline": true,
-      "specify_attack_event_or_order": true
+      "contact_must_answer_identity_proof_demand": true
     },
     "broader": {
       "Maison_des_Saules_not_secured": true,
