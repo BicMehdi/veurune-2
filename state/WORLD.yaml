@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0729",
-  "turn": 719,
+  "save_id": "VEY-0730",
+  "turn": 720,
   "time": {
     "year": 347,
     "day": 513,
@@ -21,31 +21,23 @@
   "last_action": {
     "actor": "bridge_contact",
     "dialogue_sequence": [
-      "Bien.",
-      "Maintenant, la marque."
+      "Combien ?",
+      "Et où étaient-ils tracés ?"
     ],
-    "intent": "resume_identity_verification_after_release"
-  },
-  "Mehdi": {
-    "positioning": {
-      "holds_contact_clothing": false,
-      "contact_immobilized": false
-    }
+    "intent": "request_number_and_placement_of_claimed_caravan_marking_lines"
   },
   "bridge_contact": {
     "response": {
-      "clothing_grabbed_by_Mehdi": false,
-      "immobilized": false,
       "does_not_attack": true,
       "does_not_leave_meeting": true,
       "identity_confirmed": false,
       "identity_denied": false,
-      "physical_pressure_ended": true,
-      "continues_identity_verification": true
+      "does_not_confirm_caravan_marking": true,
+      "asks_for_number_and_placement_of_lines": true
     },
     "dialogue": [
-      "Bien.",
-      "Maintenant, la marque."
+      "Combien ?",
+      "Et où étaient-ils tracés ?"
     ],
     "identity": {
       "whether_Meren": "unresolved",
@@ -59,12 +51,11 @@
       "identity_verification_question_in_progress": true,
       "cargo_attack_claim_by_Mehdi": true,
       "caravan_marking_claim_by_Mehdi": true,
+      "caravan_marking_lines_claim_by_Mehdi": true,
       "cargo_attack_objective_details_unresolved": true,
       "caravan_marking_objective_details_unresolved": true,
       "contact_knowledge_of_cargo_attack_unresolved": true,
-      "contact_knowledge_of_caravan_marking_unresolved": true,
-      "Mehdi_holds_contact_clothing": false,
-      "contact_not_immobilized": true
+      "contact_knowledge_of_caravan_marking_unresolved": true
     }
   },
   "information_firewall": {
