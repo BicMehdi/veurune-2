@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0723",
-  "turn": 713,
+  "save_id": "VEY-0724",
+  "turn": 714,
   "canonical_source": {
     "type": "player_supplied_save_capsule",
     "save_id": "VEY-0719",
@@ -26,12 +26,9 @@
   "last_action": {
     "actor": "bridge_contact",
     "dialogue_sequence": [
-      "Enfin.",
-      "Tu as raison sur un point : si je te demande de parler à visage découvert pendant que je reste un nom, je te demande d’être stupide.",
-      "Je ne vais pas te demander de me croire. Pose-moi une question dont, selon toi, seul Meren devrait connaître la réponse. Une seule.",
-      "Si je ne peux pas y répondre, tu repars. Si je peux, tu cesses de parler à demi-mot."
+      "Continue."
     ],
-    "intent": "offer_identity_verification_challenge"
+    "intent": "prompt_completion_of_identity_verification_question"
   },
   "observed_test_result": {
     "dice": [
@@ -81,14 +78,12 @@
       "does_not_attack": true,
       "identity_confirmed": false,
       "identity_denied": false,
-      "accepts_verifiable_identity_challenge": true,
-      "invites_single_player_verification_question": true
+      "identity_verification_challenge_active": true,
+      "verification_question_in_progress": true,
+      "asks_player_to_continue": true
     },
     "dialogue": [
-      "Enfin.",
-      "Tu as raison sur un point : si je te demande de parler à visage découvert pendant que je reste un nom, je te demande d’être stupide.",
-      "Je ne vais pas te demander de me croire. Pose-moi une question dont, selon toi, seul Meren devrait connaître la réponse. Une seule.",
-      "Si je ne peux pas y répondre, tu repars. Si je peux, tu cesses de parler à demi-mot."
+      "Continue."
     ],
     "identity": {
       "whether_Meren": "unresolved",
@@ -103,7 +98,7 @@
       "identity_confirmation": false,
       "identity_denial": false,
       "hostile_action_started": false,
-      "identity_verification_challenge_offered": true
+      "asks_player_to_continue": true
     }
   },
   "bridge_site": {
@@ -387,7 +382,8 @@
       "contact_identity_test_inconclusive": true,
       "Aveline_outside_direct_meeting": true,
       "bound_runner_with_Aveline": true,
-      "player_may_pose_single_identity_verification_question": true
+      "identity_verification_question_in_progress": true,
+      "cargo_attack_reference_not_resolved_in_current_canon": true
     },
     "broader": {
       "Maison_des_Saules_not_secured": true,
