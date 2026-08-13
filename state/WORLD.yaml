@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0722",
-  "turn": 712,
+  "save_id": "VEY-0723",
+  "turn": 713,
   "canonical_source": {
     "type": "player_supplied_save_capsule",
     "save_id": "VEY-0719",
@@ -24,12 +24,14 @@
     "meeting_active": true
   },
   "last_action": {
-    "actor": "Mehdi",
+    "actor": "bridge_contact",
     "dialogue_sequence": [
-      "Tu as attaqué le mauvais groupe",
-      "J’ai l’impression que tu me prends pour un imbecile honnêtement car je ne sais même pas à qui je parle réellement d’où le fait le fait que je parle à demi mot donc prouve moi que tu es meren"
+      "Enfin.",
+      "Tu as raison sur un point : si je te demande de parler à visage découvert pendant que je reste un nom, je te demande d’être stupide.",
+      "Je ne vais pas te demander de me croire. Pose-moi une question dont, selon toi, seul Meren devrait connaître la réponse. Une seule.",
+      "Si je ne peux pas y répondre, tu repars. Si je peux, tu cesses de parler à demi-mot."
     ],
-    "intent": "demand_proof_contact_is_Meren"
+    "intent": "offer_identity_verification_challenge"
   },
   "observed_test_result": {
     "dice": [
@@ -75,15 +77,18 @@
       "approximately_8m_from_Mehdi": true
     },
     "response": {
-      "refuses_to_confirm_or_deny_identity": true,
       "remains_composed": true,
       "does_not_attack": true,
-      "latest_player_demand_pending_response": true
+      "identity_confirmed": false,
+      "identity_denied": false,
+      "accepts_verifiable_identity_challenge": true,
+      "invites_single_player_verification_question": true
     },
     "dialogue": [
-      "Non.",
-      "Tu es vivant, armé, devant moi. Ceux que tu as laissés derrière toi ne peuvent pas tous en dire autant.",
-      "Alors donne-moi un fait. Un lieu. Un ordre. Quelque chose de plus solide que ton ressentiment."
+      "Enfin.",
+      "Tu as raison sur un point : si je te demande de parler à visage découvert pendant que je reste un nom, je te demande d’être stupide.",
+      "Je ne vais pas te demander de me croire. Pose-moi une question dont, selon toi, seul Meren devrait connaître la réponse. Une seule.",
+      "Si je ne peux pas y répondre, tu repars. Si je peux, tu cesses de parler à demi-mot."
     ],
     "identity": {
       "whether_Meren": "unresolved",
@@ -95,15 +100,10 @@
     "stats": "unknown",
     "intent": "unknown",
     "latest_response": {
-      "exact_dialogue": [
-        "Non.",
-        "Tu es vivant, armé, devant moi. Ceux que tu as laissés derrière toi ne peuvent pas tous en dire autant.",
-        "Alors donne-moi un fait. Un lieu. Un ordre. Quelque chose de plus solide que ton ressentiment."
-      ],
       "identity_confirmation": false,
       "identity_denial": false,
       "hostile_action_started": false,
-      "latest_player_demand_pending_response": true
+      "identity_verification_challenge_offered": true
     }
   },
   "bridge_site": {
@@ -387,7 +387,7 @@
       "contact_identity_test_inconclusive": true,
       "Aveline_outside_direct_meeting": true,
       "bound_runner_with_Aveline": true,
-      "contact_must_answer_identity_proof_demand": true
+      "player_may_pose_single_identity_verification_question": true
     },
     "broader": {
       "Maison_des_Saules_not_secured": true,
