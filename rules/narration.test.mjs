@@ -52,6 +52,8 @@ test("le document narratif est exposé par search et fetch", async () => {
   assert.match(text, /"fetch_master_section"/);
   assert.match(text, /"check_save_status"/);
   assert.match(text, /"roll_dice"/);
+  assert.match(text, /Compatibility: if roll_dice is absent/);
+  assert.match(text, /compatibility_bridge/);
   assert.match(text, /state\/MEHDI_SHEET\.yaml/);
 });
 

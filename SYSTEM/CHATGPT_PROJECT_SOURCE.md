@@ -27,6 +27,8 @@ Utiliser de préférence `save_turn` avec `mode: patch` : transmettre uniquement
 
 `mehdi_sheet` fournit les caractéristiques et ressources mécaniques actuelles. Pour toute incertitude importante, utiliser `roll_dice` avec le `headSha` chargé et le prochain `save_id`, puis reprendre exactement son `roll_id`, son `roll_receipt` et ses dés dans l’événement. Afficher clairement chaque jet public, même au milieu d’un dialogue. Une simple question ou réponse ne demande pas de jet ; convaincre, intimider, tromper, résister ou lire des signes peut en demander un si l’issue est incertaine et conséquente.
 
+Compatibilité de catalogue : si le connecteur n’affiche pas encore `roll_dice`, appeler `search` avec `roll_dice 2d10 <headSha> <prochain_save_id> <intitulé>`, puis `fetch` avec l’identifiant renvoyé. Ce pont exécute le même générateur signé, produit le même reçu et n’avance pas la fiction.
+
 `OOC: ETAT`, `OOC: AUDIT`, `OOC: PAUSE` et un simple chargement ne créent aucun tour.
 
 ## Agence et format roman

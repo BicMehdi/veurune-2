@@ -76,6 +76,54 @@ function textResult(text: string) {
   return { content: [{ type: "text" as const, text }] };
 }
 
+function encodeDiceRequest(count: number, sides: number, expectedHeadSha: string, expectedSaveId: string, label?: string) {
+  const encodedLabel = label ? encodeURIComponent(label) : "";
+  return `roll_dice:${count}d${sides}:${expectedHeadSha}:${expectedSaveId}:${encodedLabel}`;
+}
+
+function parseDiceSearch(query: string) {
+  const match = query.trim().match(/^roll_dice\s+(\d+)d(\d+)\s+([0-9a-f]{40})\s+(VEY-\d{4}[A-Z]*)(?:\s+(.+))?$/i);
+  if (!match) return null;
+  const count = Number(match[1]);
+  const sides = Number(match[2]);
+  if (!Number.isInteger(count) || count < 1 || count > 10 || !Number.isInteger(sides) || sides < 2 || sides > 100) {
+    throw new Error("demande de dés hors limites");
+  }
+  return { count, sides, expectedHeadSha: match[3], expectedSaveId: match[4], label: match[5] };
+}
+
+function parseDiceRequest(id: string) {
+  const match = id.match(/^roll_dice:(\d+)d(\d+):([0-9a-f]{40}):(VEY-\d{4}[A-Z]*):(.*)$/i);
+  if (!match) return null;
+  return {
+    count: Number(match[1]),
+    sides: Number(match[2]),
+    expectedHeadSha: match[3],
+    expectedSaveId: match[4],
+    label: match[5] ? decodeURIComponent(match[5]) : undefined,
+  };
+}
+
+async function issueCanonicalDiceRoll(
+  env: VeyruneEnv,
+  count: number,
+  sides: number,
+  label: string | undefined,
+  expectedHeadSha: string,
+  expectedSaveId: string,
+) {
+  const actualHeadSha = await getHeadSha(env);
+  if (actualHeadSha !== expectedHeadSha) {
+    throw new Error(`canon modifié avant le jet: HEAD attendu ${expectedHeadSha}, HEAD actuel ${actualHeadSha}; recharger avec load_game`);
+  }
+  const current = parseDocument(await readFile(env, "state/CURRENT.yaml", actualHeadSha), "CURRENT avant jet");
+  const nextSave = current.next_expected_save as Record<string, unknown> | undefined;
+  if (nextSave?.save_id !== expectedSaveId) {
+    throw new Error(`save_id de jet invalide: attendu ${String(nextSave?.save_id || "inconnu")}, reçu ${expectedSaveId}`);
+  }
+  return issueDiceRoll(count, sides, label, expectedHeadSha, expectedSaveId, env.COOKIE_ENCRYPTION_KEY);
+}
+
 function assertOwner(env: VeyruneEnv) {
   const props = getMcpAuthContext()?.props as Props | undefined;
   const login = props?.login;
@@ -96,12 +144,31 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "search",
     {
-      description: "Use this when you need to locate a player-visible canonical Veyrune document.",
+      description: "Use this when you need to locate a player-visible canonical Veyrune document. Compatibility: if roll_dice is absent from the connector catalog, call search with `roll_dice 2d10 <headSha> <next_save_id> <label>`, then fetch the returned id to generate the signed roll.",
       inputSchema: z.object({ query: z.string() }),
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true, idempotentHint: true },
     },
     async ({ query }) => {
       assertOwner(env);
+      const diceRequest = parseDiceSearch(query);
+      if (diceRequest) {
+        const id = encodeDiceRequest(
+          diceRequest.count,
+          diceRequest.sides,
+          diceRequest.expectedHeadSha,
+          diceRequest.expectedSaveId,
+          diceRequest.label,
+        );
+        return textResult(JSON.stringify({
+          results: [{
+            id,
+            title: `Jet Veyrune signé — ${diceRequest.count}d${diceRequest.sides}${diceRequest.label ? ` — ${diceRequest.label}` : ""}`,
+            url: canonicalUrl(env, "rules/NARRATION_DARK_FANTASY.md"),
+          }],
+          compatibility_bridge: true,
+          next_step: "Appeler fetch avec cet id. Cela exécute le même générateur signé que roll_dice et n'avance pas la fiction.",
+        }));
+      }
       const needle = query.toLowerCase();
       const results = Object.entries(PUBLIC_DOCUMENTS)
         .filter(([, item]) => `${item.title} ${item.path}`.toLowerCase().includes(needle))
@@ -113,12 +180,23 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "fetch",
     {
-      description: "Use this when you need the full text of one player-visible Veyrune document returned by search.",
+      description: "Use this when you need the full text of one player-visible Veyrune document returned by search, or to execute a signed roll_dice compatibility id returned by search.",
       inputSchema: z.object({ id: z.string() }),
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true, idempotentHint: true },
     },
     async ({ id }) => {
       assertOwner(env);
+      const diceRequest = parseDiceRequest(id);
+      if (diceRequest) {
+        return textResult(JSON.stringify(await issueCanonicalDiceRoll(
+          env,
+          diceRequest.count,
+          diceRequest.sides,
+          diceRequest.label,
+          diceRequest.expectedHeadSha,
+          diceRequest.expectedSaveId,
+        )));
+      }
       const item = PUBLIC_DOCUMENTS[id];
       if (!item) throw new Error(`document public inconnu: ${id}`);
       const text = await readFile(env, item.path);
@@ -154,7 +232,7 @@ function createVeyruneServer(env: VeyruneEnv) {
     },
     async ({ count, sides, label, expected_head_sha, expected_save_id }) => {
       assertOwner(env);
-      return textResult(JSON.stringify(await issueDiceRoll(count, sides, label, expected_head_sha, expected_save_id, env.COOKIE_ENCRYPTION_KEY)));
+      return textResult(JSON.stringify(await issueCanonicalDiceRoll(env, count, sides, label, expected_head_sha, expected_save_id)));
     },
   );
 

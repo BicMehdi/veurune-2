@@ -22,6 +22,8 @@ L'écriture GitHub utilise une création d'arbre avec contenu intégré. Les hui
 
 Les champs `mehdi_sheet` et `narration_rules` sont lus au même commit GitHub que le reste du canon. Le MJ utilise la fiche avant tout test et applique les règles d’affichage avant de présenter le résultat.
 
+Si un ancien catalogue de connecteur ne montre pas encore `roll_dice`, `search("roll_dice 2d10 <headSha> <next_save_id> <label>")` renvoie un identifiant que `fetch` exécute avec exactement le même générateur et le même reçu signé. Ce pont peut être retiré lorsque tous les clients rafraîchissent correctement leur catalogue.
+
 ## Tests de non-régression
 
 `npm test` exécute notamment :
