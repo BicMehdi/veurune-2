@@ -27,7 +27,7 @@ test("materialise un patch compact sans perdre les donnees inchangees", () => {
     events: [{ event_id: "EVT-0720-0001", type: "dialogue" }],
   };
   const world = { save_id: "VEY-0719R", turn: 709, audience: "player_visible", district: { name: "Fours", alert: "low" } };
-  const hidden = { save_id: "VEY-0719R", turn: 709, audience: "gm_only", antagonist: { name: "M", clock: 1 } };
+  const hidden = { save_id: "VEY-0719R", turn: 709, audience: "gm_only", unresolved_secrets: [], invented_secret_values: [], antagonist: { name: "M", clock: 1 } };
 
   const materialized = materializeTurnPayload(base, world, hidden, patch);
   assert.deepEqual(materialized.current.scene, {
@@ -72,6 +72,81 @@ test("refuse les champs de continuite geres par le serveur dans un patch", () =>
   }), /champ g.r. par le serveur interdit: save_id/);
 });
 
+test("le mode complet legacy conserve les secrets et les mémoires omis", () => {
+  const base = {
+    save_id: "VEY-0719R",
+    turn: 709,
+    last_event_id: "EVT-0719R-0008",
+    next_expected_save: { save_id: "VEY-0720", parent_save_id: "VEY-0719R", turn: 710 },
+    durable_fact: { kept: true },
+  };
+  const hidden = {
+    save_id: "VEY-0719R",
+    turn: 709,
+    audience: "gm_only",
+    unresolved_secrets: [{ path: "contact.identity", status: "unresolved_hidden", value_known_to_persistence: false }],
+    invented_secret_values: [],
+  };
+  const profile = { save_id: "VEY-0719R", turn: 709, audience: "gm_only", observed_patterns: [{ pattern_id: "P1" }] };
+  const memory = { save_id: "VEY-0719R", turn: 709, audience: "gm_only", chapters: [] };
+  const save = {
+    save_id: "VEY-0720",
+    parent_save_id: "VEY-0719R",
+    turn: 710,
+    event_time: { year: 347, day: 513, clock: "01:26" },
+    record_time: timestamp,
+    fiction_advanced: true,
+  };
+  const materialized = materializeTurnPayload(
+    base,
+    { save_id: "VEY-0719R", turn: 709, audience: "player_visible", known: true },
+    hidden,
+    profile,
+    memory,
+    {
+      expected_head_sha: "a".repeat(40),
+      expected_current_save_id: "VEY-0719R",
+      save,
+      current: {
+        ...save,
+        last_event_id: "EVT-0720-0001",
+        next_expected_save: { save_id: "VEY-0721", parent_save_id: "VEY-0720", turn: 711 },
+      },
+      world: { save_id: "VEY-0720", turn: 710, audience: "player_visible" },
+      hidden: { save_id: "VEY-0720", turn: 710, audience: "gm_only" },
+      events: [{
+        event_id: "EVT-0720-0001",
+        save_id: "VEY-0720",
+        parent_save_id: "VEY-0719R",
+        turn: 710,
+        event_time: save.event_time,
+        record_time: timestamp,
+      }],
+    },
+  );
+
+  assert.equal(materialized.current.durable_fact.kept, true);
+  assert.equal(materialized.hidden.unresolved_secrets[0].path, "contact.identity");
+  assert.equal(materialized.mehdi_profile.observed_patterns[0].pattern_id, "P1");
+  assert.equal(materialized.narrative_memory.rolling_index.current_chapter_id, "CHAPTER-0700-0749");
+  assert.doesNotThrow(() => validateTurnPayload(base, '{"event_id":"EVT-0719R-0008"}\n', materialized, { hidden }));
+});
+
+test("refuse la suppression silencieuse d'un secret non résolu", () => {
+  const { base, payload } = fixture();
+  const baseHidden = {
+    save_id: "VEY-0719R",
+    turn: 709,
+    audience: "gm_only",
+    unresolved_secrets: [{ path: "contact.identity", status: "unresolved_hidden", value_known_to_persistence: false }],
+    invented_secret_values: [],
+  };
+  assert.throws(
+    () => validateTurnPayload(base, '{"event_id":"EVT-0719R-0008"}\n', payload, { hidden: baseHidden }),
+    /suppression silencieuse interdite/,
+  );
+});
+
 function fixture() {
   const base = {
     save_id: "VEY-0719R",
@@ -108,7 +183,7 @@ function fixture() {
         next_expected_save: { save_id: "VEY-0721", parent_save_id: "VEY-0720", turn: 711 },
       },
       world: { save_id: "VEY-0720", turn: 710, audience: "player_visible" },
-      hidden: { save_id: "VEY-0720", turn: 710, audience: "gm_only", unresolved_secrets: [] },
+      hidden: { save_id: "VEY-0720", turn: 710, audience: "gm_only", unresolved_secrets: [], invented_secret_values: [] },
       events: [event],
     },
   };

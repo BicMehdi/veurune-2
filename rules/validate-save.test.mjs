@@ -74,10 +74,11 @@ test("ne déduit jamais save_id depuis turn", () => {
   }));
 });
 
-test("CURRENT est chargé depuis la capsule attestée", () => {
-  assert.notEqual(importedCurrent.scene.status, "not_loaded");
-  assert.notEqual(importedCurrent.player_state.status, "pending_attested_source");
-  assert.equal(importedCurrent.player_state.status, "loaded_from_attested_capsule");
+test("CURRENT vivant reste relié au checkpoint terminal", () => {
+  assert.equal(importedCurrent.save_id, "VEY-0732");
+  assert.equal(importedCurrent.turn, 722);
+  assert.equal(importedCurrent.scene.meeting_active, true);
+  assert.equal(importedCurrent.next_expected_save.parent_save_id, importedCurrent.save_id);
 });
 
 test("le checkpoint de récupération conserve le Pont des Trois Chaînes à 01:24", () => {

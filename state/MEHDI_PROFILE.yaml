@@ -1,0 +1,74 @@
+{
+  "persistence_version": 1,
+  "audience": "gm_only",
+  "save_id": "VEY-0732",
+  "turn": 722,
+  "authority": "descriptive_only_player_final_authority",
+  "update_policy": {
+    "allowed_sources": [
+      "explicit_player_OOC_direction",
+      "canonical_played_events",
+      "player_corrections"
+    ],
+    "forbidden_uses": [
+      "invent_memory_or_knowledge",
+      "prescribe_future_major_choice",
+      "convert_pattern_into_inner_emotion",
+      "punish_player_correction"
+    ]
+  },
+  "delegation": {
+    "ordinary_dialogue": true,
+    "reversible_low_stakes_gestures": true,
+    "major_choices_reserved_to_player": true,
+    "stop_before": [
+      "durable_commitment",
+      "moral_or_political_bifurcation",
+      "pact",
+      "intimate_consent",
+      "relationship_boundary",
+      "important_expenditure",
+      "combat_initiation",
+      "irreversible_violence",
+      "life_or_death_decision"
+    ]
+  },
+  "player_declared_current_direction": {
+    "traits": [
+      "fier",
+      "parfois_arrogant",
+      "incisif",
+      "dur",
+      "peut_etre_percu_comme_violent"
+    ],
+    "not_a_fixed_personality": true,
+    "source": "explicit_player_OOC_direction_after_turn_720"
+  },
+  "observed_patterns": [
+    {
+      "pattern_id": "MEHDI-PATTERN-001",
+      "description": "Sous forte pression, Mehdi emploie volontiers une parole directe, brève et parfois profane.",
+      "confidence": "limited_recent_evidence",
+      "evidence_event_ids": [
+        "EVT-0728-0001",
+        "EVT-0730-0001"
+      ]
+    },
+    {
+      "pattern_id": "MEHDI-PATTERN-002",
+      "description": "Face à une identité incertaine, Mehdi exige des preuves concrètes et peut exercer une pression physique, sans que cela impose sa prochaine réaction.",
+      "confidence": "limited_recent_evidence",
+      "evidence_event_ids": [
+        "EVT-0722-0002",
+        "EVT-0727-0001",
+        "EVT-0729-0001"
+      ]
+    }
+  ],
+  "counterexamples_and_evolution": [],
+  "history_coverage": {
+    "known_campaign_length_turns": 722,
+    "structured_evidence_available_from_turn": 709,
+    "older_behavior_must_not_be_invented": true
+  }
+}

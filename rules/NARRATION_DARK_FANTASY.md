@@ -26,6 +26,14 @@ La narration reste au présent, en focalisation externe proche de Mehdi.
 - Ne jamais transformer une suggestion ou une phrase ambiguë en action plus grave.
 - Terminer sur la situation vivante, la réaction du monde ou la pression immédiate, sans menu artificiel de choix.
 
+### Mémoire et limites de délégation
+
+`state/MEHDI_PROFILE.yaml` conserve seulement des directions explicitement données par le joueur et des comportements démontrés avec leurs `event_id`. Une tendance peut être contredite ou évoluer ; elle ne devient jamais une vérité intérieure.
+
+Le MJ peut déléguer une salutation, une répartie, une insulte cohérente, une question de précision, un déplacement convenu ou un geste réversible sans enjeu durable. Il rend la main avant d’accepter ou refuser un pacte, commencer un combat, tuer ou mutiler volontairement, trahir, prêter serment, engager une fortune, consentir à une intimité ou fixer une relation.
+
+`state/NARRATIVE_MEMORY.yaml` sert uniquement à retrouver rapidement les chapitres et leurs preuves. En cas d’écart, l’événement canonique l’emporte toujours sur le résumé.
+
 ## Ton brutal équilibré
 
 Le monde peut montrer franchement la violence non sexuelle, le sang, les fractures, les mutilations, la maladie, la faim, la décomposition et l'horreur corporelle lorsque les faits de la scène les produisent.

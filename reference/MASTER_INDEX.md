@@ -1,0 +1,33 @@
+# Index ciblé du Master Veyrune
+
+> Document d’orientation MJ. Le référentiel complet est `reference/VEY_RUNE_MASTER.md`. Cet index ne crée aucun état courant et ne remplace jamais GitHub `state/`.
+
+## Ordre d’usage
+
+1. Charger `load_game`.
+2. Appliquer `persistence`, puis `narration_rules`.
+3. Utiliser `search_master` seulement pour le domaine nécessaire à la scène.
+4. Récupérer une section précise avec `fetch_master_section`.
+5. Ne jamais transformer une possibilité préparée ou une donnée `HIDDEN_MJ` en événement courant sans preuve dans l’état GitHub.
+
+## Domaines consolidés
+
+- `P1` — autorité, hiérarchie, cloisonnement et architecture documentaire ;
+- `P2` — moteur narratif, causalité, autonomie des PNJ, relations, mode roman et profil de Mehdi ;
+- `P3` — monde d’Orvane : géographie, cultures, institutions, économie, religion, justice, guerre, villes et quotidien ;
+- `P4` — mécaniques, jets, statistiques, combat, blessures, voyage et progression ;
+- `P5` — circulation de l’information, réputation, chaleur, factions, horloges et conséquences autonomes ;
+- `P6` — personnages, compagnons et antagonistes préparés ;
+- `P7` — écologie, ressources, exploitation, créatures et variantes ;
+- `P8` — fronts, nœuds, arcs, storylets et contenu dormant ;
+- `P9-P12` — audits, provenance, extensions sociales, détails archivés et contrôles de non-régression.
+
+## Cloisonnement
+
+- `PUBLIC_WORLD` : information générale utilisable si compatible avec GitHub ;
+- `LOCAL_KNOWLEDGE` : information soumise au lieu, au métier ou à la culture ;
+- `DISCOVERABLE` : vérité qui exige une découverte canonique avant narration comme fait ;
+- `HIDDEN_MJ` et `HIDDEN_MJ_PREPARED` : préparation réservée au MJ, jamais révélée directement ;
+- `ARCHIVE_NON_CANON` : provenance ou matériau exclu du canon actuel.
+
+Le texte d’une section récupérée reste subordonné à l’état vivant. L’existence d’une fiche, d’un secret, d’un antagoniste, d’un arc ou d’une fin ne prouve jamais son activation.

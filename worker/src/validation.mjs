@@ -79,6 +79,84 @@ function mergePatch(targetValue, patchValue) {
   return target;
 }
 
+function synchronizedProjection(value, audience, saveId, turn) {
+  return {
+    ...object(value, audience),
+    save_id: saveId,
+    turn,
+    audience,
+  };
+}
+
+function chapterIdForTurn(turn) {
+  const start = Math.floor(turn / 50) * 50;
+  return {
+    id: `CHAPTER-${String(start).padStart(4, "0")}-${String(start + 49).padStart(4, "0")}`,
+    start,
+    end: start + 49,
+  };
+}
+
+function advanceNarrativeMemory(value, saveId, turn) {
+  const memory = synchronizedProjection(value, "gm_only", saveId, turn);
+  const chapter = chapterIdForTurn(turn);
+  const chapters = Array.isArray(memory.chapters) ? [...memory.chapters] : [];
+  if (!chapters.some((entry) => entry && entry.chapter_id === chapter.id)) {
+    chapters.push({
+      chapter_id: chapter.id,
+      turn_start: chapter.start,
+      turn_end: chapter.end,
+      coverage_start: turn,
+      status: "summary_due",
+      event_file: eventFileForTurn(turn),
+      summary: [],
+      evidence_event_ids: [],
+      unresolved_summary: [],
+    });
+  }
+  return {
+    ...memory,
+    chapters,
+    rolling_index: {
+      ...(memory.rolling_index && typeof memory.rolling_index === "object" ? memory.rolling_index : {}),
+      current_chapter_id: chapter.id,
+      next_summary_due_at_turn: chapter.end + 1,
+      open_scene_resume_source: "state/CURRENT.yaml",
+    },
+  };
+}
+
+export function validateHiddenState(value, label = "HIDDEN") {
+  const hidden = fields(value, ["save_id", "turn", "audience", "unresolved_secrets", "invented_secret_values"], label);
+  if (hidden.audience !== "gm_only") fail(`${label}.audience doit valoir gm_only`);
+  if (!Array.isArray(hidden.unresolved_secrets)) fail(`${label}.unresolved_secrets doit être un tableau`);
+  const paths = new Set();
+  for (const secret of hidden.unresolved_secrets) {
+    const entry = fields(secret, ["path", "status", "value_known_to_persistence"], `${label}.unresolved_secrets`);
+    if (typeof entry.path !== "string" || !entry.path || entry.status !== "unresolved_hidden" || entry.value_known_to_persistence !== false) {
+      fail(`${label}: enregistrement secret non résolu invalide`);
+    }
+    if (paths.has(entry.path)) fail(`${label}: chemin secret dupliqué: ${entry.path}`);
+    paths.add(entry.path);
+  }
+  if (!Array.isArray(hidden.invented_secret_values) || hidden.invented_secret_values.length !== 0) {
+    fail(`${label}: invented_secret_values doit rester vide`);
+  }
+  return hidden;
+}
+
+function assertHiddenRegistryPreserved(baseHiddenValue, nextHiddenValue) {
+  const base = object(baseHiddenValue, "HIDDEN distant");
+  const next = object(nextHiddenValue, "HIDDEN candidat");
+  if (!Array.isArray(base.unresolved_secrets)) return;
+  const nextPaths = new Set((Array.isArray(next.unresolved_secrets) ? next.unresolved_secrets : []).map((entry) => entry?.path));
+  for (const entry of base.unresolved_secrets) {
+    if (entry?.path && !nextPaths.has(entry.path)) {
+      fail(`HIDDEN: suppression silencieuse interdite pour ${entry.path}`);
+    }
+  }
+}
+
 function rejectReservedKeys(patch, reserved, label) {
   const record = object(patch, label);
   for (const key of Object.keys(record)) {
@@ -94,9 +172,28 @@ const CURRENT_SERVER_KEYS = new Set([
 const PROJECTION_SERVER_KEYS = new Set(["save_id", "turn", "audience"]);
 const EVENT_SERVER_KEYS = new Set(["save_id", "parent_save_id", "turn", "event_time", "record_time"]);
 
-export function materializeTurnPayload(baseCurrentValue, baseWorldValue, baseHiddenValue, payloadValue) {
+export function materializeTurnPayload(baseCurrentValue, baseWorldValue, baseHiddenValue, ...rest) {
+  let baseProfileValue = {};
+  let baseMemoryValue = {};
+  let payloadValue;
+  if (rest.length === 1) [payloadValue] = rest;
+  else [baseProfileValue, baseMemoryValue, payloadValue] = rest;
   const payload = object(payloadValue, "save_turn");
-  if (payload.mode !== "patch") return payloadValue;
+  if (payload.mode !== "patch") {
+    const full = fields(payload, ["save", "current", "world", "hidden", "events"], "save_turn full");
+    const current = mergePatch(mergePatch(baseCurrentValue, full.save), full.current);
+    const saveId = current.save_id;
+    const turn = current.turn;
+    return {
+      ...full,
+      save: current,
+      current,
+      world: synchronizedProjection(mergePatch(baseWorldValue, full.world), "player_visible", saveId, turn),
+      hidden: synchronizedProjection(mergePatch(baseHiddenValue, full.hidden), "gm_only", saveId, turn),
+      mehdi_profile: synchronizedProjection(mergePatch(baseProfileValue, full.mehdi_profile ?? {}), "gm_only", saveId, turn),
+      narrative_memory: advanceNarrativeMemory(mergePatch(baseMemoryValue, full.narrative_memory ?? {}), saveId, turn),
+    };
+  }
 
   const base = fields(baseCurrentValue, ["save_id", "turn", "next_expected_save"], "CURRENT distant");
   const fast = fields(payload, [
@@ -106,6 +203,8 @@ export function materializeTurnPayload(baseCurrentValue, baseWorldValue, baseHid
   const currentPatch = rejectReservedKeys(fast.current_patch, CURRENT_SERVER_KEYS, "current_patch");
   const worldPatch = rejectReservedKeys(fast.world_patch, PROJECTION_SERVER_KEYS, "world_patch");
   const hiddenPatch = rejectReservedKeys(fast.hidden_patch, PROJECTION_SERVER_KEYS, "hidden_patch");
+  const profilePatch = rejectReservedKeys(fast.mehdi_profile_patch ?? {}, PROJECTION_SERVER_KEYS, "mehdi_profile_patch");
+  const memoryPatch = rejectReservedKeys(fast.narrative_memory_patch ?? {}, PROJECTION_SERVER_KEYS, "narrative_memory_patch");
   if (!Array.isArray(fast.events) || fast.events.length === 0 || fast.events.length > 50) {
     fail("events doit contenir entre 1 et 50 événements atomiques");
   }
@@ -157,6 +256,8 @@ export function materializeTurnPayload(baseCurrentValue, baseWorldValue, baseHid
     turn,
     audience: "gm_only",
   };
+  const mehdiProfile = synchronizedProjection(mergePatch(baseProfileValue, profilePatch), "gm_only", saveId, turn);
+  const narrativeMemory = advanceNarrativeMemory(mergePatch(baseMemoryValue, memoryPatch), saveId, turn);
   return {
     expected_head_sha: fast.expected_head_sha,
     expected_current_save_id: fast.expected_current_save_id,
@@ -164,6 +265,8 @@ export function materializeTurnPayload(baseCurrentValue, baseWorldValue, baseHid
     current,
     world,
     hidden,
+    mehdi_profile: mehdiProfile,
+    narrative_memory: narrativeMemory,
     events,
   };
 }
@@ -189,13 +292,19 @@ function existingEventIds(text) {
   return { ids, events };
 }
 
-export function validateTurnPayload(baseCurrentValue, existingEventsText, payloadValue) {
+export function validateTurnPayload(baseCurrentValue, existingEventsText, payloadValue, baseState = {}) {
   const base = fields(baseCurrentValue, ["save_id", "turn", "last_event_id", "next_expected_save"], "CURRENT distant");
   const payload = fields(payloadValue, ["expected_head_sha", "expected_current_save_id", "save", "current", "world", "hidden", "events"], "save_turn");
   const save = fields(payload.save, ["save_id", "parent_save_id", "turn", "event_time", "record_time", "fiction_advanced"], "save");
   const current = fields(payload.current, ["save_id", "parent_save_id", "turn", "record_time", "last_event_id", "next_expected_save"], "current");
   const world = fields(payload.world, ["save_id", "turn", "audience"], "world");
   const hidden = fields(payload.hidden, ["save_id", "turn", "audience"], "hidden");
+  const mehdiProfile = payload.mehdi_profile
+    ? fields(payload.mehdi_profile, ["save_id", "turn", "audience"], "mehdi_profile")
+    : null;
+  const narrativeMemory = payload.narrative_memory
+    ? fields(payload.narrative_memory, ["save_id", "turn", "audience"], "narrative_memory")
+    : null;
 
   if (typeof payload.expected_head_sha !== "string" || !/^[0-9a-f]{40}$/i.test(payload.expected_head_sha)) fail("expected_head_sha invalide");
   if (payload.expected_current_save_id !== base.save_id) fail(`état périmé: attendu ${payload.expected_current_save_id}, trouvé ${base.save_id}`);
@@ -212,6 +321,13 @@ export function validateTurnPayload(baseCurrentValue, existingEventsText, payloa
   instant(current.record_time, "current.record_time");
   if (world.save_id !== save.save_id || world.turn !== save.turn || world.audience !== "player_visible") fail("world ne correspond pas au nouveau checkpoint joueur");
   if (hidden.save_id !== save.save_id || hidden.turn !== save.turn || hidden.audience !== "gm_only") fail("hidden ne correspond pas au nouveau checkpoint MJ");
+  validateHiddenState(hidden, "hidden");
+  if (baseState.hidden) assertHiddenRegistryPreserved(baseState.hidden, hidden);
+  for (const [projection, label] of [[mehdiProfile, "mehdi_profile"], [narrativeMemory, "narrative_memory"]]) {
+    if (projection && (projection.save_id !== save.save_id || projection.turn !== save.turn || projection.audience !== "gm_only")) {
+      fail(`${label} ne correspond pas au nouveau checkpoint`);
+    }
+  }
   assertPlayerVisible(current, "current");
   assertPlayerVisible(world, "world");
 
@@ -253,6 +369,8 @@ export function validateTurnPayload(baseCurrentValue, existingEventsText, payloa
     "state/HIDDEN.yaml": jsonDocument(hidden),
     [eventFileForTurn(save.turn)]: appendedEvents,
   };
+  if (mehdiProfile) files["state/MEHDI_PROFILE.yaml"] = jsonDocument(mehdiProfile);
+  if (narrativeMemory) files["state/NARRATIVE_MEMORY.yaml"] = jsonDocument(narrativeMemory);
   const totalBytes = Object.values(files).reduce((total, text) => total + new TextEncoder().encode(text).byteLength, 0);
   if (totalBytes > 1_000_000) fail("transaction trop volumineuse (maximum 1 Mo)");
 

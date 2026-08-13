@@ -16,5 +16,9 @@
 14. Un checkpoint technique ne fait pas avancer la fiction.
 15. Une suppression ou une modification d’une ligne JSONL existante bloque la validation append-only.
 16. Un patch de sauvegarde ne modifie que les clés explicitement fournies. Les données absentes restent intactes ; `null` constitue une suppression explicite et un tableau fourni remplace le tableau entier. Le checkpoint complet reconstruit subit toutes les validations ordinaires avant le commit.
+17. Le mode complet historique est matérialisé par fusion avec l’état GitHub chargé. Une clé omise n’est jamais interprétée comme une suppression.
+18. Le registre `HIDDEN.unresolved_secrets` ne peut perdre silencieusement aucun chemin. Une découverte future doit conserver une trace explicite de la résolution au lieu d’effacer la mémoire.
+19. `MEHDI_PROFILE` reste descriptif, sourcé et révisable ; il ne prescrit jamais un choix majeur. `NARRATIVE_MEMORY` est un index de rappel et ne remplace jamais les événements.
+20. Une réponse réseau absente après `save_turn` se résout par `check_save_status`, jamais par une nouvelle supposition de tour.
 
 Les fichiers `.yaml` de ce dépôt utilisent le sous-ensemble JSON de YAML 1.2. Ils restent des documents YAML valides tout en permettant une validation reproductible avec Node.js sans bibliothèque externe.

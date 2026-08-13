@@ -4,33 +4,31 @@ Il n’est pas nécessaire de jouer sur PC en permanence.
 
 Pour cet usage, le PC sert surtout à mettre en place Codex et le dépôt GitHub au début, puis éventuellement à effectuer certaines opérations de maintenance.
 
-## Architecture prévue
+## Architecture active
 
-### Configuration initiale sur PC
+### Configuration et maintenance sur PC
 
 - connecter Codex ;
 - connecter le dépôt `BicMehdi/veurune-2` ;
 - créer les fichiers de sauvegarde ;
 - vérifier que Codex peut créer des commits et pousser les changements vers GitHub.
 
-### Utilisation ensuite sur téléphone
+### Utilisation sur téléphone
 
 - continuer à jouer à Veyrune dans ChatGPT ;
-- utiliser ce dépôt GitHub comme sauvegarde permanente.
+- utiliser automatiquement ce dépôt GitHub comme sauvegarde permanente grâce à Veyrune Cloud Save.
 
-## Limite actuelle
+## État actuel
 
-Une conversation de jeu normale sur téléphone ne déclenche pas automatiquement Codex après chaque message. Les workflows ChatGPT et Codex restent séparés.
+Le Worker Cloudflare assure désormais le chargement et la sauvegarde depuis un chat mobile, PC éteint. Chaque vrai tour est validé puis enregistré atomiquement. Les anciens clients utilisant le format complet ne peuvent plus effacer des champs omis ; le format patch reste recommandé pour la vitesse.
 
-Pour obtenir une sauvegarde GitHub après chaque tour, il faut donc soit :
+Le projet conserve également :
 
-- faire passer la partie elle-même dans un workflow compatible avec Codex ou ChatGPT Work ;
-- construire une automatisation qui écrit l’état de la partie dans GitHub ;
-- lancer périodiquement Codex pour synchroniser la sauvegarde.
-
-## Conclusion
-
-L’installation initiale peut être réalisée une seule fois sur PC. En revanche, Codex seul ne transforme pas automatiquement une conversation mobile Veyrune en système de sauvegarde GitHub après chaque tour : cette synchronisation doit être automatisée séparément.
+- le profil descriptif et révisable de Mehdi ;
+- une mémoire narrative par chapitres de 50 tours ;
+- le Master consolidé complet avec recherche ciblée par section ;
+- un registre MJ caché protégé contre les suppressions silencieuses ;
+- une vérification de sauvegarde idempotente lorsque la réponse réseau se perd.
 
 ## Système de sauvegarde
 

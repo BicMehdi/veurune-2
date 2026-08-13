@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import { validateHiddenState } from "../worker/src/validation.mjs";
 
 const ISO_INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/;
 const HIDDEN_KEYS = new Set(["hidden_state", "secrets", "private_agendas", "sealed_revelations", "gm_only"]);
@@ -98,6 +99,8 @@ export function validateRepository(rootDir) {
   const current = parseYamlSubset(path.join(stateDir, "CURRENT.yaml"));
   const world = parseYamlSubset(path.join(stateDir, "WORLD.yaml"));
   const hidden = parseYamlSubset(path.join(stateDir, "HIDDEN.yaml"));
+  const mehdiProfile = parseYamlSubset(path.join(stateDir, "MEHDI_PROFILE.yaml"));
+  const narrativeMemory = parseYamlSubset(path.join(stateDir, "NARRATIVE_MEMORY.yaml"));
 
   requireFields(current, ["save_id", "parent_save_id", "turn", "fiction_advanced", "record_time", "last_event_id", "next_expected_save"], "CURRENT");
   validateInstant(current.record_time, "CURRENT.record_time");
@@ -105,18 +108,16 @@ export function validateRepository(rootDir) {
   assertNoHiddenKeys(world, "WORLD");
   assertNoHiddenMarkers(current, "CURRENT");
   assertNoHiddenMarkers(world, "WORLD");
-  if (hidden.audience !== "gm_only") fail("HIDDEN.audience doit valoir gm_only");
-  if (!Array.isArray(hidden.unresolved_secrets) || hidden.unresolved_secrets.length === 0) fail("HIDDEN.unresolved_secrets doit conserver les emplacements secrets non résolus");
-  for (const secret of hidden.unresolved_secrets) {
-    if (typeof secret.path !== "string" || !secret.path || secret.status !== "unresolved_hidden" || secret.value_known_to_persistence !== false) {
-      fail(`HIDDEN: valeur secrète inventée ou enregistrement invalide pour ${secret.path ?? "chemin inconnu"}`);
-    }
-  }
-  if (!Array.isArray(hidden.invented_secret_values) || hidden.invented_secret_values.length !== 0) fail("HIDDEN contient une valeur secrète inventée");
+  validateHiddenState(hidden, "HIDDEN");
   if (world.audience !== "player_visible") fail("WORLD.audience doit valoir player_visible");
   for (const projection of [[world, "WORLD"], [hidden, "HIDDEN"]]) {
     if (projection[0].save_id !== current.save_id || projection[0].turn !== current.turn) {
       fail(`${projection[1]} ne correspond pas à CURRENT`);
+    }
+  }
+  for (const [projection, label] of [[mehdiProfile, "MEHDI_PROFILE"], [narrativeMemory, "NARRATIVE_MEMORY"]]) {
+    if (projection.audience !== "gm_only" || projection.save_id !== current.save_id || projection.turn !== current.turn) {
+      fail(`${label} ne correspond pas à CURRENT`);
     }
   }
 
@@ -179,7 +180,7 @@ export function validateRepository(rootDir) {
     }
   }
   if (!lastEvent || lastEvent.event_id !== current.last_event_id) fail("CURRENT.last_event_id ne correspond pas au dernier événement");
-  return { current, world, hidden, saves: saves.size, events: eventIds.size };
+  return { current, world, hidden, mehdiProfile, narrativeMemory, saves: saves.size, events: eventIds.size };
 }
 
 const invokedDirectly = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);

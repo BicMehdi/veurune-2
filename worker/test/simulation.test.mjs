@@ -40,7 +40,7 @@ function payloadFor(base) {
       next_expected_save: nextExpected(saveId, turn),
     },
     world: { save_id: saveId, turn, audience: "player_visible" },
-    hidden: { save_id: saveId, turn, audience: "gm_only", unresolved_secrets: [] },
+    hidden: { save_id: saveId, turn, audience: "gm_only", unresolved_secrets: [], invented_secret_values: [] },
     events: [{
       event_id: id,
       save_id: saveId,

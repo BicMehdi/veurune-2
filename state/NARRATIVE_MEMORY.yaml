@@ -1,0 +1,53 @@
+{
+  "persistence_version": 1,
+  "audience": "gm_only",
+  "save_id": "VEY-0732",
+  "turn": 722,
+  "policy": {
+    "role": "fast_recall_index_only",
+    "event_log_remains_authoritative": true,
+    "never_create_unplayed_history": true,
+    "chapter_size_turns": 50,
+    "summary_requires_event_evidence": true
+  },
+  "history_coverage": {
+    "campaign_turns_known": 722,
+    "structured_event_history_complete_from_turn": 709,
+    "earlier_history": "partial_snapshot_only"
+  },
+  "chapters": [
+    {
+      "chapter_id": "CHAPTER-0700-0749",
+      "turn_start": 700,
+      "turn_end": 749,
+      "coverage_start": 709,
+      "status": "open",
+      "event_file": "events/0700-0799.jsonl",
+      "summary": [
+        "Au Pont des Trois Chaînes, Mehdi poursuit une vérification d'identité avec un contact dont l'identité demeure non résolue.",
+        "L'échange porte sur une attaque de cargaison, une escorte et une marque de caravane faite de traits.",
+        "Mehdi a saisi le vêtement du contact puis l'a relâché lorsque celui-ci l'a exigé ; la rencontre n'a pas basculé en combat.",
+        "Aux tours 721 et 722, le contact explique sa méthode de vérification puis répond oui au détail de l'étui noir, sans que cette réponse confirme son identité."
+      ],
+      "evidence_event_ids": [
+        "EVT-0719R-0001",
+        "EVT-0724-0001",
+        "EVT-0727-0001",
+        "EVT-0729-0001",
+        "EVT-0730-0002",
+        "EVT-0731-0002",
+        "EVT-0732-0002"
+      ],
+      "unresolved_summary": [
+        "identite_du_contact",
+        "connaissance_reelle_de_la_marque",
+        "details_objectifs_de_la_marque"
+      ]
+    }
+  ],
+  "rolling_index": {
+    "current_chapter_id": "CHAPTER-0700-0749",
+    "next_summary_due_at_turn": 750,
+    "open_scene_resume_source": "state/CURRENT.yaml"
+  }
+}
