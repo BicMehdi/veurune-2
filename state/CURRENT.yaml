@@ -1,12 +1,12 @@
 {
   "persistence_version": 1,
-  "save_id": "VEY-0731",
-  "parent_save_id": "VEY-0730",
-  "turn": 721,
+  "save_id": "VEY-0732",
+  "parent_save_id": "VEY-0731",
+  "turn": 722,
   "checkpoint_kind": "narrative_turn",
   "fiction_advanced": true,
-  "record_time": "2026-08-13T11:09:00Z",
-  "last_event_id": "EVT-0731-0002",
+  "record_time": "2026-08-13T11:14:00Z",
+  "last_event_id": "EVT-0732-0002",
   "time": {
     "year": 347,
     "day": 513,
@@ -23,15 +23,19 @@
     "physical_confrontation_active": false
   },
   "player_declared_action": {
-    "dialogue_intent": "demande_une_derniere_fois_ce_que_le_contact_cherche_si_ce_n_est_pas_a_enerver_Mehdi",
+    "dialogue": [
+      "Pardon c'est ma faute, non tu voulais acheter un étui noir."
+    ],
     "intent": {
-      "demand_contact_explain_purpose_of_repeated_detail_questions": true,
+      "apologize_for_previous_confusion": true,
+      "test_contact_with_black_case_detail": true,
+      "continue_identity_verification": true,
       "attack": false,
       "threat": false
     }
   },
   "previous_action_result": {
-    "resolution": "contact_explains_that_specific_details_are_required_to_avoid_being_fed_the_answer_during_identity_test",
+    "resolution": "contact_answers_yes_to_black_case_claim_but_warns_that_agreement_alone_is_not_identity_proof",
     "roll_required": false
   },
   "bridge_contact": {
@@ -40,13 +44,14 @@
       "does_not_leave_meeting": true,
       "identity_confirmed": false,
       "identity_denied": false,
-      "explains_reason_for_requesting_specific_mark_details": true,
-      "does_not_confirm_caravan_marking": true
+      "answers_yes_to_black_case_claim": true,
+      "agreement_establishes_objective_history": false,
+      "continues_identity_verification": true
     },
     "dialogue": [
-      "Je cherche à savoir si tu me testes vraiment, pas à te faire réciter ta nuit.",
-      "Si je te donne moi-même le motif, tu ne vérifies plus rien. Tu me souffles une histoire et j’y entre.",
-      "Tu veux savoir si je suis Meren ? Donne-moi ce que tu as vu. Le signe exact. Ensuite je te dirai ce que j’en sais."
+      "Oui.",
+      "Voilà. Là, tu m'as enfin donné une question.",
+      "Mais ne fais pas l'erreur de croire qu'un « oui » me rend Meren. Demande-moi ce que tu ne m'as pas déjà donné."
     ],
     "identity_resolution": {
       "status": "unresolved",
@@ -61,6 +66,9 @@
       "cargo_attack_claim_by_Mehdi": true,
       "caravan_marking_claim_by_Mehdi": true,
       "caravan_marking_lines_claim_by_Mehdi": true,
+      "black_case_claim_by_Mehdi": true,
+      "black_case_objective_history_unresolved": true,
+      "contact_black_case_answer_is_claim_only": true,
       "cargo_attack_objective_details_unresolved": true,
       "caravan_marking_objective_details_unresolved": true,
       "contact_knowledge_of_cargo_attack_unresolved": true,
@@ -68,14 +76,14 @@
     }
   },
   "resume_prompt": {
-    "situation": "Mehdi demande une dernière fois ce que le contact cherche à obtenir, sinon l'énerver.",
-    "result": "Le contact explique qu'il exige le signe exact pour éviter de fournir lui-même les éléments du test et maintient qu'il répondra ensuite à ce qu'il en sait.",
-    "waiting_state": "L'homme attend le signe exact observé par Mehdi."
+    "situation": "Mehdi s'excuse pour la confusion précédente et avance un nouveau détail de vérification : le contact voulait acheter un étui noir.",
+    "result": "Le contact répond oui, mais souligne que cette approbation ne constitue pas à elle seule une preuve d'identité et demande un détail que Mehdi ne lui a pas déjà fourni.",
+    "waiting_state": "Le contact reste en face de Mehdi ; son identité et la vérité historique sur l'étui noir restent non établies."
   },
   "next_expected_save": {
-    "save_id": "VEY-0732",
-    "parent_save_id": "VEY-0731",
-    "turn": 722
+    "save_id": "VEY-0733",
+    "parent_save_id": "VEY-0732",
+    "turn": 723
   },
   "event_time": {
     "year": 347,

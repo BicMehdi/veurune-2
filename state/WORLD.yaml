@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0731",
-  "turn": 721,
+  "save_id": "VEY-0732",
+  "turn": 722,
   "time": {
     "year": 347,
     "day": 513,
@@ -21,11 +21,11 @@
   "last_action": {
     "actor": "bridge_contact",
     "dialogue_sequence": [
-      "Je cherche à savoir si tu me testes vraiment, pas à te faire réciter ta nuit.",
-      "Si je te donne moi-même le motif, tu ne vérifies plus rien. Tu me souffles une histoire et j’y entre.",
-      "Tu veux savoir si je suis Meren ? Donne-moi ce que tu as vu. Le signe exact. Ensuite je te dirai ce que j’en sais."
+      "Oui.",
+      "Voilà. Là, tu m'as enfin donné une question.",
+      "Mais ne fais pas l'erreur de croire qu'un « oui » me rend Meren. Demande-moi ce que tu ne m'as pas déjà donné."
     ],
-    "intent": "explain_verification_method_without_confirming_identity_or_marking"
+    "intent": "answer_black_case_claim_without_treating_agreement_as_identity_proof"
   },
   "bridge_contact": {
     "response": {
@@ -33,13 +33,14 @@
       "does_not_leave_meeting": true,
       "identity_confirmed": false,
       "identity_denied": false,
-      "explains_reason_for_requesting_specific_mark_details": true,
-      "does_not_confirm_caravan_marking": true
+      "answers_yes_to_black_case_claim": true,
+      "agreement_establishes_objective_history": false,
+      "continues_identity_verification": true
     },
     "dialogue": [
-      "Je cherche à savoir si tu me testes vraiment, pas à te faire réciter ta nuit.",
-      "Si je te donne moi-même le motif, tu ne vérifies plus rien. Tu me souffles une histoire et j’y entre.",
-      "Tu veux savoir si je suis Meren ? Donne-moi ce que tu as vu. Le signe exact. Ensuite je te dirai ce que j’en sais."
+      "Oui.",
+      "Voilà. Là, tu m'as enfin donné une question.",
+      "Mais ne fais pas l'erreur de croire qu'un « oui » me rend Meren. Demande-moi ce que tu ne m'as pas déjà donné."
     ],
     "identity": {
       "whether_Meren": "unresolved",
@@ -51,18 +52,17 @@
   "open_threads": {
     "immediate": {
       "identity_verification_question_in_progress": true,
-      "cargo_attack_claim_by_Mehdi": true,
-      "caravan_marking_claim_by_Mehdi": true,
-      "caravan_marking_lines_claim_by_Mehdi": true,
+      "black_case_claim_by_Mehdi": true,
+      "black_case_objective_history_unresolved": true,
+      "contact_black_case_answer_is_claim_only": true,
       "cargo_attack_objective_details_unresolved": true,
-      "caravan_marking_objective_details_unresolved": true,
-      "contact_knowledge_of_cargo_attack_unresolved": true,
-      "contact_knowledge_of_caravan_marking_unresolved": true
+      "caravan_marking_objective_details_unresolved": true
     }
   },
   "information_firewall": {
     "contact_identity_unresolved": true,
     "cargo_attack_objective_details_unresolved": true,
-    "caravan_marking_objective_details_unresolved": true
+    "caravan_marking_objective_details_unresolved": true,
+    "black_case_objective_history_unresolved": true
   }
 }

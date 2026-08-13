@@ -1,0 +1,15 @@
+{
+  "persistence_version": 1,
+  "save_id": "VEY-0732",
+  "parent_save_id": "VEY-0731",
+  "turn": 722,
+  "checkpoint_kind": "narrative_turn",
+  "fiction_advanced": true,
+  "record_time": "2026-08-13T11:14:00Z",
+  "last_event_id": "EVT-0732-0002",
+  "event_time": {
+    "year": 347,
+    "day": 513,
+    "clock": "01:25"
+  }
+}
