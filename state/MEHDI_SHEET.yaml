@@ -1,0 +1,85 @@
+{
+  "persistence_version": 1,
+  "audience": "player_visible",
+  "save_id": "VEY-0733",
+  "turn": 723,
+  "authority": "current_mechanical_projection",
+  "ruleset": "V3.2.2",
+  "formula": "2d10 + capability + mastery + modifiers",
+  "provenance": {
+    "recovered_from_save_id": "VEY-0724",
+    "recovered_from_turn": 714,
+    "recovery_kind": "technical_projection_without_fiction_advance",
+    "mechanical_change_after_source_found": false,
+    "events_reviewed_through": "EVT-0733-0002",
+    "values_must_change_only_through_explicit_mechanical_event": true
+  },
+  "status": {
+    "alive": true,
+    "conscious": true,
+    "combat_capable": true
+  },
+  "endurance": {
+    "current": 8,
+    "max": 14
+  },
+  "defense": 13,
+  "protection": 3,
+  "resolution": {
+    "current": 2,
+    "max": 2
+  },
+  "fatigue": 0,
+  "corruption": 0,
+  "reaction_available": true,
+  "exposed": false,
+  "capabilities": {
+    "vigor": 5,
+    "address": 1,
+    "instinct": 1,
+    "reason": 0,
+    "will": 2,
+    "presence": 1
+  },
+  "masteries": {
+    "melee": 3,
+    "athletics": 3,
+    "intimidation": 2,
+    "vigilance": 2,
+    "survival": 1,
+    "research": 0,
+    "stealth": 0,
+    "influence": 0,
+    "tir": 0,
+    "commandement": 0
+  },
+  "techniques": [
+    "heavy_strike",
+    "sweep",
+    "guard_break",
+    "engagement",
+    "fermer_la_porte"
+  ],
+  "mechanical_equipment": {
+    "Yared": {
+      "type": "greatsword",
+      "damage": 5,
+      "condition": 2,
+      "drawn": true
+    },
+    "reinforced_mail": {
+      "protection": 3,
+      "condition": 2
+    }
+  },
+  "wounds": {
+    "superficial_hip_cut": true,
+    "superficial_crossbow_flank_wound": true,
+    "superficial_upper_arm_cut": true,
+    "superficial_flank_blade_cut": true,
+    "moderate_flank_torso_blade_wound": {
+      "grave": false,
+      "permanent": false
+    }
+  }
+}

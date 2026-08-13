@@ -5,7 +5,8 @@ import { z } from "zod";
 import { canonicalUrl, checkSaveStatus, commitTurn, fetchMasterSection, getHeadSha, loadGame, readFile, searchMaster } from "./github";
 import { GitHubHandler } from "./github-handler";
 import type { VeyruneEnv } from "./env";
-import { eventFileForTurn, parseDocument, validateHiddenState } from "./validation.mjs";
+import { rollDice } from "./dice";
+import { eventFileForTurn, parseDocument, validateHiddenState, validateMehdiSheet } from "./validation.mjs";
 import type { Props } from "./utils";
 
 const PUBLIC_DOCUMENTS: Record<string, { title: string; path: string }> = {
@@ -14,6 +15,7 @@ const PUBLIC_DOCUMENTS: Record<string, { title: string; path: string }> = {
   bootstrap: { title: "Procédure de reprise canonique", path: "SYSTEM/BOOTSTRAP.md" },
   persistence: { title: "Règles de persistance", path: "rules/PERSISTENCE.md" },
   narration: { title: "Règles permanentes de narration Dark Fantasy", path: "rules/NARRATION_DARK_FANTASY.md" },
+  mehdi_sheet: { title: "Fiche mécanique actuelle de Mehdi", path: "state/MEHDI_SHEET.yaml" },
 };
 
 const eventTimeSchema = z.union([
@@ -35,6 +37,7 @@ const fullSaveTurnSchema = z.object({
   hidden: z.record(z.string(), z.unknown()),
   mehdi_profile: z.record(z.string(), z.unknown()).optional(),
   narrative_memory: z.record(z.string(), z.unknown()).optional(),
+  mehdi_sheet: z.record(z.string(), z.unknown()).optional(),
   events: z.array(z.record(z.string(), z.unknown())).min(1).max(50),
 });
 
@@ -61,8 +64,11 @@ const patchSaveTurnSchema = z.object({
   narrative_memory_patch: z.record(z.string(), z.unknown()).optional().describe(
     "Résumé de chapitre fondé sur des event_id existants; ne remplace jamais le journal événementiel.",
   ),
+  mehdi_sheet_patch: z.record(z.string(), z.unknown()).optional().describe(
+    "Uniquement les changements mécaniques explicitement causés pendant le tour: Endurance, ressources, états, valeurs, équipement ou progression. Une valeur inchangée est omise.",
+  ),
   events: z.array(z.record(z.string(), z.unknown())).min(1).max(50).describe(
-    "Événements atomiques nouveaux. Fournir event_id et les faits; le serveur ajoute automatiquement filiation, tour et horodatages.",
+    "Événements atomiques nouveaux. Fournir event_id et les faits; le serveur ajoute automatiquement filiation, tour et horodatages. Pour un test, reprendre exactement roll_id, notation et dice de roll_dice, puis capacité, maîtrise, modificateurs, total, cible publique ou hidden, marge publique si permise, degré et conséquence.",
   ),
 });
 
@@ -81,9 +87,9 @@ function assertOwner(env: VeyruneEnv) {
 
 function createVeyruneServer(env: VeyruneEnv) {
   const server = new McpServer(
-    { name: "veyrune-cloud-save", version: "1.2.0" },
+    { name: "veyrune-cloud-save", version: "1.3.0" },
     {
-      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_profile et narrative_memory pour la continuité. Consulter le Master seulement par section ciblée. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale. Ne jamais annoncer un tour comme acquis si save_turn échoue. Ne jamais révéler hidden ni une section MJ non découverte.",
+      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. Tout hasard passe par roll_dice. Afficher chaque jet public selon narration_rules, y compris au milieu d'un dialogue; garder seulement l'opposition sensible cachée. Consulter le Master par section ciblée. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale. Ne jamais annoncer un tour comme acquis si save_turn échoue. Ne jamais révéler hidden ni une section MJ non découverte.",
     },
   );
 
@@ -123,13 +129,30 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "load_game",
     {
-      description: "Use this before resuming Veyrune or resolving a new turn. Loads persistence and permanent Dark Fantasy narration rules, current state, recent events, player projection, and GM-only unresolved state from canonical GitHub main.",
+      description: "Use this before resuming Veyrune or resolving a new turn. Loads rules, current state, Mehdi's current mechanical sheet, recent events, player projection, and GM-only continuity from canonical GitHub main.",
       inputSchema: z.object({}),
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true, idempotentHint: true },
     },
     async () => {
       assertOwner(env);
       return textResult(JSON.stringify(await loadGame(env)));
+    },
+  );
+
+  server.registerTool(
+    "roll_dice",
+    {
+      description: "Génère les dés impartiaux d'un test Veyrune sans avancer la fiction. Utiliser ce résultat exact dans l'événement sauvegardé et afficher tout jet public selon les règles de narration.",
+      inputSchema: z.object({
+        count: z.number().int().min(1).max(10).default(2),
+        sides: z.number().int().min(2).max(100).default(10),
+        label: z.string().max(120).optional(),
+      }),
+      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: false },
+    },
+    async ({ count, sides, label }) => {
+      assertOwner(env);
+      return textResult(JSON.stringify(rollDice(count, sides, label)));
     },
   );
 
@@ -162,7 +185,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "save_turn",
     {
-      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch: send only changed facts; the server reconstructs and validates the complete checkpoint without losing untouched depth. Legacy full mode remains accepted. Atomically commits the complete save, projections, hidden state, and append-only events to GitHub main. If it fails, the narrative turn is not committed.",
+      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch: send only changed facts; the server reconstructs and validates the complete checkpoint without losing untouched depth. Preserve mehdi_sheet unless an explicit mechanical event changes it. Every roll event must reuse the exact roll_dice output. Legacy full mode remains accepted. Atomically commits the complete save, projections, hidden state, and append-only events to GitHub main. If it fails, the narrative turn is not committed.",
       inputSchema: z.union([patchSaveTurnSchema, fullSaveTurnSchema]),
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true, idempotentHint: false },
     },
@@ -195,20 +218,23 @@ function createVeyruneServer(env: VeyruneEnv) {
     async () => {
       assertOwner(env);
       const headSha = await getHeadSha(env);
-      const [currentText, hiddenText, profileText, memoryText] = await Promise.all([
+      const [currentText, hiddenText, profileText, memoryText, sheetText] = await Promise.all([
         readFile(env, "state/CURRENT.yaml", headSha),
         readFile(env, "state/HIDDEN.yaml", headSha),
         readFile(env, "state/MEHDI_PROFILE.yaml", headSha),
         readFile(env, "state/NARRATIVE_MEMORY.yaml", headSha),
+        readFile(env, "state/MEHDI_SHEET.yaml", headSha),
       ]);
       const current = parseDocument(currentText, "CURRENT");
       const hidden = validateHiddenState(parseDocument(hiddenText, "HIDDEN"), "HIDDEN");
       const profile = parseDocument(profileText, "MEHDI_PROFILE");
       const memory = parseDocument(memoryText, "NARRATIVE_MEMORY");
+      const sheet = validateMehdiSheet(parseDocument(sheetText, "MEHDI_SHEET"), "MEHDI_SHEET");
       const synchronizedProjections: Array<[Record<string, unknown>, string]> = [
         [hidden, "HIDDEN"],
         [profile, "MEHDI_PROFILE"],
         [memory, "NARRATIVE_MEMORY"],
+        [sheet, "MEHDI_SHEET"],
       ];
       for (const [projection, label] of synchronizedProjections) {
         if (projection.save_id !== current.save_id || projection.turn !== current.turn) throw new Error(`${label} désynchronisé de CURRENT`);
@@ -222,6 +248,7 @@ function createVeyruneServer(env: VeyruneEnv) {
         protectedHiddenRegistry: true,
         mehdiProfileLoaded: true,
         narrativeMemoryLoaded: true,
+        mehdiSheetLoaded: true,
       }));
     },
   );

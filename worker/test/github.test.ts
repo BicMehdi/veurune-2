@@ -26,6 +26,7 @@ test("charge les règles de narration au même commit que tout le canon", async 
     if (url.includes("/contents/state/HIDDEN.yaml")) return new Response("hidden");
     if (url.includes("/contents/state/MEHDI_PROFILE.yaml")) return new Response("profile");
     if (url.includes("/contents/state/NARRATIVE_MEMORY.yaml")) return new Response("memory");
+    if (url.includes("/contents/state/MEHDI_SHEET.yaml")) return new Response("sheet");
     if (url.includes("/contents/reference/MASTER_INDEX.md")) return new Response("master-index");
     if (url.includes("/contents/SYSTEM/BOOTSTRAP.md")) return new Response("bootstrap");
     if (url.includes("/contents/rules/PERSISTENCE.md")) return new Response("persistence");
@@ -43,6 +44,7 @@ test("charge les règles de narration au même commit que tout le canon", async 
   assert.equal(result.persistence, "persistence");
   assert.equal(result.mehdi_profile, "profile");
   assert.equal(result.narrative_memory, "memory");
+  assert.equal(result.mehdi_sheet, "sheet");
   assert.equal(result.master_index, "master-index");
   assert.equal(result.current, JSON.stringify({ save_id: "VEY-0721", turn: 711 }));
   assert.equal(result.recentEvents, '{"event_id":"EVT-0721-0001"}');
@@ -121,6 +123,13 @@ test("met à jour main en fast-forward et jamais avec force", async (t) => {
     if (url.includes("/contents/state/HIDDEN.yaml")) return new Response(JSON.stringify({ save_id: "VEY-0719R", turn: 709, audience: "gm_only", unresolved_secrets: [], invented_secret_values: [] }));
     if (url.includes("/contents/state/MEHDI_PROFILE.yaml")) return new Response(JSON.stringify({ save_id: "VEY-0719R", turn: 709, audience: "gm_only" }));
     if (url.includes("/contents/state/NARRATIVE_MEMORY.yaml")) return new Response(JSON.stringify({ save_id: "VEY-0719R", turn: 709, audience: "gm_only", chapters: [] }));
+    if (url.includes("/contents/state/MEHDI_SHEET.yaml")) return new Response(JSON.stringify({
+      save_id: "VEY-0719R", turn: 709, audience: "player_visible", authority: "current_mechanical_projection",
+      ruleset: "V3.2.2", formula: "2d10 + capability + mastery + modifiers",
+      endurance: { current: 8, max: 14 }, defense: 13, protection: 3, resolution: { current: 2, max: 2 },
+      capabilities: { vigor: 5, address: 1, instinct: 1, reason: 0, will: 2, presence: 1 },
+      masteries: { melee: 3, athletics: 3 },
+    }));
     if (url.includes("/contents/events/0700-0799.jsonl")) return new Response('{"event_id":"EVT-0719R-0008"}\n');
     if (url.includes("/contents/saves/VEY-0720.yaml")) return new Response("not found", { status: 404 });
     if (url.endsWith("/git/trees")) return Response.json({ sha: "new-tree" });
@@ -147,7 +156,7 @@ test("met à jour main en fast-forward et jamais avec force", async (t) => {
   assert.ok(treeRequest);
   const treeBody = JSON.parse(treeRequest.body || "{}");
   assert.equal(treeBody.base_tree, "base-tree");
-  assert.equal(treeBody.tree.length, 7);
+  assert.equal(treeBody.tree.length, 8);
   assert.ok(treeBody.tree.every((entry) => typeof entry.content === "string" && !("sha" in entry)));
 });
 
@@ -183,6 +192,15 @@ test("reconstruit un checkpoint complet depuis un patch compact", async (t) => {
     if (url.includes("/contents/state/NARRATIVE_MEMORY.yaml")) {
       return new Response(JSON.stringify({ save_id: "VEY-0719R", turn: 709, audience: "gm_only", chapters: [] }));
     }
+    if (url.includes("/contents/state/MEHDI_SHEET.yaml")) {
+      return new Response(JSON.stringify({
+        save_id: "VEY-0719R", turn: 709, audience: "player_visible", authority: "current_mechanical_projection",
+        ruleset: "V3.2.2", formula: "2d10 + capability + mastery + modifiers",
+        endurance: { current: 8, max: 14 }, defense: 13, protection: 3, resolution: { current: 2, max: 2 },
+        capabilities: { vigor: 5, address: 1, instinct: 1, reason: 0, will: 2, presence: 1 },
+        masteries: { melee: 3, athletics: 3 },
+      }));
+    }
     if (url.includes("/contents/events/0700-0799.jsonl")) return new Response('{"event_id":"EVT-0719R-0008"}\n');
     if (url.includes("/contents/saves/VEY-0720.yaml")) return new Response("not found", { status: 404 });
     if (url.endsWith("/git/trees")) return Response.json({ sha: "new-tree" });
@@ -213,6 +231,7 @@ test("reconstruit un checkpoint complet depuis un patch compact", async (t) => {
   assert.deepEqual(current.scene, { location: "bridge", weather: { rain: true, wind: "strong" } });
   assert.deepEqual(document("state/WORLD.yaml").known, { bridge: true, gate: true });
   assert.deepEqual(document("state/HIDDEN.yaml").clocks, { M: 2 });
+  assert.equal(document("state/MEHDI_SHEET.yaml").endurance.current, 8);
   assert.deepEqual(document("saves/VEY-0720.yaml"), current);
   assert.equal(requests.filter((request) => request.url.endsWith("/git/blobs")).length, 0);
 });

@@ -1,7 +1,7 @@
 # VEY_RUNE MASTER — Architecture de consolidation
 
-> **Statut :** consolidation complète auditée et persistance renforcée — document MJ uniquement  
-> **Version de référence :** `MASTER-P13-HARDENED`  
+> **Statut :** consolidation complète auditée, persistance et résolution renforcées — document MJ uniquement
+> **Version de référence :** `MASTER-P14-ROLLS`
 > **Sources consolidées :** corpus V3.2, bootstrap d’autorité GitHub, extensions de worldbuilding validées dans la conversation « Reprendre aventure chat »  
 > **Portée actuelle :** toutes les couches prévues sont intégrées et auditées. Les fichiers `sources/` restent inchangés et ne doivent faire l’objet d’aucune suppression ou migration sans décision OOC distincte.
 
@@ -179,6 +179,23 @@ Déterminer qui peut voir, entendre, reconnaître ou déduire ; la clarté de ce
 - enregistrer formule, dés, modificateurs, difficulté ou défense, total, marge et conséquence lorsqu’un jet change le canon.
 
 Le système de base V3.2 emploie `2d10 + attribut + maîtrise` contre une difficulté ou une défense pour ses tests définis. Les exceptions et procédures spécialisées — combat, soins, rites, pactes — prévalent. Cette passe n’invente pas de table universelle de degrés absente du corpus : les résultats chargés ou explicitement définis par la règle utilisée font foi.
+
+La passe P14 fixe désormais le référentiel universel absent du corpus :
+
+| DD | Situation |
+|---:|---|
+| 10 | favorable ou simple sous pression |
+| 12 | obstacle ordinaire avec risque réel |
+| 15 | difficile pour une personne compétente |
+| 18 | redoutable |
+| 21 | extrême |
+| 24 | presque impossible sans avantage exceptionnel |
+
+La marge détermine le degré : `+5 ou plus` réussite forte ; `0 à +4` réussite ; `-1 à -4` revers ; `-5 ou moins` désastre. Une règle spécialisée peut nommer autrement ces degrés sans changer la marge. Les circonstances concrètes donnent normalement `±1` ou `±2`, avec un total situationnel limité à `±4`. La position de risque fixe les conséquences possibles, jamais artificiellement le DD.
+
+Tout hasard mécanique utilise `roll_dice`. Une action certaine et sans opposition ne demande aucun jet ; une action impossible échoue sans jet ; une action possible, incertaine et porteuse d’une conséquence significative en exige un. Un seul jet couvre un échange ou une manœuvre jusqu’à ce que l’objectif, la méthode, l’opposition ou les enjeux changent.
+
+Après résolution, tout jet public apparaît explicitement dans la réponse avec son intitulé, les dés, la capacité, la maîtrise, les modificateurs, le total, le DD ou la défense, la marge, le degré et la conséquence. Un test dont l’opposition révélerait un secret montre les dés et le total du joueur, puis `opposition cachée` et seulement la conséquence perceptible ; DD et marge complets restent dans `hidden`.
 
 ### `TURN-RISK` — Position de risque
 
@@ -761,7 +778,25 @@ Maîtrises ordinaires de 0 à 5 : Mêlée, Tir, Athlétisme, Mobilité, Furtivit
 - **Protection** : réduction des dégâts fournie principalement par l’armure ;
 - **Résolution** : ressource rare permettant les usages explicitement enregistrés par la fiche ou les règles.
 
-La valeur actuelle de Défense de Mehdi, comme toutes ses autres valeurs, vient de `current`, jamais d’un ancien chiffre du corpus.
+La valeur actuelle de Défense de Mehdi, comme toutes ses autres valeurs mécaniques, vient de `state/MEHDI_SHEET.yaml`, jamais d’un ancien chiffre du corpus.
+
+Depuis P14, `state/MEHDI_SHEET.yaml` est la projection mécanique courante chargée avec `current`. Elle gouverne capacités, maîtrises, Endurance, Défense, Protection, Résolution, Fatigue, Corruption, techniques, blessures et équipement mécanique. Elle est synchronisée à chaque tour et ne change que par événement mécanique explicite.
+
+## `RULE-SOCIAL-CHECKS` — Résolution des dialogues à enjeu
+
+Parler, poser une question, répondre, annoncer une menace ou formuler une offre ne déclenche pas automatiquement un jet. Lancer seulement lorsque la méthode tente de modifier un comportement incertain, dissimuler un fait sous observation active, résister à une pression ou obtenir une lecture perceptive importante. Un jet social ne crée ni consentement, ni connaissance absente, ni loyauté, ni amour, ni peur automatique.
+
+| Intention | Jet actif | Opposition de référence |
+|---|---|---|
+| convaincre, négocier, obtenir une concession | Présence + Influence | `10 + Volonté + Influence/Commandement pertinent` |
+| imposer par une pression crédible | Présence ou Vigueur + Intimidation | `10 + Volonté + Commandement pertinent` |
+| mentir ou dissimuler activement | Présence + Tromperie | `10 + Instinct + Vigilance` |
+| lire une réaction, incohérence ou tension visible | Instinct + Vigilance | `10 + Présence + Tromperie` ou DD de situation |
+| commander dans un groupe reconnaissant l’autorité | Présence + Commandement | `10 + Volonté + Commandement` si résistance réelle |
+
+Choisir la capacité d’après la méthode réellement employée, jamais d’après le meilleur score disponible. Une menace physique peut utiliser Vigueur ; une menace de statut ou de réputation utilise Présence. La crédibilité, la preuve, le levier, la relation, le public, le temps et le risque fournissent les modificateurs. Intimidation obtient au mieux conformité, recul, révélation partielle ou escalade : elle ne produit pas confiance. Influence rend une option acceptable dans les limites et intérêts de la cible : elle ne réécrit pas ses valeurs.
+
+Une lecture sociale réussie donne seulement un indice observable proportionné à la marge. Elle ne confirme jamais directement « il ment », une identité cachée, une pensée ou un secret inaccessible. Sur revers, aucun indice fiable ou un coût perceptif survient ; sur désastre, une lecture erronée peut devenir une croyance de Mehdi seulement si le joueur l’adopte — le MJ ne lui impose jamais cette conclusion intérieure.
 
 ## `RULE-COMBAT` — Structure du combat
 
@@ -1970,6 +2005,8 @@ Règle de portée : l’extérieur et les lieux lointains ne sont détaillés da
 9. **Passe 10 — Inventaire des Sources : terminée.** Bootstrap, carte et corpus concaténé ont été comparés sans modification du miroir synchronisé.
 10. **Passe 11 — Intimité : terminée.** Sexualité, consentement, variations régionales, santé et conséquences sociales sont intégrés sans relation ni état courant présumé.
 11. **Passe 12 — Migration du corpus : terminée.** Les 56 blocs V3.2 sont classés ; 39 détails utiles sont extraits et cloisonnés ; anciennes sauvegardes et autorités restent hors des Sources actives.
+12. **Passe 13 — Persistance renforcée : terminée.** Registre HIDDEN, profil de Mehdi, mémoire par chapitres, accès ciblé au Master et reprise idempotente sont actifs.
+13. **Passe 14 — Jets et caractéristiques : terminée.** Fiche mécanique courante, hasard serveur, difficultés, marges, résolution sociale et affichage obligatoire des jets publics sont intégrés.
 
 Critère de fin : chaque information canonique n’existe qu’à un endroit de référence, possède un identifiant stable, une classe d’accès, une provenance et des liens vers ses usages.
 
@@ -2025,3 +2062,32 @@ Si GitHub a reçu le commit mais que la réponse de `save_turn` disparaît, `che
 ## `VALIDATION-SINGLE-PATH` — Contrôles alignés
 
 Le validateur local et le Worker partagent les invariants de `HIDDEN`. Les pushes directs comme les pull requests vérifient l’append-only. Profil, mémoire, projections, checkpoint et journal sont synchronisés dans le même commit atomique.
+
+---
+
+# 20. P14 — Jets, caractéristiques et lisibilité mécanique
+
+## `MECH-SHEET-PERSISTENT` — Fiche actuelle de Mehdi
+
+`state/MEHDI_SHEET.yaml` restaure techniquement les valeurs attestées par le dernier snapshot complet `VEY-0724`, tour 714, après vérification des événements jusqu’au tour courant. Cette restauration ne modifie aucune valeur, n’ajoute aucun progrès et n’avance pas la fiction. La fiche devient ensuite une projection atomique : chaque tour la synchronise, et tout changement exige un événement mécanique explicite.
+
+## `MECH-RANDOM-SERVER` — Dés impartiaux
+
+`roll_dice` produit les dés au moyen du générateur cryptographique du Worker, sans créer de tour. Le MJ reprend exactement le `roll_id` et les valeurs obtenues dans l’événement du test. Il ne choisit, ne corrige et ne relance jamais les dés pour obtenir une issue narrative.
+
+## `MECH-PUBLIC-DISPLAY` — Jets visibles
+
+Tout jet dont l’existence et l’opposition sont publiques est affiché ainsi, sans être noyé dans la prose :
+
+```text
+🎲 Test — Intimidation
+2d10 [7, 10] + Présence 1 + Intimidation 2 + situation 0 = 20
+DD 17 • marge +3 • réussite
+Conséquence : le comportement obtenu ou le prix subi.
+```
+
+La règle vaut aussi pendant une conversation. L’absence de jet est normale pour une simple question, une déclaration, une information certaine ou une action sans conséquence significative.
+
+## `MECH-HIDDEN-ROLL` — Opposition sensible
+
+Si révéler le DD, la marge ou même la nature exacte de l’opposition dévoilerait un secret, la réponse montre les dés, les valeurs publiques et le total de Mehdi, puis `opposition cachée` et l’effet perceptible. Le détail complet est conservé uniquement dans `HIDDEN`. Un test caché ne peut jamais être utilisé pour annoncer au joueur une vérité que Mehdi n’a pas découverte.

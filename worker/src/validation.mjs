@@ -116,12 +116,27 @@ function advanceNarrativeMemory(value, saveId, turn) {
   }
   return {
     ...memory,
+    history_coverage: {
+      ...(memory.history_coverage && typeof memory.history_coverage === "object" ? memory.history_coverage : {}),
+      campaign_turns_known: turn,
+    },
     chapters,
     rolling_index: {
       ...(memory.rolling_index && typeof memory.rolling_index === "object" ? memory.rolling_index : {}),
       current_chapter_id: chapter.id,
       next_summary_due_at_turn: chapter.end + 1,
       open_scene_resume_source: "state/CURRENT.yaml",
+    },
+  };
+}
+
+function advanceMehdiProfile(value, saveId, turn) {
+  const profile = synchronizedProjection(value, "gm_only", saveId, turn);
+  return {
+    ...profile,
+    history_coverage: {
+      ...(profile.history_coverage && typeof profile.history_coverage === "object" ? profile.history_coverage : {}),
+      known_campaign_length_turns: turn,
     },
   };
 }
@@ -143,6 +158,35 @@ export function validateHiddenState(value, label = "HIDDEN") {
     fail(`${label}: invented_secret_values doit rester vide`);
   }
   return hidden;
+}
+
+export function validateMehdiSheet(value, label = "MEHDI_SHEET") {
+  const sheet = fields(value, [
+    "save_id", "turn", "audience", "authority", "ruleset", "formula",
+    "endurance", "defense", "protection", "resolution", "capabilities", "masteries",
+  ], label);
+  if (sheet.audience !== "player_visible") fail(`${label}.audience doit valoir player_visible`);
+  if (sheet.authority !== "current_mechanical_projection") fail(`${label}.authority invalide`);
+  const endurance = fields(sheet.endurance, ["current", "max"], `${label}.endurance`);
+  const resolution = fields(sheet.resolution, ["current", "max"], `${label}.resolution`);
+  for (const [resource, record] of [["endurance", endurance], ["resolution", resolution]]) {
+    if (!Number.isInteger(record.current) || !Number.isInteger(record.max) || record.current < 0 || record.max < 0 || record.current > record.max) {
+      fail(`${label}.${resource}: valeurs courantes invalides`);
+    }
+  }
+  for (const key of ["defense", "protection", "fatigue", "corruption"]) {
+    if (key in sheet && (!Number.isInteger(sheet[key]) || sheet[key] < 0)) fail(`${label}.${key}: entier positif ou nul attendu`);
+  }
+  const capabilities = fields(sheet.capabilities, ["vigor", "address", "instinct", "reason", "will", "presence"], `${label}.capabilities`);
+  for (const [key, score] of Object.entries(capabilities)) {
+    if (!Number.isInteger(score) || score < 0 || score > 10) fail(`${label}.capabilities.${key}: score 0 à 10 attendu`);
+  }
+  const masteries = object(sheet.masteries, `${label}.masteries`);
+  for (const [key, score] of Object.entries(masteries)) {
+    if (!Number.isInteger(score) || score < 0 || score > 5) fail(`${label}.masteries.${key}: score 0 à 5 attendu`);
+  }
+  assertPlayerVisible(sheet, label);
+  return sheet;
 }
 
 function assertHiddenRegistryPreserved(baseHiddenValue, nextHiddenValue) {
@@ -175,9 +219,12 @@ const EVENT_SERVER_KEYS = new Set(["save_id", "parent_save_id", "turn", "event_t
 export function materializeTurnPayload(baseCurrentValue, baseWorldValue, baseHiddenValue, ...rest) {
   let baseProfileValue = {};
   let baseMemoryValue = {};
+  let baseSheetValue = {};
   let payloadValue;
+  const hasSheet = rest.length >= 4;
   if (rest.length === 1) [payloadValue] = rest;
-  else [baseProfileValue, baseMemoryValue, payloadValue] = rest;
+  else if (rest.length === 3) [baseProfileValue, baseMemoryValue, payloadValue] = rest;
+  else [baseProfileValue, baseMemoryValue, baseSheetValue, payloadValue] = rest;
   const payload = object(payloadValue, "save_turn");
   if (payload.mode !== "patch") {
     const full = fields(payload, ["save", "current", "world", "hidden", "events"], "save_turn full");
@@ -190,8 +237,11 @@ export function materializeTurnPayload(baseCurrentValue, baseWorldValue, baseHid
       current,
       world: synchronizedProjection(mergePatch(baseWorldValue, full.world), "player_visible", saveId, turn),
       hidden: synchronizedProjection(mergePatch(baseHiddenValue, full.hidden), "gm_only", saveId, turn),
-      mehdi_profile: synchronizedProjection(mergePatch(baseProfileValue, full.mehdi_profile ?? {}), "gm_only", saveId, turn),
+      mehdi_profile: advanceMehdiProfile(mergePatch(baseProfileValue, full.mehdi_profile ?? {}), saveId, turn),
       narrative_memory: advanceNarrativeMemory(mergePatch(baseMemoryValue, full.narrative_memory ?? {}), saveId, turn),
+      ...(hasSheet ? {
+        mehdi_sheet: synchronizedProjection(mergePatch(baseSheetValue, full.mehdi_sheet ?? {}), "player_visible", saveId, turn),
+      } : {}),
     };
   }
 
@@ -205,6 +255,7 @@ export function materializeTurnPayload(baseCurrentValue, baseWorldValue, baseHid
   const hiddenPatch = rejectReservedKeys(fast.hidden_patch, PROJECTION_SERVER_KEYS, "hidden_patch");
   const profilePatch = rejectReservedKeys(fast.mehdi_profile_patch ?? {}, PROJECTION_SERVER_KEYS, "mehdi_profile_patch");
   const memoryPatch = rejectReservedKeys(fast.narrative_memory_patch ?? {}, PROJECTION_SERVER_KEYS, "narrative_memory_patch");
+  const sheetPatch = rejectReservedKeys(fast.mehdi_sheet_patch ?? {}, PROJECTION_SERVER_KEYS, "mehdi_sheet_patch");
   if (!Array.isArray(fast.events) || fast.events.length === 0 || fast.events.length > 50) {
     fail("events doit contenir entre 1 et 50 événements atomiques");
   }
@@ -256,8 +307,11 @@ export function materializeTurnPayload(baseCurrentValue, baseWorldValue, baseHid
     turn,
     audience: "gm_only",
   };
-  const mehdiProfile = synchronizedProjection(mergePatch(baseProfileValue, profilePatch), "gm_only", saveId, turn);
+  const mehdiProfile = advanceMehdiProfile(mergePatch(baseProfileValue, profilePatch), saveId, turn);
   const narrativeMemory = advanceNarrativeMemory(mergePatch(baseMemoryValue, memoryPatch), saveId, turn);
+  const mehdiSheet = hasSheet
+    ? synchronizedProjection(mergePatch(baseSheetValue, sheetPatch), "player_visible", saveId, turn)
+    : null;
   return {
     expected_head_sha: fast.expected_head_sha,
     expected_current_save_id: fast.expected_current_save_id,
@@ -267,6 +321,7 @@ export function materializeTurnPayload(baseCurrentValue, baseWorldValue, baseHid
     hidden,
     mehdi_profile: mehdiProfile,
     narrative_memory: narrativeMemory,
+    ...(mehdiSheet ? { mehdi_sheet: mehdiSheet } : {}),
     events,
   };
 }
@@ -305,6 +360,9 @@ export function validateTurnPayload(baseCurrentValue, existingEventsText, payloa
   const narrativeMemory = payload.narrative_memory
     ? fields(payload.narrative_memory, ["save_id", "turn", "audience"], "narrative_memory")
     : null;
+  const mehdiSheet = payload.mehdi_sheet
+    ? validateMehdiSheet(payload.mehdi_sheet, "mehdi_sheet")
+    : null;
 
   if (typeof payload.expected_head_sha !== "string" || !/^[0-9a-f]{40}$/i.test(payload.expected_head_sha)) fail("expected_head_sha invalide");
   if (payload.expected_current_save_id !== base.save_id) fail(`état périmé: attendu ${payload.expected_current_save_id}, trouvé ${base.save_id}`);
@@ -327,6 +385,9 @@ export function validateTurnPayload(baseCurrentValue, existingEventsText, payloa
     if (projection && (projection.save_id !== save.save_id || projection.turn !== save.turn || projection.audience !== "gm_only")) {
       fail(`${label} ne correspond pas au nouveau checkpoint`);
     }
+  }
+  if (mehdiSheet && (mehdiSheet.save_id !== save.save_id || mehdiSheet.turn !== save.turn || mehdiSheet.audience !== "player_visible")) {
+    fail("mehdi_sheet ne correspond pas au nouveau checkpoint");
   }
   assertPlayerVisible(current, "current");
   assertPlayerVisible(world, "world");
@@ -371,6 +432,7 @@ export function validateTurnPayload(baseCurrentValue, existingEventsText, payloa
   };
   if (mehdiProfile) files["state/MEHDI_PROFILE.yaml"] = jsonDocument(mehdiProfile);
   if (narrativeMemory) files["state/NARRATIVE_MEMORY.yaml"] = jsonDocument(narrativeMemory);
+  if (mehdiSheet) files["state/MEHDI_SHEET.yaml"] = jsonDocument(mehdiSheet);
   const totalBytes = Object.values(files).reduce((total, text) => total + new TextEncoder().encode(text).byteLength, 0);
   if (totalBytes > 1_000_000) fail("transaction trop volumineuse (maximum 1 Mo)");
 

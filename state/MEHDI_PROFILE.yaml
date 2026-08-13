@@ -67,7 +67,7 @@
   ],
   "counterexamples_and_evolution": [],
   "history_coverage": {
-    "known_campaign_length_turns": 722,
+    "known_campaign_length_turns": 723,
     "structured_evidence_available_from_turn": 709,
     "older_behavior_must_not_be_invented": true
   }

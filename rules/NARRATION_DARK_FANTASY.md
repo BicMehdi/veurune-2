@@ -67,6 +67,25 @@ Chaque réplique poursuit un objectif concret : obtenir, cacher, tester, menacer
 - Un PNJ peut mentir, fuir, trahir, dénoncer, frapper, tuer, se taire ou aider selon ses croyances, ses moyens et ses intérêts.
 - Aucun PNJ ne devient cruel, tendre, amoureux, loyal ou hostile uniquement pour servir l'ambiance.
 
+## Jets visibles, y compris dans les dialogues
+
+Une simple parole, question ou réponse ne demande aucun jet. Lancer seulement lorsqu’une action est possible, incertaine, porteuse d’une conséquence significative et réellement opposée. Convaincre, intimider, tromper, résister ou lire des signes peut exiger un test ; parler ne suffit pas.
+
+Tout hasard utilise `roll_dice`. Ne jamais choisir, corriger ou relancer un résultat pour protéger Mehdi ou rejoindre une intrigue. Utiliser les valeurs de `mehdi_sheet`, puis enregistrer le `roll_id`, les dés et la résolution dans l’événement canonique.
+
+Tout jet public est affiché hors de la prose, immédiatement avant sa conséquence :
+
+```text
+🎲 Test — Intimidation
+2d10 [7, 10] + Présence 1 + Intimidation 2 + situation 0 = 20
+DD 17 • marge +3 • réussite
+Conséquence : ...
+```
+
+Ne jamais masquer un jet public sous une formule comme « après vérification » ou seulement raconter son résultat. Si le DD ou la marge révèle un secret, montrer les dés et le total public de Mehdi, écrire `opposition cachée`, puis seulement l’indice ou la conséquence perceptible. La valeur secrète reste dans `hidden`.
+
+Un test social modifie un comportement possible, jamais le consentement, les valeurs profondes, une connaissance absente ou la vérité objective. Une lecture sociale donne des signes observables, jamais un accès direct aux pensées ni la certitude automatique qu’une personne ment.
+
 ## Protections permanentes
 
 La brutalité fictionnelle ne supprime jamais :
@@ -91,6 +110,7 @@ Avant chaque réponse de jeu, vérifier :
 4. La noirceur découle-t-elle de la causalité plutôt que d'une escalade gratuite ?
 5. Les voix et objectifs des PNJ restent-ils cohérents ?
 6. La réponse respecte-t-elle le rythme de la scène et la longueur cible ?
-7. Le tour a-t-il été sauvegardé avec succès avant d'être présenté comme canonique ?
+7. Tout jet a-t-il été généré par `roll_dice`, enregistré et affiché selon sa visibilité ?
+8. Le tour a-t-il été sauvegardé avec succès avant d'être présenté comme canonique ?
 
-Un échec sur les points 1 à 5 ou 7 bloque l'envoi jusqu'à correction.
+Un échec sur les points 1 à 5, 7 ou 8 bloque l'envoi jusqu'à correction.

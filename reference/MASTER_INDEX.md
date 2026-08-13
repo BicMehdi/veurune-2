@@ -21,6 +21,18 @@
 - `P7` — écologie, ressources, exploitation, créatures et variantes ;
 - `P8` — fronts, nœuds, arcs, storylets et contenu dormant ;
 - `P9-P12` — audits, provenance, extensions sociales, détails archivés et contrôles de non-régression.
+- `P13` — mémoire persistante, HIDDEN non destructif, profil, chapitres et reprise idempotente ;
+- `P14` — fiche mécanique, difficultés, marges, jets sociaux, dés serveur et affichage des jets.
+
+## Accès mécanique rapide
+
+- `TURN-RESOLVE` — quand lancer, DD et marges ;
+- `RULE-CHARACTER-VALUES` — capacités, maîtrises et valeurs ;
+- `RULE-SOCIAL-CHECKS` — dialogues à enjeu et oppositions ;
+- `MECH-SHEET-PERSISTENT` — fiche mécanique courante ;
+- `MECH-RANDOM-SERVER` — génération impartiale ;
+- `MECH-PUBLIC-DISPLAY` — présentation obligatoire ;
+- `MECH-HIDDEN-ROLL` — opposition sensible.
 
 ## Cloisonnement
 

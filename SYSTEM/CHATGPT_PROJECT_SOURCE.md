@@ -14,7 +14,7 @@ Avant `LANCER VEYRUNE`, avant une reprise et avant de résoudre un nouveau tour 
 
 1. appeler `load_game` avec Veyrune Cloud Save ;
 2. appliquer `persistence` et `narration_rules` avant de lire l'état ;
-3. charger `current`, `world`, `mehdi_profile`, `narrative_memory`, `recentEvents`, puis `hidden` côté MJ uniquement ;
+3. charger `current`, `world`, `mehdi_sheet`, `mehdi_profile`, `narrative_memory`, `recentEvents`, puis `hidden` côté MJ uniquement ;
 4. ne jamais révéler `hidden`, ses déductions ou ses valeurs au joueur avant leur découverte canonique ;
 5. vérifier le `headSha`, le `save_id`, le `turn` et `next_expected_save` ;
 6. reprendre sans avancer le temps ni la fiction pendant le chargement.
@@ -24,6 +24,8 @@ Après chaque vrai tour narratif résolu, appeler exactement une fois `save_turn
 Utiliser de préférence `save_turn` avec `mode: patch` : transmettre uniquement les faits modifiés dans `current_patch`, `world_patch` et `hidden_patch`. Une valeur `null` supprime explicitement une clé, tandis qu'un tableau fourni remplace le tableau entier. Le serveur reconstruit puis valide les documents complets avant le commit ; ce mode accélère l'écriture sans résumer ni retirer les informations inchangées.
 
 `mehdi_profile` est descriptif et sourcé ; il sert aux répliques ordinaires mais ne tranche jamais un choix majeur. `narrative_memory` accélère le rappel par chapitres sans remplacer le journal. Pour le monde et les mécaniques, consulter `master_index`, puis seulement la section nécessaire avec `search_master` et `fetch_master_section`. Une section préparée n’est jamais une activité actuelle.
+
+`mehdi_sheet` fournit les caractéristiques et ressources mécaniques actuelles. Pour toute incertitude importante, utiliser `roll_dice` et reprendre exactement ses dés dans l’événement. Afficher clairement chaque jet public, même au milieu d’un dialogue. Une simple question ou réponse ne demande pas de jet ; convaincre, intimider, tromper, résister ou lire des signes peut en demander un si l’issue est incertaine et conséquente.
 
 `OOC: ETAT`, `OOC: AUDIT`, `OOC: PAUSE` et un simple chargement ne créent aucun tour.
 

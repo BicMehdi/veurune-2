@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { eventFileForTurn, materializeTurnPayload, nextSaveId, validateTurnPayload } from "../src/validation.mjs";
+import { eventFileForTurn, materializeTurnPayload, nextSaveId, validateMehdiSheet, validateTurnPayload } from "../src/validation.mjs";
 
 const timestamp = "2026-08-12T12:00:00Z";
 
@@ -89,6 +89,13 @@ test("le mode complet legacy conserve les secrets et les mémoires omis", () => 
   };
   const profile = { save_id: "VEY-0719R", turn: 709, audience: "gm_only", observed_patterns: [{ pattern_id: "P1" }] };
   const memory = { save_id: "VEY-0719R", turn: 709, audience: "gm_only", chapters: [] };
+  const sheet = {
+    save_id: "VEY-0719R", turn: 709, audience: "player_visible", authority: "current_mechanical_projection",
+    ruleset: "V3.2.2", formula: "2d10 + capability + mastery + modifiers",
+    endurance: { current: 8, max: 14 }, defense: 13, protection: 3, resolution: { current: 2, max: 2 },
+    capabilities: { vigor: 5, address: 1, instinct: 1, reason: 0, will: 2, presence: 1 },
+    masteries: { melee: 3, athletics: 3 },
+  };
   const save = {
     save_id: "VEY-0720",
     parent_save_id: "VEY-0719R",
@@ -103,6 +110,7 @@ test("le mode complet legacy conserve les secrets et les mémoires omis", () => 
     hidden,
     profile,
     memory,
+    sheet,
     {
       expected_head_sha: "a".repeat(40),
       expected_current_save_id: "VEY-0719R",
@@ -129,7 +137,22 @@ test("le mode complet legacy conserve les secrets et les mémoires omis", () => 
   assert.equal(materialized.hidden.unresolved_secrets[0].path, "contact.identity");
   assert.equal(materialized.mehdi_profile.observed_patterns[0].pattern_id, "P1");
   assert.equal(materialized.narrative_memory.rolling_index.current_chapter_id, "CHAPTER-0700-0749");
+  assert.equal(materialized.mehdi_sheet.endurance.current, 8);
+  assert.equal(materialized.mehdi_sheet.save_id, "VEY-0720");
   assert.doesNotThrow(() => validateTurnPayload(base, '{"event_id":"EVT-0719R-0008"}\n', materialized, { hidden }));
+});
+
+test("valide les bornes de la fiche mécanique de Mehdi", () => {
+  const sheet = {
+    save_id: "VEY-0733", turn: 723, audience: "player_visible", authority: "current_mechanical_projection",
+    ruleset: "V3.2.2", formula: "2d10 + capability + mastery + modifiers",
+    endurance: { current: 8, max: 14 }, defense: 13, protection: 3, resolution: { current: 2, max: 2 },
+    capabilities: { vigor: 5, address: 1, instinct: 1, reason: 0, will: 2, presence: 1 },
+    masteries: { melee: 3, athletics: 3, intimidation: 2 },
+  };
+  assert.doesNotThrow(() => validateMehdiSheet(sheet));
+  assert.throws(() => validateMehdiSheet({ ...sheet, masteries: { melee: 6 } }), /score 0 à 5 attendu/);
+  assert.throws(() => validateMehdiSheet({ ...sheet, endurance: { current: 15, max: 14 } }), /valeurs courantes invalides/);
 });
 
 test("refuse la suppression silencieuse d'un secret non résolu", () => {

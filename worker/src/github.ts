@@ -76,11 +76,12 @@ export async function loadGame(env: GitHubEnv) {
   const currentText = await readFile(env, "state/CURRENT.yaml", headSha);
   const current = parseDocument(currentText, "state/CURRENT.yaml");
   const eventPath = eventFileForTurn(current.turn as number);
-  const [world, hidden, mehdiProfile, narrativeMemory, masterIndex, bootstrap, persistence, narrationRules, events] = await Promise.all([
+  const [world, hidden, mehdiProfile, narrativeMemory, mehdiSheet, masterIndex, bootstrap, persistence, narrationRules, events] = await Promise.all([
     readFile(env, "state/WORLD.yaml", headSha),
     readFile(env, "state/HIDDEN.yaml", headSha),
     readFile(env, "state/MEHDI_PROFILE.yaml", headSha),
     readFile(env, "state/NARRATIVE_MEMORY.yaml", headSha),
+    readFile(env, "state/MEHDI_SHEET.yaml", headSha),
     readFile(env, "reference/MASTER_INDEX.md", headSha),
     readFile(env, "SYSTEM/BOOTSTRAP.md", headSha),
     readFile(env, "rules/PERSISTENCE.md", headSha),
@@ -95,6 +96,7 @@ export async function loadGame(env: GitHubEnv) {
     hidden,
     mehdi_profile: mehdiProfile,
     narrative_memory: narrativeMemory,
+    mehdi_sheet: mehdiSheet,
     master_index: masterIndex,
     bootstrap,
     persistence,
@@ -203,12 +205,13 @@ export async function commitTurn(env: GitHubEnv, payload: unknown) {
   }
 
   const eventPath = eventFileForTurn(candidateSave.turn as number);
-  const [baseCurrentText, baseWorldText, baseHiddenText, baseProfileText, baseMemoryText, existingEvents, existingSave] = await Promise.all([
+  const [baseCurrentText, baseWorldText, baseHiddenText, baseProfileText, baseMemoryText, baseSheetText, existingEvents, existingSave] = await Promise.all([
     readFile(env, "state/CURRENT.yaml", actualHead),
     readFile(env, "state/WORLD.yaml", actualHead),
     readFile(env, "state/HIDDEN.yaml", actualHead),
     readFile(env, "state/MEHDI_PROFILE.yaml", actualHead),
     readFile(env, "state/NARRATIVE_MEMORY.yaml", actualHead),
+    readFile(env, "state/MEHDI_SHEET.yaml", actualHead),
     readFile(env, eventPath, actualHead, true),
     readFile(env, `saves/${String(candidateSave.save_id)}.yaml`, actualHead, true),
   ]);
@@ -224,12 +227,14 @@ export async function commitTurn(env: GitHubEnv, payload: unknown) {
   const baseHidden = parseDocument(baseHiddenText, "HIDDEN distant");
   const baseProfile = parseDocument(baseProfileText, "MEHDI_PROFILE distant");
   const baseMemory = parseDocument(baseMemoryText, "NARRATIVE_MEMORY distant");
+  const baseSheet = parseDocument(baseSheetText, "MEHDI_SHEET distant");
   const materializedPayload = materializeTurnPayload(
     baseCurrent,
     baseWorld,
     baseHidden,
     baseProfile,
     baseMemory,
+    baseSheet,
     payload,
   );
   const transaction = validateTurnPayload(baseCurrent, existingEvents, materializedPayload, { hidden: baseHidden });

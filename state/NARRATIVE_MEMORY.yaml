@@ -11,7 +11,7 @@
     "summary_requires_event_evidence": true
   },
   "history_coverage": {
-    "campaign_turns_known": 722,
+    "campaign_turns_known": 723,
     "structured_event_history_complete_from_turn": 709,
     "earlier_history": "partial_snapshot_only"
   },
@@ -27,7 +27,7 @@
         "Au Pont des Trois Chaînes, Mehdi poursuit une vérification d'identité avec un contact dont l'identité demeure non résolue.",
         "L'échange porte sur une attaque de cargaison, une escorte et une marque de caravane faite de traits.",
         "Mehdi a saisi le vêtement du contact puis l'a relâché lorsque celui-ci l'a exigé ; la rencontre n'a pas basculé en combat.",
-        "Aux tours 721 et 722, le contact explique sa méthode de vérification puis répond oui au détail de l'étui noir, sans que cette réponse confirme son identité."
+        "Aux tours 721 à 723, le contact explique sa méthode de vérification, répond oui au détail de l'étui noir puis affirme être venu seul, sans que ces déclarations confirment son identité ni la sécurité du site."
       ],
       "evidence_event_ids": [
         "EVT-0719R-0001",
@@ -36,7 +36,8 @@
         "EVT-0729-0001",
         "EVT-0730-0002",
         "EVT-0731-0002",
-        "EVT-0732-0002"
+        "EVT-0732-0002",
+        "EVT-0733-0002"
       ],
       "unresolved_summary": [
         "identite_du_contact",

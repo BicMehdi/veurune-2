@@ -8,6 +8,8 @@ const workerIndexPath = new URL("../worker/src/index.ts", import.meta.url);
 const evalsPath = new URL("./narration-evals.json", import.meta.url);
 const profilePath = new URL("../state/MEHDI_PROFILE.yaml", import.meta.url);
 const memoryPath = new URL("../state/NARRATIVE_MEMORY.yaml", import.meta.url);
+const sheetPath = new URL("../state/MEHDI_SHEET.yaml", import.meta.url);
+const mechanicsEvalsPath = new URL("./mechanics-evals.json", import.meta.url);
 
 test("les règles Dark Fantasy permanentes conservent les invariants du jeu", async () => {
   const text = await readFile(narrationPath, "utf8");
@@ -24,6 +26,8 @@ test("les règles Dark Fantasy permanentes conservent les invariants du jeu", as
     "limites de sécurité obligatoires de ChatGPT",
     "La violence sexuelle n'est jamais détaillée ni érotisée.",
     "Le tour a-t-il été sauvegardé avec succès",
+    "Tout jet a-t-il été généré par `roll_dice`",
+    "🎲 Test — Intimidation",
   ]) {
     assert.ok(text.includes(required), `règle obligatoire absente: ${required}`);
   }
@@ -47,6 +51,28 @@ test("le document narratif est exposé par search et fetch", async () => {
   assert.match(text, /"search_master"/);
   assert.match(text, /"fetch_master_section"/);
   assert.match(text, /"check_save_status"/);
+  assert.match(text, /"roll_dice"/);
+  assert.match(text, /state\/MEHDI_SHEET\.yaml/);
+});
+
+test("la fiche mécanique de Mehdi reste complète, visible et synchronisée", async () => {
+  const sheet = JSON.parse(await readFile(sheetPath, "utf8"));
+  assert.equal(sheet.audience, "player_visible");
+  assert.equal(sheet.authority, "current_mechanical_projection");
+  assert.deepEqual(sheet.endurance, { current: 8, max: 14 });
+  assert.equal(sheet.defense, 13);
+  assert.equal(sheet.capabilities.vigor, 5);
+  assert.equal(sheet.masteries.athletics, 3);
+  assert.equal(sheet.masteries.intimidation, 2);
+});
+
+test("les dialogues ordinaires restent sans jet et les actions sociales à enjeu sont résolues", async () => {
+  const fixtures = JSON.parse(await readFile(mechanicsEvalsPath, "utf8"));
+  assert.equal(fixtures.cases.find((entry) => entry.id === "ask-ordinary-question")?.expected_roll, "none");
+  assert.equal(fixtures.cases.find((entry) => entry.id === "detect-hidden-lie")?.expected_roll, "hidden_opposition");
+  assert.equal(fixtures.cases.find((entry) => entry.id === "credible-threat")?.expected_roll, "public");
+  assert.equal(fixtures.cases.find((entry) => entry.id === "intimacy-refusal")?.expected_roll, "forbidden");
+  assert.ok(fixtures.cases.filter((entry) => entry.expected_roll === "public").length >= 4);
 });
 
 test("la matrice de délégation réserve toutes les décisions majeures au joueur", async () => {

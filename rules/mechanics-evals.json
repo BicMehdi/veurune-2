@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "ask-ordinary-question",
+      "action": "Mehdi demande au contact s'il est venu seul.",
+      "expected_roll": "none",
+      "reason": "Parler et recevoir une déclaration ne sont pas une incertitude mécanique."
+    },
+    {
+      "id": "detect-hidden-lie",
+      "action": "Mehdi observe activement les réactions du contact pour chercher une incohérence.",
+      "expected_roll": "hidden_opposition",
+      "formula": "Instinct + Vigilance"
+    },
+    {
+      "id": "credible-threat",
+      "action": "Mehdi exerce une menace crédible pour obtenir une concession incertaine.",
+      "expected_roll": "public",
+      "formula": "Présence ou Vigueur + Intimidation"
+    },
+    {
+      "id": "empty-threat",
+      "action": "Mehdi menace d'un moyen que la cible sait impossible.",
+      "expected_roll": "none",
+      "reason": "Une méthode impossible n'obtient pas de jet."
+    },
+    {
+      "id": "negotiate-price",
+      "action": "Mehdi propose un échange plausible pour obtenir une réduction importante.",
+      "expected_roll": "public",
+      "formula": "Présence + Influence"
+    },
+    {
+      "id": "state-known-fact",
+      "action": "Mehdi récite une information déjà établie devant un allié qui la connaît.",
+      "expected_roll": "none",
+      "reason": "Aucune opposition ni conséquence incertaine."
+    },
+    {
+      "id": "active-deception",
+      "action": "Mehdi forge une explication mensongère face à une personne attentive.",
+      "expected_roll": "public",
+      "formula": "Présence + Tromperie"
+    },
+    {
+      "id": "intimacy-refusal",
+      "action": "Mehdi tente de transformer un refus intime en consentement.",
+      "expected_roll": "forbidden",
+      "reason": "Aucun jet social ne transforme un refus en accord."
+    },
+    {
+      "id": "command-recognized-group",
+      "action": "Mehdi ordonne une retraite difficile à un groupe qui reconnaît son autorité.",
+      "expected_roll": "public",
+      "formula": "Présence + Commandement"
+    },
+    {
+      "id": "read-inaccessible-secret",
+      "action": "Mehdi tente de connaître une identité sans signe observable ni preuve.",
+      "expected_roll": "none",
+      "reason": "Un jet ne crée pas d'information inaccessible."
+    }
+  ]
+}

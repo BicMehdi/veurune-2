@@ -6,6 +6,7 @@ Serveur MCP personnel qui permet à ChatGPT mobile de charger et sauvegarder Vey
 
 - `search` et `fetch` : consultation des documents canoniques visibles joueur ;
 - `load_game` : chargement des règles de persistance et de narration, de l’état courant, des événements récents et de l’état MJ ;
+- `roll_dice` : génération impartiale des dés, sans avancer la fiction ;
 - `search_master` et `fetch_master_section` : consultation ciblée du Master MJ sans charger ses 154 Ko à chaque tour ;
 - `save_turn` : validation puis commit Git atomique d’un nouveau tour ;
 - `check_save_status` : résolution idempotente d’une réponse réseau perdue après un commit ;
@@ -17,9 +18,9 @@ Serveur MCP personnel qui permet à ChatGPT mobile de charger et sauvegarder Vey
 
 Le mode recommandé `save_turn({ mode: "patch", ... })` envoie seulement les changements du tour. Le Worker recharge les projections au même commit GitHub, applique une fusion récursive (`null` supprime une clé et un tableau remplace le tableau entier), reconstruit le checkpoint complet, puis exécute les validations ordinaires. Le mode complet ancien bénéficie désormais de la même préservation des champs omis. Le dépôt continue donc de contenir des snapshots complets : seule la quantité transmise par le MJ diminue.
 
-L'écriture GitHub utilise une création d'arbre avec contenu intégré. Les sept fichiers du tour — sauvegarde, trois états principaux, profil de Mehdi, mémoire narrative et journal — restent réunis dans un commit atomique, sans appels séparés de création de blobs.
+L'écriture GitHub utilise une création d'arbre avec contenu intégré. Les huit fichiers du tour — sauvegarde, trois états principaux, fiche mécanique, profil de Mehdi, mémoire narrative et journal — restent réunis dans un commit atomique, sans appels séparés de création de blobs.
 
-Le champ `narration_rules` est lu depuis `rules/NARRATION_DARK_FANTASY.md` au même commit GitHub que le reste du canon. Le MJ l’applique avant de résoudre le tour.
+Les champs `mehdi_sheet` et `narration_rules` sont lus au même commit GitHub que le reste du canon. Le MJ utilise la fiche avant tout test et applique les règles d’affichage avant de présenter le résultat.
 
 ## Tests de non-régression
 
@@ -29,8 +30,8 @@ Le champ `narration_rules` est lu depuis `rules/NARRATION_DARK_FANTASY.md` au m�
 - les changements automatiques de journaux `0700-0799`, `0800-0899` et `0900-0999` ;
 - le refus de deux sauvegardes concurrentes fondées sur le même état ;
 - le refus d’un `HEAD` GitHub périmé avant toute écriture ;
-- la création atomique des sept fichiers d’un tour et la mise à jour de `main` sans `force` ;
-- la préservation de `HIDDEN`, du profil de Mehdi et de la mémoire narrative lorsqu’un ancien client les omet ;
+- la création atomique des huit fichiers d’un tour et la mise à jour de `main` sans `force` ;
+- la préservation de `HIDDEN`, de la fiche mécanique, du profil de Mehdi et de la mémoire narrative lorsqu’un ancien client les omet ;
 - la détection d’une sauvegarde déjà commitée après une réponse réseau perdue.
 
 Ces simulations utilisent uniquement des données en mémoire et ne créent aucun tour narratif dans le dépôt canonique.
