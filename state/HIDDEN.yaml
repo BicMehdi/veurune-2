@@ -1,547 +1,547 @@
 {
   "persistence_version": 1,
   "audience": "gm_only",
-  "save_id": "VEY-0732",
-  "turn": 722,
-    "canonical_source": {
-      "type": "technical_hidden_registry_recovery",
-      "recovered_from_commit": "f47a7dca871afd7648c8029ff2529c213e1d1fdd",
-      "recovered_from_save_id": "VEY-0724",
-      "values_restored": false,
-      "registry_only": true
+  "save_id": "VEY-0733",
+  "turn": 723,
+  "canonical_source": {
+    "type": "technical_hidden_registry_recovery",
+    "recovered_from_commit": "f47a7dca871afd7648c8029ff2529c213e1d1fdd",
+    "recovered_from_save_id": "VEY-0724",
+    "values_restored": false,
+    "registry_only": true
+  },
+  "policy": "Restauration technique des seuls emplacements non résolus. Aucune valeur secrète n'est inventée ni rétablie.",
+  "unresolved_secrets": [
+    {
+      "path": "bridge_contact.identity.whether_Meren",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
     },
-    "policy": "Restauration technique des seuls emplacements non résolus. Aucune valeur secrète n'est inventée ni rétablie.",
-    "unresolved_secrets": [
-      {
-        "path": "bridge_contact.identity.whether_Meren",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_contact.identity.true_identity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_contact.identity.exact_role",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_contact.identity.affiliation",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_contact.identity.relation_to_Sarel",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_contact.identity.relation_to_Fer",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_contact.concealed_weapons",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_contact.stats",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_contact.intent",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_site.hidden.watchers",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_site.hidden.guards",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_site.hidden.traps",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_site.hidden.maintenance_door_contents",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_site.hidden.boat_true_status",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_site.hidden.alternate_escape_routes",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "bridge_site.hidden.reinforcements",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "M_reply.authenticity.author_identity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "M_reply.authenticity.whether_current_contact_wrote_it",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "M_reply.authenticity.whether_M_is_Meren",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Meren.true_identity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Meren.affiliation",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Meren.motive",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Meren.current_location",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Meren.whether_current_bridge_contact_is_Meren",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Mehdi.equipment.key_network_items.dark_wooden_piece.meaning",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Mehdi.equipment.key_network_items.Mira_marked_scrap.meaning",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Mehdi.equipment.key_network_items.Veilleuse_copper_plate.deeper_meaning",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Aveline_Sor.current_position.exact_position",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "rear_rooftop_fugitive.identity.true_identity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "rear_rooftop_fugitive.identity.exact_role",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "rear_rooftop_fugitive.identity.affiliation",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Ilyne_claimed.current_activity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Ilyne_claimed.true_identity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Ilyne_claimed.exact_role",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Ilyne_claimed.affiliation",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Ilyne_claimed.Meren_connection",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Veilleuse_claimant.current_location",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Veilleuse_claimant.true_identity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Veilleuse_claimant.exact_role",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Veilleuse_claimant.affiliation",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Mira_Veln_claimed.current_exact_status",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Mira_Veln_claimed.actual_identity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Mira_Veln_claimed.true_role",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "crossbow_defender_at_Maison.current_exact_status",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "crossbow_defender_at_Maison.identity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "first_captured_fugitive.current_exact_status",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "first_captured_fugitive.identity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "first_captured_fugitive.role",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Maison_des_Saules.hazards.lower_warning_line.function",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Maison_des_Saules.hazards.upper_floor_ring.function",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Maison_des_Saules.current_site_state",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "Maison_des_Saules.remaining_occupancy",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "second_building.first_occupant_status",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "second_building.gravely_wounded_second_occupant_status",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "other_unresolved_people.Deren_Voss_claimed.current_status",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "other_unresolved_people.first_storage_woman.current_status",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "other_unresolved_people.Calven_Rhos_claimed.survival",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "other_unresolved_people.recovery_bag.contents",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "other_unresolved_people.original_direct_site.survivor_states",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "dead_drop.current_status",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "dead_drop.collection",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "dead_drop.response",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "QT.Varek.identity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "QT.Varek.rank",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "QT.Varek.wealth",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "densification.armature_research.exact_budget",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "densification.armature_research.exact_protocol",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "densification.armature_research.exact_materials",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "densification.armature_research.exact_specialists",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "densification.armature_research.exact_T9_requirement",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "other_relationships.Sive.location",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "other_relationships.Lysa.location",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "other_relationships.Aldren.location",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "open_threads.broader.fourth_furnace",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_contact.whether_Meren",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_contact.true_identity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_contact.exact_role",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_contact.affiliation",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_contact.concealed_weapons",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_contact.stats",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_contact.intent",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_contact.truthful_reaction_to_test",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_site.watchers",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_site.guards",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_site.traps",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_site.boat_true_status",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_site.maintenance_door_contents",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_site.alternate_escape_routes",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.bridge_site.reinforcements",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.Meren.true_identity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.Meren.affiliation",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.Meren.current_location",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.Meren.motive",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.claimed_Sarel.true_identity",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.claimed_Sarel.whether_actual_Sarel",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.claimed_Sarel.exact_role",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.claimed_Sarel.affiliation",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.claimed_Sarel.Meren_connection",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.other.leak_source",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.other.internal_traitor",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.other.fourth_furnace",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.other.Varek_identity_rank_wealth",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.other.armature_details",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.other.Sive_location",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.other.Lysa_location",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      },
-      {
-        "path": "hidden_state.other.Aldren_location",
-        "status": "unresolved_hidden",
-        "value_known_to_persistence": false
-      }
-    ],
-    "invented_secret_values": []
+    {
+      "path": "bridge_contact.identity.true_identity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_contact.identity.exact_role",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_contact.identity.affiliation",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_contact.identity.relation_to_Sarel",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_contact.identity.relation_to_Fer",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_contact.concealed_weapons",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_contact.stats",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_contact.intent",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_site.hidden.watchers",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_site.hidden.guards",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_site.hidden.traps",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_site.hidden.maintenance_door_contents",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_site.hidden.boat_true_status",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_site.hidden.alternate_escape_routes",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "bridge_site.hidden.reinforcements",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "M_reply.authenticity.author_identity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "M_reply.authenticity.whether_current_contact_wrote_it",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "M_reply.authenticity.whether_M_is_Meren",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Meren.true_identity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Meren.affiliation",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Meren.motive",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Meren.current_location",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Meren.whether_current_bridge_contact_is_Meren",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Mehdi.equipment.key_network_items.dark_wooden_piece.meaning",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Mehdi.equipment.key_network_items.Mira_marked_scrap.meaning",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Mehdi.equipment.key_network_items.Veilleuse_copper_plate.deeper_meaning",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Aveline_Sor.current_position.exact_position",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "rear_rooftop_fugitive.identity.true_identity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "rear_rooftop_fugitive.identity.exact_role",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "rear_rooftop_fugitive.identity.affiliation",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Ilyne_claimed.current_activity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Ilyne_claimed.true_identity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Ilyne_claimed.exact_role",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Ilyne_claimed.affiliation",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Ilyne_claimed.Meren_connection",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Veilleuse_claimant.current_location",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Veilleuse_claimant.true_identity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Veilleuse_claimant.exact_role",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Veilleuse_claimant.affiliation",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Mira_Veln_claimed.current_exact_status",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Mira_Veln_claimed.actual_identity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Mira_Veln_claimed.true_role",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "crossbow_defender_at_Maison.current_exact_status",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "crossbow_defender_at_Maison.identity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "first_captured_fugitive.current_exact_status",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "first_captured_fugitive.identity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "first_captured_fugitive.role",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Maison_des_Saules.hazards.lower_warning_line.function",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Maison_des_Saules.hazards.upper_floor_ring.function",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Maison_des_Saules.current_site_state",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "Maison_des_Saules.remaining_occupancy",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "second_building.first_occupant_status",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "second_building.gravely_wounded_second_occupant_status",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "other_unresolved_people.Deren_Voss_claimed.current_status",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "other_unresolved_people.first_storage_woman.current_status",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "other_unresolved_people.Calven_Rhos_claimed.survival",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "other_unresolved_people.recovery_bag.contents",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "other_unresolved_people.original_direct_site.survivor_states",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "dead_drop.current_status",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "dead_drop.collection",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "dead_drop.response",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "QT.Varek.identity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "QT.Varek.rank",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "QT.Varek.wealth",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "densification.armature_research.exact_budget",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "densification.armature_research.exact_protocol",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "densification.armature_research.exact_materials",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "densification.armature_research.exact_specialists",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "densification.armature_research.exact_T9_requirement",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "other_relationships.Sive.location",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "other_relationships.Lysa.location",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "other_relationships.Aldren.location",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "open_threads.broader.fourth_furnace",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_contact.whether_Meren",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_contact.true_identity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_contact.exact_role",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_contact.affiliation",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_contact.concealed_weapons",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_contact.stats",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_contact.intent",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_contact.truthful_reaction_to_test",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_site.watchers",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_site.guards",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_site.traps",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_site.boat_true_status",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_site.maintenance_door_contents",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_site.alternate_escape_routes",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.bridge_site.reinforcements",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.Meren.true_identity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.Meren.affiliation",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.Meren.current_location",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.Meren.motive",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.claimed_Sarel.true_identity",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.claimed_Sarel.whether_actual_Sarel",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.claimed_Sarel.exact_role",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.claimed_Sarel.affiliation",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.claimed_Sarel.Meren_connection",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.other.leak_source",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.other.internal_traitor",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.other.fourth_furnace",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.other.Varek_identity_rank_wealth",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.other.armature_details",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.other.Sive_location",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.other.Lysa_location",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    },
+    {
+      "path": "hidden_state.other.Aldren_location",
+      "status": "unresolved_hidden",
+      "value_known_to_persistence": false
+    }
+  ],
+  "invented_secret_values": []
 }

@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0732",
-  "turn": 722,
+  "save_id": "VEY-0733",
+  "turn": 723,
   "time": {
     "year": 347,
     "day": 513,
@@ -21,11 +21,9 @@
   "last_action": {
     "actor": "bridge_contact",
     "dialogue_sequence": [
-      "Oui.",
-      "Voilà. Là, tu m'as enfin donné une question.",
-      "Mais ne fais pas l'erreur de croire qu'un « oui » me rend Meren. Demande-moi ce que tu ne m'as pas déjà donné."
+      "À ce rendez-vous ? Oui. Je suis venu seul."
     ],
-    "intent": "answer_black_case_claim_without_treating_agreement_as_identity_proof"
+    "intent": "answer_whether_he_came_alone_without_establishing_objective_site_status"
   },
   "bridge_contact": {
     "response": {
@@ -35,12 +33,12 @@
       "identity_denied": false,
       "answers_yes_to_black_case_claim": true,
       "agreement_establishes_objective_history": false,
-      "continues_identity_verification": true
+      "continues_identity_verification": true,
+      "claims_came_alone": true,
+      "claim_establishes_objective_site_status": false
     },
     "dialogue": [
-      "Oui.",
-      "Voilà. Là, tu m'as enfin donné une question.",
-      "Mais ne fais pas l'erreur de croire qu'un « oui » me rend Meren. Demande-moi ce que tu ne m'as pas déjà donné."
+      "À ce rendez-vous ? Oui. Je suis venu seul."
     ],
     "identity": {
       "whether_Meren": "unresolved",
@@ -56,13 +54,16 @@
       "black_case_objective_history_unresolved": true,
       "contact_black_case_answer_is_claim_only": true,
       "cargo_attack_objective_details_unresolved": true,
-      "caravan_marking_objective_details_unresolved": true
+      "caravan_marking_objective_details_unresolved": true,
+      "contact_claims_came_alone": true,
+      "contact_actual_alone_status_unresolved": true
     }
   },
   "information_firewall": {
     "contact_identity_unresolved": true,
     "cargo_attack_objective_details_unresolved": true,
     "caravan_marking_objective_details_unresolved": true,
-    "black_case_objective_history_unresolved": true
+    "black_case_objective_history_unresolved": true,
+    "contact_actual_alone_status_unresolved": true
   }
 }
