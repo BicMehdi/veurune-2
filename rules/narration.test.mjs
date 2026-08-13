@@ -12,8 +12,10 @@ test("les règles Dark Fantasy permanentes conservent les invariants du jeu", as
   for (const required of [
     "dark_fantasy_brutal_equilibre",
     "activation : permanente",
-    "quatre à sept paragraphes",
-    "Ne jamais lui prêter pensée, émotion, intention, parole, consentement, conclusion ou décision.",
+    "huit à douze paragraphes développés",
+    "Le joueur autorise le MJ à faire parler et réagir Mehdi dans les échanges ordinaires",
+    "Rendre immédiatement la main avant un engagement durable",
+    "l'autorité finale du joueur sur Mehdi",
     "FER_NOIR_STRICT",
     "OOC: PAUSE",
     "limites de sécurité obligatoires de ChatGPT",
