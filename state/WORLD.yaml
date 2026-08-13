@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0728",
-  "turn": 718,
+  "save_id": "VEY-0729",
+  "turn": 719,
   "time": {
     "year": 347,
     "day": 513,
@@ -16,39 +16,36 @@
     "combat_active": false,
     "tactical_alert": "very_high",
     "meeting_active": true,
-    "physical_confrontation_active": true
+    "physical_confrontation_active": false
   },
   "last_action": {
     "actor": "bridge_contact",
     "dialogue_sequence": [
-      "Si je te dis « Meren », ça ne prouve rien.",
-      "C’est toi qui m’as demandé une preuve. Pas un nom à répéter.",
-      "Lâche-moi. Sinon, cette conversation s’arrête ici."
+      "Bien.",
+      "Maintenant, la marque."
     ],
-    "intent": "refuse_empty_name_claim_and_demand_release"
+    "intent": "resume_identity_verification_after_release"
   },
   "Mehdi": {
     "positioning": {
-      "holds_contact_clothing": true,
+      "holds_contact_clothing": false,
       "contact_immobilized": false
     }
   },
   "bridge_contact": {
     "response": {
-      "clothing_grabbed_by_Mehdi": true,
+      "clothing_grabbed_by_Mehdi": false,
       "immobilized": false,
       "does_not_attack": true,
       "does_not_leave_meeting": true,
       "identity_confirmed": false,
       "identity_denied": false,
-      "refuses_simple_name_claim_as_proof": true,
-      "demands_release": true,
-      "warns_conversation_will_end_if_physical_pressure_continues": true
+      "physical_pressure_ended": true,
+      "continues_identity_verification": true
     },
     "dialogue": [
-      "Si je te dis « Meren », ça ne prouve rien.",
-      "C’est toi qui m’as demandé une preuve. Pas un nom à répéter.",
-      "Lâche-moi. Sinon, cette conversation s’arrête ici."
+      "Bien.",
+      "Maintenant, la marque."
     ],
     "identity": {
       "whether_Meren": "unresolved",
@@ -66,9 +63,8 @@
       "caravan_marking_objective_details_unresolved": true,
       "contact_knowledge_of_cargo_attack_unresolved": true,
       "contact_knowledge_of_caravan_marking_unresolved": true,
-      "Mehdi_holds_contact_clothing": true,
-      "contact_not_immobilized": true,
-      "physical_pressure_escalated_to_explicit_threat": true
+      "Mehdi_holds_contact_clothing": false,
+      "contact_not_immobilized": true
     }
   },
   "information_firewall": {
