@@ -16,6 +16,8 @@ Serveur MCP personnel qui permet à ChatGPT mobile de charger et sauvegarder Vey
 
 `save_turn` refuse les parents ou commits périmés, les tours discontinus, un mauvais `save_id`, les secrets dans les projections joueur, les reconstructions historiques injectées, toute modification non append-only du journal et tout calcul mécanique différent de son reçu serveur.
 
+Les PNJ improvisés utilisent les profils génériques `NPC-*` de `reference/MECHANICAL_PROFILES.json`. L'attribution est fournie à `validate_check` et `roll_check` avant les dés, avec justification et références. `roll_check` renvoie `required_profile_persistence`; `save_turn` exige sa copie exacte dans `HIDDEN`, puis interdit toute réattribution. Sans preuve d'un niveau particulier, seul le profil civil ordinaire est accepté.
+
 ## Sauvegarde rapide sans perte
 
 Le mode recommandé `save_turn({ mode: "patch", ... })` envoie seulement les changements du tour. Le Worker recharge les projections au même commit GitHub, applique une fusion récursive (`null` supprime une clé et un tableau remplace le tableau entier), reconstruit le checkpoint complet, puis exécute les validations ordinaires. Le mode complet ancien bénéficie désormais de la même préservation des champs omis. Le dépôt continue donc de contenir des snapshots complets : seule la quantité transmise par le MJ diminue.

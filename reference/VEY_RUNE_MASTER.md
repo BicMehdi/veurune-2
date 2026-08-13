@@ -1724,7 +1724,7 @@ Les numéros renvoient aux blocs `# FICHIER` du corpus concaténé `VEY_RUNE_V3.
 | procédure détaillée archivée | règle spécialisée du Master, puis bloc ciblé de `VEY_RUNE_REFERENCE_DETAILS_P12.md` |
 | alias et arbitrages | `REF-ALIAS`, registres `CON-*` et `DUP-*` |
 
-Les 152 identifiants de section sont uniques après l’extension mécanique P14.1. Les identifiants de contenu scellé — 60 nœuds, 40 storylets et 12 antagonistes — ont leur propre cardinalité contrôlée.
+Les 153 identifiants de section sont uniques après l’extension mécanique P14.2. Les identifiants de contenu scellé — 60 nœuds, 40 storylets et 12 antagonistes — ont leur propre cardinalité contrôlée.
 
 ## `QA-GLOBAL-MATRIX` — Résultats de l’audit P9, complétés en P11/P12
 
@@ -1733,7 +1733,7 @@ Les 152 identifiants de section sont uniques après l’extension mécanique P14
 | autorité GitHub | PASS | `AUTH-ABSOLUTE`, anciennes capsules explicitement abrogées |
 | ordre `load_game` | PASS | `persistence` → `narration_rules` → `current` → `world` → `recentEvents` → `hidden` |
 | sauvegarde | PASS | exactement un `save_turn` après vrai tour, avant narration finale |
-| identifiants de section | PASS | 152 identifiants, aucun doublon |
+| identifiants de section | PASS | 153 identifiants, aucun doublon |
 | campagne | PASS | 60 nœuds et 40 storylets uniques |
 | antagonistes | PASS | 12 dossiers scellés, aucune activation présumée |
 | écologie | PASS | 13 espèces, statistiques/populations/chaînes séparées |
@@ -2092,6 +2092,24 @@ Après validation, `roll_check` relit le même canon, tire `2d10` par le génér
 ## `MECH-PROFILE-INDEX` — Profils mécaniques et état vivant
 
 `reference/MECHANICAL_PROFILES.json` est un index lisible par le serveur, strictement subordonné aux profils numériques du Master. Une entrée de cet index ne crée jamais une personne ou une créature dans la campagne. Elle devient applicable seulement lorsqu’un acteur vivant de `state/` référence explicitement son `mechanical_profile_id`; les valeurs directes et états sauvegardés de cette instance prévalent.
+
+## `MECH-GENERIC-NPC-PROFILES` — Secours persistant pour PNJ improvisés
+
+Un PNJ vivant sans fiche individuelle peut recevoir un profil générique avant son premier test mécanique. Ce choix se fonde sur ce que la fiction a déjà établi, jamais sur les valeurs de Mehdi ni sur l'issue désirée. L'attribution fournit `target_ref`, `profile_id`, `basis`, `rationale` et `evidence_refs` à `validate_check`, puis à `roll_check`.
+
+| Profil | E/D/P | Capacités utiles | Maîtrises utiles | Condition d'emploi |
+|---|---:|---|---|---|
+| `NPC-CIVIL-ORDINARY` | 5/10/0 | toutes 0 | aucune | seul défaut minimal autorisé sans compétence établie |
+| `NPC-WORKER-ROBUST` | 8/10/0 | Vigueur 2, Volonté 1 | Athlétisme 2, Artisanat 1 | travail physique ou robustesse explicitement établis |
+| `NPC-GUARD-AVERAGE` | 8/12/2 | Vigueur 2, Adresse 1, Instinct 1, Volonté 1 | Mêlée 2, Athlétisme 1, Vigilance 1 | garde ordinaire réellement identifié ou équivalent |
+| `NPC-MERCENARY-TRAINED` | 10/13/2 | Vigueur 2, Adresse 2, Instinct 2, Volonté 2 | Mêlée 3, Athlétisme 2, Vigilance 2, Intimidation 1 | entraînement professionnel établi |
+| `NPC-VETERAN` | 12/14/3 | Vigueur 3, Adresse 2, Instinct 3, Raison 1, Volonté 3, Présence 1 | Mêlée 4, Athlétisme 3, Vigilance 3, Intimidation 2, Commandement 2 | expérience durable et dangereuse attestée |
+| `NPC-SPECIALIST-AGILE` | 8/15/1 | Vigueur 1, Adresse 3, Instinct 3, Raison 1, Volonté 2, Présence 1 | Mêlée 2, Athlétisme 2, Mobilité 4, Furtivité 3, Vigilance 3 | agilité ou spécialisation perceptible et établie |
+| `NPC-COMBATANT-ELITE` | 14/15/3 | Vigueur 3, Adresse 3, Instinct 3, Raison 1, Volonté 3, Présence 2 | Mêlée 4, Athlétisme 4, Mobilité 3, Vigilance 3, Intimidation 3, Commandement 3 | statut d'élite démontré par plusieurs faits canoniques |
+
+`E/D/P` signifie Endurance, Défense et Protection. Toute capacité ou maîtrise non indiquée vaut 0. Un profil est un socle, pas une identité ni une présence. Les valeurs individuelles déjà sauvegardées prévalent.
+
+Lorsque le profil est utilisé pour lancer les dés, `roll_check` le verrouille dans le reçu et renvoie `required_profile_persistence`. Le même `save_turn` doit enregistrer sous la cible `HIDDEN` le `mechanical_profile_id` et l'objet `mechanical_profile_assignment` exact. Une omission, une attribution sans reçu, une altération ou une réattribution future est bloquée. Si les faits ne permettent aucun choix légitime, `OPPOSITION_UNRESOLVED` demeure la bonne réponse.
 
 ## `MECH-PUBLIC-DISPLAY` — Jets visibles
 

@@ -1,8 +1,64 @@
 {
   "authority": "machine_readable_index_subordinate_to_VEY_RUNE_MASTER",
-  "policy": "Un profil ne prouve jamais la présence d'un acteur. Il devient utilisable seulement lorsqu'un acteur vivant de state/ le référence explicitement.",
-  "source": "reference/VEY_RUNE_MASTER.md#RULE-HUMAN-PROFILES et #BESTIARY-STATS",
+  "policy": "Un profil ne prouve jamais la présence d'un acteur. Il devient utilisable seulement lorsqu'un acteur vivant de state/ le référence explicitement. Un profil générique de secours est choisi avant le premier jet, verrouillé par son reçu et persisté dans HIDDEN par le même save_turn.",
+  "source": "reference/VEY_RUNE_MASTER.md#RULE-HUMAN-PROFILES, #BESTIARY-STATS et #MECH-GENERIC-NPC-PROFILES",
   "profiles": {
+    "NPC-CIVIL-ORDINARY": {
+      "label": "civil ordinaire", "fallback_assignable": true, "minimal_default_allowed": true,
+      "mechanics": {
+        "endurance": 5, "defense": 10, "protection": 0,
+        "capabilities": { "vigor": 0, "address": 0, "instinct": 0, "reason": 0, "will": 0, "presence": 0 },
+        "masteries": {}
+      }
+    },
+    "NPC-WORKER-ROBUST": {
+      "label": "ouvrier robuste", "fallback_assignable": true, "minimal_default_allowed": false,
+      "mechanics": {
+        "endurance": 8, "defense": 10, "protection": 0,
+        "capabilities": { "vigor": 2, "address": 0, "instinct": 0, "reason": 0, "will": 1, "presence": 0 },
+        "masteries": { "athletics": 2, "artisanat": 1 }
+      }
+    },
+    "NPC-GUARD-AVERAGE": {
+      "label": "garde moyen", "fallback_assignable": true, "minimal_default_allowed": false,
+      "mechanics": {
+        "endurance": 8, "defense": 12, "protection": 2,
+        "capabilities": { "vigor": 2, "address": 1, "instinct": 1, "reason": 0, "will": 1, "presence": 0 },
+        "masteries": { "melee": 2, "athletics": 1, "vigilance": 1 }
+      }
+    },
+    "NPC-MERCENARY-TRAINED": {
+      "label": "mercenaire entraîné", "fallback_assignable": true, "minimal_default_allowed": false,
+      "mechanics": {
+        "endurance": 10, "defense": 13, "protection": 2,
+        "capabilities": { "vigor": 2, "address": 2, "instinct": 2, "reason": 0, "will": 2, "presence": 0 },
+        "masteries": { "melee": 3, "athletics": 2, "vigilance": 2, "intimidation": 1 }
+      }
+    },
+    "NPC-VETERAN": {
+      "label": "vétéran", "fallback_assignable": true, "minimal_default_allowed": false,
+      "mechanics": {
+        "endurance": 12, "defense": 14, "protection": 3,
+        "capabilities": { "vigor": 3, "address": 2, "instinct": 3, "reason": 1, "will": 3, "presence": 1 },
+        "masteries": { "melee": 4, "athletics": 3, "vigilance": 3, "intimidation": 2, "commandement": 2 }
+      }
+    },
+    "NPC-SPECIALIST-AGILE": {
+      "label": "spécialiste agile", "fallback_assignable": true, "minimal_default_allowed": false,
+      "mechanics": {
+        "endurance": 8, "defense": 15, "protection": 1,
+        "capabilities": { "vigor": 1, "address": 3, "instinct": 3, "reason": 1, "will": 2, "presence": 1 },
+        "masteries": { "melee": 2, "athletics": 2, "mobility": 4, "stealth": 3, "vigilance": 3 }
+      }
+    },
+    "NPC-COMBATANT-ELITE": {
+      "label": "combattant d'élite", "fallback_assignable": true, "minimal_default_allowed": false,
+      "mechanics": {
+        "endurance": 14, "defense": 15, "protection": 3,
+        "capabilities": { "vigor": 3, "address": 3, "instinct": 3, "reason": 1, "will": 3, "presence": 2 },
+        "masteries": { "melee": 4, "athletics": 4, "mobility": 3, "vigilance": 3, "intimidation": 3, "commandement": 3 }
+      }
+    },
     "HUM-GARDE-URBAIN": { "mechanics": { "endurance": 8, "defense": 12, "protection": 2 } },
     "HUM-SOLDAT-LOURD": { "mechanics": { "endurance": 12, "defense": 12, "protection": 4 } },
     "HUM-DUELLISTE": { "mechanics": { "endurance": 9, "defense": 15, "protection": 1 } },

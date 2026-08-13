@@ -27,6 +27,8 @@ Utiliser de préférence `save_turn` avec `mode: patch` : transmettre uniquement
 
 `mehdi_sheet` fournit les caractéristiques et ressources mécaniques actuelles. Pour toute incertitude importante, appeler `validate_check`, puis `roll_check` avec le `headSha` chargé et le prochain `save_id`. Le serveur relit les statistiques canoniques, calcule total, opposition, marge et degré, puis renvoie un reçu chiffré. Reprendre exactement `roll_id`, `roll_receipt`, les dés et `mechanical_check` dans l’événement. Montrer seulement `public_display`, jamais `gm_resolution`. Une statistique adverse absente retourne `OPPOSITION_UNRESOLVED` et ne peut pas être inventée.
 
+Pour un PNJ sans fiche, utiliser au besoin `profile_assignments` avant le dé avec un profil générique `NPC-*`, une justification et des références factuelles. Sans preuve, seul `NPC-CIVIL-ORDINARY` est permis. Si `roll_check` renvoie `required_profile_persistence`, recopier exactement cette attribution sous la cible correspondante de `hidden_patch` avec `mechanical_profile_id` et `mechanical_profile_assignment`. `save_turn` refuse toute omission ou réattribution.
+
 Compatibilité de catalogue : si le connecteur n’affiche pas encore `validate_check` ou `roll_check`, appeler `search` avec `validate_check <JSON>` ou `roll_check <JSON>`, puis `fetch` avec l’identifiant renvoyé. Le pont utilise exactement le même validateur et le même générateur. Pour un hasard brut, l’ancien format `roll_dice 2d10 <headSha> <prochain_save_id> <intitulé>` reste accepté. Ces appels n’avancent jamais la fiction.
 
 `OOC: ETAT`, `OOC: AUDIT`, `OOC: PAUSE` et un simple chargement ne créent aucun tour.

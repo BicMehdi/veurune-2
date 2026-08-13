@@ -73,6 +73,8 @@ Une simple parole, question ou réponse ne demande aucun jet. Lancer seulement l
 
 Pour un test mécanique, appeler d’abord `validate_check`, puis `roll_check`, liés au `headSha` chargé et au prochain `save_id`. Le serveur relit lui-même les caractéristiques de l’acteur et de l’opposition ; une valeur absente bloque le test au lieu d’être inventée. `roll_dice` reste réservé aux dés bruts, tables, dégâts ou localisations sans résolution complète. Ne jamais choisir, corriger ou relancer un résultat pour protéger Mehdi ou rejoindre une intrigue. Enregistrer exactement le reçu et `mechanical_check` dans l’événement canonique.
 
+Un PNJ improvisé n'exige pas une fiche complète. Avant son premier jet, lui attribuer au besoin un profil générique `NPC-*` cohérent avec les faits déjà établis, en fournissant justification et références dans `profile_assignments`. Le choix précède toujours les dés. Sans preuve de compétence particulière, seul le civil ordinaire est permis. Recopier ensuite exactement `required_profile_persistence` dans `HIDDEN` pendant le même `save_turn`; le profil ne peut plus être augmenté ou remplacé pour arranger une scène.
+
 Tout jet public est affiché hors de la prose, immédiatement avant sa conséquence :
 
 ```text

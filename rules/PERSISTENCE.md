@@ -25,5 +25,8 @@
 23. Un jet public conserve formule, valeurs, DD ou défense, total, marge, degré et conséquence. Une opposition secrète conserve son détail uniquement dans `HIDDEN` et ne publie que les éléments perceptibles.
 24. `validate_check` ne lance aucun dé. Une statistique d’acteur ou d’opposition absente de l’état canonique retourne `ACTOR_UNRESOLVED` ou `OPPOSITION_UNRESOLVED` ; le MJ ne la remplace jamais par une valeur improvisée.
 25. `roll_check` relit les statistiques au commit attendu, calcule le test, chiffre et authentifie la résolution complète. `public_display` est la seule projection montrable au joueur ; `gm_resolution` et le contenu du reçu restent MJ.
+26. Un PNJ vivant sans fiche individuelle peut recevoir avant son premier test un profil générique `NPC-*` de `MECHANICAL_PROFILES`. L'attribution cite sa justification et ses preuves, puis devient persistante ; elle n'est jamais choisie d'après la puissance de Mehdi ou l'issue souhaitée.
+27. Sans fait établi permettant un profil spécialisé, seul `NPC-CIVIL-ORDINARY` est autorisé comme défaut minimal. Les profils ouvrier, garde, mercenaire, vétéran, spécialiste agile et combattant d'élite exigent une base fictionnelle citée.
+28. Si `roll_check` renvoie `required_profile_persistence`, le même `save_turn` inscrit exactement `mechanical_profile_id` et `mechanical_profile_assignment` dans `HIDDEN`. La sauvegarde refuse l'omission, l'altération, une attribution hors reçu et toute réattribution ultérieure.
 
 Les fichiers `.yaml` de ce dépôt utilisent le sous-ensemble JSON de YAML 1.2. Ils restent des documents YAML valides tout en permettant une validation reproductible avec Node.js sans bibliothèque externe.

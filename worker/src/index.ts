@@ -36,6 +36,14 @@ const checkModifierSchema = z.object({
   source: z.string().min(1).max(240),
 });
 
+const profileAssignmentSchema = z.object({
+  target_ref: z.string().regex(/^hidden:.+/).describe("Référence HIDDEN stable du PNJ; cette même cible recevra le profil dans hidden_patch."),
+  profile_id: z.string().min(1).max(100).describe("Profil NPC-* de secours autorisé par MECHANICAL_PROFILES."),
+  basis: z.enum(["established_fiction", "minimal_default"]),
+  rationale: z.string().min(1).max(500).describe("Pourquoi les faits déjà établis justifient ce niveau, avant de connaître les dés."),
+  evidence_refs: z.array(z.string().min(1).max(180)).min(1).max(8).describe("event_id, chemin d'état ou fait courant qui fonde l'attribution."),
+});
+
 const checkOppositionSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("difficulty"),
@@ -65,6 +73,9 @@ const checkRequestSchema = z.object({
   capability: z.string().min(1).max(80),
   mastery: z.string().min(1).max(80),
   modifiers: z.array(checkModifierSchema).max(10).default([]),
+  profile_assignments: z.array(profileAssignmentSchema).max(2).default([]).describe(
+    "Secours pour un PNJ sans fiche. Choisir avant le dé; roll_check verrouille l'attribution et save_turn exige sa persistance exacte dans HIDDEN.",
+  ),
   opposition: checkOppositionSchema,
   expected_head_sha: z.string().regex(/^[0-9a-f]{40}$/i),
   expected_save_id: z.string().regex(/^VEY-\d{4}[A-Z]*$/),
@@ -99,7 +110,7 @@ const patchSaveTurnSchema = z.object({
     "Uniquement les changements visibles du monde. Ne jamais inclure de secret. Même sémantique de fusion.",
   ),
   hidden_patch: z.record(z.string(), z.unknown()).describe(
-    "Uniquement les changements MJ cachés. Même sémantique de fusion.",
+    "Uniquement les changements MJ cachés. Même sémantique de fusion. Si roll_check renvoie required_profile_persistence, enregistrer mechanical_profile_id et l'objet mechanical_profile_assignment exact sous la cible hidden correspondante.",
   ),
   mehdi_profile_patch: z.record(z.string(), z.unknown()).optional().describe(
     "Observations descriptives fondées sur une instruction OOC explicite ou des événements canoniques cités; jamais un choix majeur futur.",
@@ -231,9 +242,9 @@ function assertOwner(env: VeyruneEnv) {
 
 function createVeyruneServer(env: VeyruneEnv) {
   const server = new McpServer(
-    { name: "veyrune-cloud-save", version: "1.4.0" },
+    { name: "veyrune-cloud-save", version: "1.5.0" },
     {
-      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Les statistiques viennent du canon serveur, jamais de valeurs recopiées ou inventées. Afficher public_display selon narration_rules et ne jamais révéler gm_resolution ni hidden. Consulter le Master par section ciblée. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale. Ne jamais annoncer un tour comme acquis si save_turn échoue.",
+      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Les statistiques viennent du canon serveur. Si un PNJ vivant n'a pas de fiche, choisir avant le dé un profil NPC-* cohérent via profile_assignments; le reçu le verrouille et save_turn impose sa persistance exacte dans HIDDEN. Sans preuve, seul NPC-CIVIL-ORDINARY est permis. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale.",
     },
   );
 
@@ -352,7 +363,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "validate_check",
     {
-      description: "Vérifie sans lancer de dé qu'un test est résoluble depuis le même commit canonique: acteur, caractéristique, maîtrise, modificateurs et opposition. Retourne OPPOSITION_UNRESOLVED plutôt que d'inventer une statistique.",
+      description: "Vérifie sans lancer de dé qu'un test est résoluble depuis le même commit canonique: acteur, caractéristique, maîtrise, modificateurs et opposition. Un PNJ sans fiche peut recevoir un profile_assignment NPC-* justifié avant le jet; sinon OPPOSITION_UNRESOLVED est retourné.",
       inputSchema: checkRequestSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
     },
@@ -365,7 +376,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "roll_check",
     {
-      description: "Résout un test Veyrune complet depuis les statistiques canoniques, lance 2d10 avec Web Crypto, calcule total, opposition, marge et degré, puis chiffre et authentifie le reçu pour save_turn. Ne lance aucun dé si validate_check échoue.",
+      description: "Résout un test complet depuis les statistiques canoniques, lance 2d10 avec Web Crypto, calcule total, opposition, marge et degré, puis chiffre le reçu. Toute attribution générique est verrouillée avant les dés et doit être recopiée exactement de required_profile_persistence vers hidden_patch pendant save_turn.",
       inputSchema: checkRequestSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: false },
     },
@@ -404,7 +415,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "save_turn",
     {
-      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch. Preserve mehdi_sheet unless an explicit mechanical event changes it. Every structured test must reuse the exact roll_check output; save_turn decrypts and verifies the full resolution without publishing hidden opposition. Raw rolls must reuse roll_dice. Legacy full mode remains accepted. If it fails, the narrative turn is not committed.",
+      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch. Preserve mehdi_sheet unless an explicit mechanical event changes it. Every structured test must reuse the exact roll_check output. If required_profile_persistence is returned, hidden_patch must persist it exactly; later reassignment is rejected. Raw rolls must reuse roll_dice. If save_turn fails, the narrative turn is not committed.",
       inputSchema: z.union([patchSaveTurnSchema, fullSaveTurnSchema]),
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true, idempotentHint: false },
     },

@@ -10,6 +10,7 @@ const profilePath = new URL("../state/MEHDI_PROFILE.yaml", import.meta.url);
 const memoryPath = new URL("../state/NARRATIVE_MEMORY.yaml", import.meta.url);
 const sheetPath = new URL("../state/MEHDI_SHEET.yaml", import.meta.url);
 const mechanicsEvalsPath = new URL("./mechanics-evals.json", import.meta.url);
+const mechanicalProfilesPath = new URL("../reference/MECHANICAL_PROFILES.json", import.meta.url);
 
 test("les règles Dark Fantasy permanentes conservent les invariants du jeu", async () => {
   const text = await readFile(narrationPath, "utf8");
@@ -82,6 +83,19 @@ test("les dialogues ordinaires restent sans jet et les actions sociales à enjeu
   assert.equal(fixtures.cases.find((entry) => entry.id === "credible-threat")?.expected_roll, "public");
   assert.equal(fixtures.cases.find((entry) => entry.id === "intimacy-refusal")?.expected_roll, "forbidden");
   assert.ok(fixtures.cases.filter((entry) => entry.expected_roll === "public").length >= 4);
+});
+
+test("les sept profils génériques de PNJ restent bornés et non actifs par eux-mêmes", async () => {
+  const catalog = JSON.parse(await readFile(mechanicalProfilesPath, "utf8"));
+  const generic = Object.entries(catalog.profiles).filter(([id]) => id.startsWith("NPC-"));
+  assert.equal(generic.length, 7);
+  assert.equal(catalog.profiles["NPC-CIVIL-ORDINARY"].minimal_default_allowed, true);
+  assert.ok(generic.filter(([id]) => id !== "NPC-CIVIL-ORDINARY").every(([, profile]) => profile.minimal_default_allowed === false));
+  assert.ok(generic.every(([, profile]) => profile.fallback_assignable === true));
+  assert.equal(catalog.profiles["NPC-WORKER-ROBUST"].mechanics.capabilities.vigor, 2);
+  assert.equal(catalog.profiles["NPC-VETERAN"].mechanics.masteries.athletics, 3);
+  assert.equal(catalog.profiles["NPC-COMBATANT-ELITE"].mechanics.defense, 15);
+  assert.match(catalog.policy, /avant le premier jet/);
 });
 
 test("la matrice de délégation réserve toutes les décisions majeures au joueur", async () => {
