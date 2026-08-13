@@ -154,8 +154,23 @@ function prepareProfileAssignments(context: CheckContext, request: CheckRequest)
     if (seen.has(assignment.target_ref)) throw new Error(`PROFILE_ASSIGNMENT_INVALID: cible dupliquée ${assignment.target_ref}`);
     seen.add(assignment.target_ref);
     const profile = record(profiles[assignment.profile_id]);
-    if (!profile || profile.fallback_assignable !== true) {
-      throw new Error(`PROFILE_ASSIGNMENT_INVALID: profil de secours interdit ou inconnu ${assignment.profile_id}`);
+    const genericAssignable = profile?.fallback_assignable === true;
+    const preparedCharacterAssignable = profile?.prepared_character_profile === true;
+    if (!profile || (!genericAssignable && !preparedCharacterAssignable)) {
+      throw new Error(`PROFILE_ASSIGNMENT_INVALID: profil attribuable interdit ou inconnu ${assignment.profile_id}`);
+    }
+    if (preparedCharacterAssignable) {
+      const actorPathSegments = targetPath.split(".").filter(Boolean);
+      const actorKey = actorPathSegments[actorPathSegments.length - 1];
+      const canonicalActorKeys = Array.isArray(profile.canonical_actor_keys)
+        ? profile.canonical_actor_keys.filter((key): key is string => typeof key === "string")
+        : [];
+      if (!actorKey || !canonicalActorKeys.includes(actorKey)) {
+        throw new Error(`PROFILE_ASSIGNMENT_INVALID: ${assignment.profile_id} ne correspond pas à ${assignment.target_ref}`);
+      }
+      if (assignment.basis !== "established_fiction") {
+        throw new Error("PROFILE_ASSIGNMENT_INVALID: une fiche préparée nommée exige une présence établie");
+      }
     }
     if (assignment.basis === "minimal_default" && profile.minimal_default_allowed !== true) {
       throw new Error("PROFILE_ASSIGNMENT_INVALID: seul le profil civil ordinaire peut servir de défaut minimal");
@@ -166,6 +181,10 @@ function prepareProfileAssignments(context: CheckContext, request: CheckRequest)
     if (!Array.isArray(assignment.evidence_refs) || assignment.evidence_refs.length < 1 || assignment.evidence_refs.length > 8
       || assignment.evidence_refs.some((reference) => typeof reference !== "string" || !reference.trim() || reference.length > 180)) {
       throw new Error("PROFILE_ASSIGNMENT_INVALID: une à huit références de preuve sont requises");
+    }
+    const minimumEvidenceRefs = typeof profile.minimum_evidence_refs === "number" ? profile.minimum_evidence_refs : 1;
+    if (assignment.evidence_refs.length < minimumEvidenceRefs) {
+      throw new Error(`PROFILE_ASSIGNMENT_INVALID: ${assignment.profile_id} exige au moins ${minimumEvidenceRefs} preuves établies`);
     }
   }
   return assignments;
@@ -187,6 +206,17 @@ function resolveActor(context: CheckContext, actorRef: string, assignments: Prof
   const profiles = record(context.mechanicalProfiles?.profiles) || {};
   const profile = typeof profileId === "string" ? record(profiles[profileId]) : undefined;
   if (typeof profileId === "string" && !profile) throw new Error(`ACTOR_UNRESOLVED: profil mécanique inconnu ${profileId}`);
+  if (profile?.prepared_character_profile === true) {
+    const actorPath = actorRef.replace(/^(current|world|hidden):/i, "");
+    const actorSegments = actorPath.split(".").filter(Boolean);
+    const actorKey = actorSegments[actorSegments.length - 1];
+    const canonicalActorKeys = Array.isArray(profile.canonical_actor_keys)
+      ? profile.canonical_actor_keys.filter((key): key is string => typeof key === "string")
+      : [];
+    if (!actorKey || !canonicalActorKeys.includes(actorKey)) {
+      throw new Error(`ACTOR_UNRESOLVED: le profil nommé ${String(profileId)} ne correspond pas à ${actorRef}`);
+    }
+  }
   const profileMechanics = record(profile?.mechanics) || profile || {};
   const capabilities = { ...numericMap(profileMechanics.capabilities), ...numericMap(direct.capabilities) };
   const masteries = { ...numericMap(profileMechanics.masteries), ...numericMap(direct.masteries) };

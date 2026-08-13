@@ -22,7 +22,7 @@
 - `P8` — fronts, nœuds, arcs, storylets et contenu dormant ;
 - `P9-P12` — audits, provenance, extensions sociales, détails archivés et contrôles de non-régression.
 - `P13` — mémoire persistante, HIDDEN non destructif, profil, chapitres et reprise idempotente ;
-- `P14` — fiche mécanique, difficultés, marges, jets sociaux, dés serveur et affichage des jets.
+- `P14` — fiche mécanique, difficultés, marges, jets sociaux, dés serveur, profils génériques persistants et fiches préparées des compagnons.
 
 ## Accès mécanique rapide
 
@@ -31,6 +31,8 @@
 - `RULE-SOCIAL-CHECKS` — dialogues à enjeu et oppositions ;
 - `MECH-SHEET-PERSISTENT` — fiche mécanique courante ;
 - `MECH-RANDOM-SERVER` — génération impartiale ;
+- `MECH-GENERIC-NPC-PROFILES` — huit profils génériques, du civil au maître/champion ;
+- `MECH-PREPARED-COMPANION-PROFILES` — neuf fiches nommées sans activation implicite ;
 - `MECH-PUBLIC-DISPLAY` — présentation obligatoire ;
 - `MECH-HIDDEN-ROLL` — opposition sensible.
 

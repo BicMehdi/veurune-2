@@ -1724,7 +1724,7 @@ Les numéros renvoient aux blocs `# FICHIER` du corpus concaténé `VEY_RUNE_V3.
 | procédure détaillée archivée | règle spécialisée du Master, puis bloc ciblé de `VEY_RUNE_REFERENCE_DETAILS_P12.md` |
 | alias et arbitrages | `REF-ALIAS`, registres `CON-*` et `DUP-*` |
 
-Les 153 identifiants de section sont uniques après l’extension mécanique P14.2. Les identifiants de contenu scellé — 60 nœuds, 40 storylets et 12 antagonistes — ont leur propre cardinalité contrôlée.
+Les 154 identifiants de section sont uniques après l’extension mécanique P14.3. Les identifiants de contenu scellé — 60 nœuds, 40 storylets et 12 antagonistes — ont leur propre cardinalité contrôlée.
 
 ## `QA-GLOBAL-MATRIX` — Résultats de l’audit P9, complétés en P11/P12
 
@@ -1733,7 +1733,7 @@ Les 153 identifiants de section sont uniques après l’extension mécanique P14
 | autorité GitHub | PASS | `AUTH-ABSOLUTE`, anciennes capsules explicitement abrogées |
 | ordre `load_game` | PASS | `persistence` → `narration_rules` → `current` → `world` → `recentEvents` → `hidden` |
 | sauvegarde | PASS | exactement un `save_turn` après vrai tour, avant narration finale |
-| identifiants de section | PASS | 153 identifiants, aucun doublon |
+| identifiants de section | PASS | 154 identifiants, aucun doublon |
 | campagne | PASS | 60 nœuds et 40 storylets uniques |
 | antagonistes | PASS | 12 dossiers scellés, aucune activation présumée |
 | écologie | PASS | 13 espèces, statistiques/populations/chaînes séparées |
@@ -2106,10 +2106,29 @@ Un PNJ vivant sans fiche individuelle peut recevoir un profil générique avant 
 | `NPC-VETERAN` | 12/14/3 | Vigueur 3, Adresse 2, Instinct 3, Raison 1, Volonté 3, Présence 1 | Mêlée 4, Athlétisme 3, Vigilance 3, Intimidation 2, Commandement 2 | expérience durable et dangereuse attestée |
 | `NPC-SPECIALIST-AGILE` | 8/15/1 | Vigueur 1, Adresse 3, Instinct 3, Raison 1, Volonté 2, Présence 1 | Mêlée 2, Athlétisme 2, Mobilité 4, Furtivité 3, Vigilance 3 | agilité ou spécialisation perceptible et établie |
 | `NPC-COMBATANT-ELITE` | 14/15/3 | Vigueur 3, Adresse 3, Instinct 3, Raison 1, Volonté 3, Présence 2 | Mêlée 4, Athlétisme 4, Mobilité 3, Vigilance 3, Intimidation 3, Commandement 3 | statut d'élite démontré par plusieurs faits canoniques |
+| `NPC-MASTER-CHAMPION` | 16/16/4 | Vigueur 4, Adresse 4, Instinct 4, Raison 2, Volonté 4, Présence 3 | Mêlée 5, Athlétisme 5, Mobilité 4, Vigilance 4, Intimidation 3, Commandement 4 | maître ou champion rarissime ; exige au moins trois preuves canoniques distinctes |
 
 `E/D/P` signifie Endurance, Défense et Protection. Toute capacité ou maîtrise non indiquée vaut 0. Un profil est un socle, pas une identité ni une présence. Les valeurs individuelles déjà sauvegardées prévalent.
 
 Lorsque le profil est utilisé pour lancer les dés, `roll_check` le verrouille dans le reçu et renvoie `required_profile_persistence`. Le même `save_turn` doit enregistrer sous la cible `HIDDEN` le `mechanical_profile_id` et l'objet `mechanical_profile_assignment` exact. Une omission, une attribution sans reçu, une altération ou une réattribution future est bloquée. Si les faits ne permettent aucun choix légitime, `OPPOSITION_UNRESOLVED` demeure la bonne réponse.
+
+## `MECH-PREPARED-COMPANION-PROFILES` — Fiches mécaniques préparées sans activation
+
+Les fiches `CHAR-*` ci-dessous sont des calibrations mécaniques `STATIC_PREPARED`. Elles ne prouvent ni présence, ni rencontre, ni compagnonnage actuel, ni équipement, ni blessure, ni survie. Elles deviennent utilisables seulement si GitHub établit l'instance vivante correspondante et si `roll_check` verrouille son identifiant exact avant le premier jet. Une fiche nommée ne peut jamais être attribuée à un autre acteur.
+
+| Fiche | E/D/P | Capacités | Maîtrises principales | Provenance mécanique |
+|---|---:|---|---|---|
+| `CHAR-AVELINE-SOR` | 12/15/3 | Vig 2, Adr 3, Ins 2, Rai 1, Vol 2, Pré 1 | Mêlée 4, Athlétisme 3, Vigilance 3 | valeurs attestées par `VEY-0719R`; les 11/12 Endurance de ce checkpoint restent un état historique, pas son état actuel |
+| `CHAR-ALDREN-VAUL` | 16/16/4 | Vig 4, Adr 4, Ins 4, Rai 2, Vol 4, Pré 3 | Mêlée 5, Athlétisme 5, Vigilance 4, Commandement 4, Équitation 4 | calibration P14.3 de maître militaire préparé |
+| `CHAR-ADRASTE-DE-LICE` | 12/15/3 | Vig 3, Adr 3, Ins 3, Rai 2, Vol 3, Pré 3 | Mêlée 4, Athlétisme 3, Vigilance 3, Commandement 4, Équitation 4 | calibration P14.3 d'héritière guerrière préparée |
+| `CHAR-ILYE-NAMAR` | 8/12/1 | Vig 1, Adr 2, Ins 2, Rai 4, Vol 3, Pré 3 | Vigilance 3, Érudition 3, Influence 3, Commandement 4, Navigation 3 | calibration P14.3 d'organisatrice et logisticienne préparée |
+| `CHAR-EREN-CORDES-ROUGES` | 9/15/1 | Vig 1, Adr 4, Ins 4, Rai 2, Vol 3, Pré 2 | Tir 3, Mobilité 4, Furtivité 4, Vigilance 3, Survie 3, Tromperie 3, Équitation 4 | calibration P14.3 de cavalier, messager et contrebandier préparé |
+| `CHAR-IRMINE-DERNIERE-PORTE` | 9/12/2 | Vig 1, Adr 1, Ins 2, Rai 4, Vol 4, Pré 3 | Vigilance 3, Érudition 4, Rites 5, Médecine 2 | calibration P14.3 de gardienne rituelle préparée |
+| `CHAR-DAREL-ONNE` | 8/11/1 | Vig 1, Adr 2, Ins 2, Rai 5, Vol 3, Pré 2 | Médecine 5, Artisanat 4, Érudition 4, Rites 3 | calibration P14.3 de médecin des liaisons préparé |
+| `CHAR-YSRA-KELD` | 13/14/2 | Vig 4, Adr 3, Ins 4, Rai 1, Vol 3, Pré 2 | Mêlée 4, Athlétisme 4, Vigilance 4, Survie 5, Tir 3 | calibration P14.3 de chasseuse des Marches préparée |
+| `CHAR-VAERA-NHAL` | 9/14/1 | Vig 1, Adr 3, Ins 4, Rai 4, Vol 4, Pré 5 | Vigilance 4, Influence 5, Tromperie 5, Commandement 4 | calibration P14.3 d'organisatrice sociale préparée |
+
+Les valeurs directes, blessures, Endurance actuelle, équipement et techniques sauvegardés pour une instance prévalent toujours. Aveline conserve comme techniques attestées `angle_vivant` et `interception_d_amorce`; aucune technique nouvelle n'est créée pour les autres fiches. `Sive` et `Lysa` possèdent des relations historiques attestées mais pas assez d'identité mécanique pour recevoir des chiffres sans invention : leurs entrées restent `deferred_unresolved` dans l'index et ne sont pas des profils utilisables.
 
 ## `MECH-PUBLIC-DISPLAY` — Jets visibles
 

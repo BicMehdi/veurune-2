@@ -28,5 +28,8 @@
 26. Un PNJ vivant sans fiche individuelle peut recevoir avant son premier test un profil générique `NPC-*` de `MECHANICAL_PROFILES`. L'attribution cite sa justification et ses preuves, puis devient persistante ; elle n'est jamais choisie d'après la puissance de Mehdi ou l'issue souhaitée.
 27. Sans fait établi permettant un profil spécialisé, seul `NPC-CIVIL-ORDINARY` est autorisé comme défaut minimal. Les profils ouvrier, garde, mercenaire, vétéran, spécialiste agile et combattant d'élite exigent une base fictionnelle citée.
 28. Si `roll_check` renvoie `required_profile_persistence`, le même `save_turn` inscrit exactement `mechanical_profile_id` et `mechanical_profile_assignment` dans `HIDDEN`. La sauvegarde refuse l'omission, l'altération, une attribution hors reçu et toute réattribution ultérieure.
+29. `NPC-MASTER-CHAMPION` est le seul palier générique au-dessus de l'élite. Il exige au moins trois références canoniques distinctes établissant une maîtrise exceptionnelle avant le jet.
+30. Les profils `CHAR-*` sont des fiches mécaniques préparées, non des états vivants. Ils sont attribuables uniquement à leur acteur nommé réellement présent selon GitHub; ils ne créent ni rencontre, ni compagnonnage, ni localisation, ni survie.
+31. Les valeurs directes sauvegardées prévalent sur la base `CHAR-*`. Endurance actuelle, blessures, équipement et techniques exigent leur propre état ou événement. Les entrées différées de Sive et Lysa ne fournissent aucune statistique.
 
 Les fichiers `.yaml` de ce dépôt utilisent le sous-ensemble JSON de YAML 1.2. Ils restent des documents YAML valides tout en permettant une validation reproductible avec Node.js sans bibliothèque externe.

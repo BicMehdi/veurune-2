@@ -1,7 +1,19 @@
 {
   "authority": "machine_readable_index_subordinate_to_VEY_RUNE_MASTER",
-  "policy": "Un profil ne prouve jamais la présence d'un acteur. Il devient utilisable seulement lorsqu'un acteur vivant de state/ le référence explicitement. Un profil générique de secours est choisi avant le premier jet, verrouillé par son reçu et persisté dans HIDDEN par le même save_turn.",
-  "source": "reference/VEY_RUNE_MASTER.md#RULE-HUMAN-PROFILES, #BESTIARY-STATS et #MECH-GENERIC-NPC-PROFILES",
+  "policy": "Un profil ne prouve jamais la présence d'un acteur. Il devient utilisable seulement lorsqu'un acteur vivant de state/ le référence explicitement. Un profil générique ou une fiche préparée est choisi avant le premier jet, verrouillé par son reçu et persisté dans HIDDEN par le même save_turn. Une fiche préparée ne devient jamais un état vivant.",
+  "source": "reference/VEY_RUNE_MASTER.md#RULE-HUMAN-PROFILES, #BESTIARY-STATS, #MECH-GENERIC-NPC-PROFILES et #MECH-PREPARED-COMPANION-PROFILES",
+  "deferred_characters": {
+    "Sive": {
+      "mechanical_status": "deferred_unresolved",
+      "reason": "relation canonique attestée mais identité mécanique, rôle et localisation actuels insuffisamment établis",
+      "source_refs": ["saves/VEY-0719R.yaml#other_relationships.Sive", "state/HIDDEN.yaml#other_relationships.Sive.location"]
+    },
+    "Lysa": {
+      "mechanical_status": "deferred_unresolved",
+      "reason": "compagnonnage canonique attesté mais identité mécanique, rôle et localisation actuels insuffisamment établis",
+      "source_refs": ["saves/VEY-0719R.yaml#other_relationships.Lysa", "state/HIDDEN.yaml#other_relationships.Lysa.location"]
+    }
+  },
   "profiles": {
     "NPC-CIVIL-ORDINARY": {
       "label": "civil ordinaire", "fallback_assignable": true, "minimal_default_allowed": true,
@@ -57,6 +69,107 @@
         "endurance": 14, "defense": 15, "protection": 3,
         "capabilities": { "vigor": 3, "address": 3, "instinct": 3, "reason": 1, "will": 3, "presence": 2 },
         "masteries": { "melee": 4, "athletics": 4, "mobility": 3, "vigilance": 3, "intimidation": 3, "commandement": 3 }
+      }
+    },
+    "NPC-MASTER-CHAMPION": {
+      "label": "maître d'armes ou champion", "fallback_assignable": true, "minimal_default_allowed": false,
+      "rare_profile": true, "minimum_evidence_refs": 3,
+      "mechanics": {
+        "endurance": 16, "defense": 16, "protection": 4,
+        "capabilities": { "vigor": 4, "address": 4, "instinct": 4, "reason": 2, "will": 4, "presence": 3 },
+        "masteries": { "melee": 5, "athletics": 5, "mobility": 4, "vigilance": 4, "intimidation": 3, "commandement": 4 }
+      }
+    },
+    "CHAR-AVELINE-SOR": {
+      "label": "Aveline Sor", "fallback_assignable": false, "prepared_character_profile": true,
+      "canonical_actor_keys": ["Aveline_Sor"], "activation_requires_live_github_instance": true,
+      "source_refs": ["saves/VEY-0719R.yaml#Aveline_Sor"],
+      "historical_live_state_note": "Le checkpoint VEY-0719R atteste 11/12 Endurance; seule l'Endurance maximale de 12 appartient à la base préparée.",
+      "mechanics": {
+        "endurance": 12, "defense": 15, "protection": 3,
+        "capabilities": { "vigor": 2, "address": 3, "instinct": 2, "reason": 1, "will": 2, "presence": 1 },
+        "masteries": { "melee": 4, "athletics": 3, "vigilance": 3, "stealth": 0, "influence": 0 },
+        "techniques": ["angle_vivant", "interception_d_amorce"]
+      }
+    },
+    "CHAR-ALDREN-VAUL": {
+      "label": "Sire Aldren Vaul", "fallback_assignable": false, "prepared_character_profile": true,
+      "canonical_actor_keys": ["Aldren", "Aldren_Vaul", "Sire_Aldren_Vaul"], "activation_requires_live_github_instance": true,
+      "source_refs": ["reference/VEY_RUNE_MASTER.md#NPC-ALDREN", "OOC:P14.3-prepared-calibration"],
+      "mechanics": {
+        "endurance": 16, "defense": 16, "protection": 4,
+        "capabilities": { "vigor": 4, "address": 4, "instinct": 4, "reason": 2, "will": 4, "presence": 3 },
+        "masteries": { "melee": 5, "athletics": 5, "mobility": 3, "vigilance": 4, "influence": 2, "intimidation": 3, "commandement": 4, "equitation": 4 }
+      }
+    },
+    "CHAR-ADRASTE-DE-LICE": {
+      "label": "Adraste de Lice", "fallback_assignable": false, "prepared_character_profile": true,
+      "canonical_actor_keys": ["Adraste", "Adraste_de_Lice"], "activation_requires_live_github_instance": true,
+      "source_refs": ["reference/VEY_RUNE_MASTER.md#NPC-ADRASTE", "OOC:P14.3-prepared-calibration"],
+      "mechanics": {
+        "endurance": 12, "defense": 15, "protection": 3,
+        "capabilities": { "vigor": 3, "address": 3, "instinct": 3, "reason": 2, "will": 3, "presence": 3 },
+        "masteries": { "melee": 4, "athletics": 3, "mobility": 2, "vigilance": 3, "influence": 3, "commandement": 4, "equitation": 4 }
+      }
+    },
+    "CHAR-ILYE-NAMAR": {
+      "label": "Ilye Namar", "fallback_assignable": false, "prepared_character_profile": true,
+      "canonical_actor_keys": ["Ilye", "Ilye_Namar"], "activation_requires_live_github_instance": true,
+      "source_refs": ["reference/VEY_RUNE_MASTER.md#NPC-ILYE", "OOC:P14.3-prepared-calibration"],
+      "mechanics": {
+        "endurance": 8, "defense": 12, "protection": 1,
+        "capabilities": { "vigor": 1, "address": 2, "instinct": 2, "reason": 4, "will": 3, "presence": 3 },
+        "masteries": { "melee": 1, "athletics": 1, "mobility": 2, "vigilance": 3, "survival": 2, "erudition": 3, "influence": 3, "commandement": 4, "navigation": 3 }
+      }
+    },
+    "CHAR-EREN-CORDES-ROUGES": {
+      "label": "Eren aux Cordes Rouges", "fallback_assignable": false, "prepared_character_profile": true,
+      "canonical_actor_keys": ["Eren", "Eren_aux_Cordes_Rouges"], "activation_requires_live_github_instance": true,
+      "source_refs": ["reference/VEY_RUNE_MASTER.md#NPC-EREN", "OOC:P14.3-prepared-calibration"],
+      "mechanics": {
+        "endurance": 9, "defense": 15, "protection": 1,
+        "capabilities": { "vigor": 1, "address": 4, "instinct": 4, "reason": 2, "will": 3, "presence": 2 },
+        "masteries": { "melee": 2, "tir": 3, "athletics": 2, "mobility": 4, "stealth": 4, "vigilance": 3, "survival": 3, "tromperie": 3, "equitation": 4, "navigation": 2 }
+      }
+    },
+    "CHAR-IRMINE-DERNIERE-PORTE": {
+      "label": "Sœur Irmine", "fallback_assignable": false, "prepared_character_profile": true,
+      "canonical_actor_keys": ["Irmine", "Soeur_Irmine"], "activation_requires_live_github_instance": true,
+      "source_refs": ["reference/VEY_RUNE_MASTER.md#NPC-IRMINE", "OOC:P14.3-prepared-calibration"],
+      "mechanics": {
+        "endurance": 9, "defense": 12, "protection": 2,
+        "capabilities": { "vigor": 1, "address": 1, "instinct": 2, "reason": 4, "will": 4, "presence": 3 },
+        "masteries": { "melee": 1, "athletics": 1, "vigilance": 3, "medecine": 2, "erudition": 4, "rites": 5, "influence": 2, "commandement": 2 }
+      }
+    },
+    "CHAR-DAREL-ONNE": {
+      "label": "Darel Onne", "fallback_assignable": false, "prepared_character_profile": true,
+      "canonical_actor_keys": ["Darel", "Darel_Onne"], "activation_requires_live_github_instance": true,
+      "source_refs": ["reference/VEY_RUNE_MASTER.md#NPC-DAREL", "OOC:P14.3-prepared-calibration"],
+      "mechanics": {
+        "endurance": 8, "defense": 11, "protection": 1,
+        "capabilities": { "vigor": 1, "address": 2, "instinct": 2, "reason": 5, "will": 3, "presence": 2 },
+        "masteries": { "melee": 0, "athletics": 1, "vigilance": 3, "medecine": 5, "artisanat": 4, "erudition": 4, "rites": 3, "influence": 2, "tromperie": 2 }
+      }
+    },
+    "CHAR-YSRA-KELD": {
+      "label": "Ysra Keld", "fallback_assignable": false, "prepared_character_profile": true,
+      "canonical_actor_keys": ["Ysra", "Ysra_Keld"], "activation_requires_live_github_instance": true,
+      "source_refs": ["reference/VEY_RUNE_MASTER.md#NPC-YSRA", "OOC:P14.3-prepared-calibration"],
+      "mechanics": {
+        "endurance": 13, "defense": 14, "protection": 2,
+        "capabilities": { "vigor": 4, "address": 3, "instinct": 4, "reason": 1, "will": 3, "presence": 2 },
+        "masteries": { "melee": 4, "tir": 3, "athletics": 4, "mobility": 3, "stealth": 3, "vigilance": 4, "survival": 5, "intimidation": 3, "equitation": 2 }
+      }
+    },
+    "CHAR-VAERA-NHAL": {
+      "label": "Vaëra Nhal", "fallback_assignable": false, "prepared_character_profile": true,
+      "canonical_actor_keys": ["Vaera", "Vaera_Nhal", "Vaëra", "Vaëra_Nhal"], "activation_requires_live_github_instance": true,
+      "source_refs": ["reference/VEY_RUNE_MASTER.md#NPC-VAERA", "OOC:P14.3-prepared-calibration"],
+      "mechanics": {
+        "endurance": 9, "defense": 14, "protection": 1,
+        "capabilities": { "vigor": 1, "address": 3, "instinct": 4, "reason": 4, "will": 4, "presence": 5 },
+        "masteries": { "melee": 2, "tir": 1, "athletics": 1, "mobility": 3, "stealth": 3, "vigilance": 4, "erudition": 3, "influence": 5, "tromperie": 5, "intimidation": 3, "commandement": 4 }
       }
     },
     "HUM-GARDE-URBAIN": { "mechanics": { "endurance": 8, "defense": 12, "protection": 2 } },

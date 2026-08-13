@@ -29,6 +29,8 @@ Utiliser de préférence `save_turn` avec `mode: patch` : transmettre uniquement
 
 Pour un PNJ sans fiche, utiliser au besoin `profile_assignments` avant le dé avec un profil générique `NPC-*`, une justification et des références factuelles. Sans preuve, seul `NPC-CIVIL-ORDINARY` est permis. Si `roll_check` renvoie `required_profile_persistence`, recopier exactement cette attribution sous la cible correspondante de `hidden_patch` avec `mechanical_profile_id` et `mechanical_profile_assignment`. `save_turn` refuse toute omission ou réattribution.
 
+`NPC-MASTER-CHAMPION` est rarissime et exige au moins trois preuves distinctes. Les profils préparés `CHAR-*` des compagnons ne sont attribuables qu'au personnage nommé correspondant, après établissement de son instance vivante par GitHub. Ils ne créent ni présence, ni alliance, ni état actuel. Sive et Lysa restent mécaniquement différées tant que leur rôle n'est pas établi.
+
 Compatibilité de catalogue : si le connecteur n’affiche pas encore `validate_check` ou `roll_check`, appeler `search` avec `validate_check <JSON>` ou `roll_check <JSON>`, puis `fetch` avec l’identifiant renvoyé. Le pont utilise exactement le même validateur et le même générateur. Pour un hasard brut, l’ancien format `roll_dice 2d10 <headSha> <prochain_save_id> <intitulé>` reste accepté. Ces appels n’avancent jamais la fiction.
 
 `OOC: ETAT`, `OOC: AUDIT`, `OOC: PAUSE` et un simple chargement ne créent aucun tour.

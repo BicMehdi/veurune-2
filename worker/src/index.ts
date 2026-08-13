@@ -38,7 +38,7 @@ const checkModifierSchema = z.object({
 
 const profileAssignmentSchema = z.object({
   target_ref: z.string().regex(/^hidden:.+/).describe("Référence HIDDEN stable du PNJ; cette même cible recevra le profil dans hidden_patch."),
-  profile_id: z.string().min(1).max(100).describe("Profil NPC-* de secours autorisé par MECHANICAL_PROFILES."),
+  profile_id: z.string().min(1).max(100).describe("Profil NPC-* générique ou CHAR-* préparé autorisé par MECHANICAL_PROFILES."),
   basis: z.enum(["established_fiction", "minimal_default"]),
   rationale: z.string().min(1).max(500).describe("Pourquoi les faits déjà établis justifient ce niveau, avant de connaître les dés."),
   evidence_refs: z.array(z.string().min(1).max(180)).min(1).max(8).describe("event_id, chemin d'état ou fait courant qui fonde l'attribution."),
@@ -242,9 +242,9 @@ function assertOwner(env: VeyruneEnv) {
 
 function createVeyruneServer(env: VeyruneEnv) {
   const server = new McpServer(
-    { name: "veyrune-cloud-save", version: "1.5.0" },
+    { name: "veyrune-cloud-save", version: "1.6.0" },
     {
-      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Les statistiques viennent du canon serveur. Si un PNJ vivant n'a pas de fiche, choisir avant le dé un profil NPC-* cohérent via profile_assignments; le reçu le verrouille et save_turn impose sa persistance exacte dans HIDDEN. Sans preuve, seul NPC-CIVIL-ORDINARY est permis. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale.",
+      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Les statistiques viennent du canon serveur. Un PNJ vivant sans fiche peut recevoir avant le dé un profil NPC-* cohérent; un compagnon nommé réellement présent peut recevoir uniquement son profil CHAR-* correspondant. Le reçu verrouille le choix et save_turn impose sa persistance exacte dans HIDDEN. Sans preuve, seul NPC-CIVIL-ORDINARY est permis. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale.",
     },
   );
 
@@ -363,7 +363,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "validate_check",
     {
-      description: "Vérifie sans lancer de dé qu'un test est résoluble depuis le même commit canonique: acteur, caractéristique, maîtrise, modificateurs et opposition. Un PNJ sans fiche peut recevoir un profile_assignment NPC-* justifié avant le jet; sinon OPPOSITION_UNRESOLVED est retourné.",
+      description: "Vérifie sans lancer de dé qu'un test est résoluble depuis le même commit canonique: acteur, caractéristique, maîtrise, modificateurs et opposition. Un PNJ sans fiche peut recevoir un profile_assignment NPC-* justifié; un compagnon nommé présent peut recevoir uniquement son CHAR-* correspondant. Sinon OPPOSITION_UNRESOLVED est retourné.",
       inputSchema: checkRequestSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
     },

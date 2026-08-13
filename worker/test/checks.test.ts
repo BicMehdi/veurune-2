@@ -7,9 +7,9 @@ const HEAD = "a".repeat(40);
 const SAVE_ID = "VEY-0734";
 const SECRET = "test-check-receipt-key";
 
-function context(hidden: Record<string, unknown> = {}): CheckContext {
+function context(hidden: Record<string, unknown> = {}, current: Record<string, unknown> = {}): CheckContext {
   return {
-    current: {},
+    current,
     world: {},
     hidden,
     mehdiSheet: {
@@ -31,6 +31,15 @@ function context(hidden: Record<string, unknown> = {}): CheckContext {
         "NPC-VETERAN": {
           fallback_assignable: true, minimal_default_allowed: false,
           mechanics: { defense: 14, capabilities: { vigor: 3, address: 2 }, masteries: { athletics: 3 } },
+        },
+        "NPC-MASTER-CHAMPION": {
+          fallback_assignable: true, minimal_default_allowed: false, minimum_evidence_refs: 3,
+          mechanics: { defense: 16, capabilities: { vigor: 4, address: 4 }, masteries: { athletics: 5 } },
+        },
+        "CHAR-AVELINE-SOR": {
+          fallback_assignable: false, prepared_character_profile: true,
+          canonical_actor_keys: ["Aveline_Sor"], activation_requires_live_github_instance: true,
+          mechanics: { defense: 15, capabilities: { vigor: 2, address: 3 }, masteries: { athletics: 3 } },
         },
       },
     },
@@ -232,4 +241,58 @@ test("un profil générique ne peut pas créer un PNJ absent du canon chargé", 
     assert.equal(validation.code, "PROFILE_ASSIGNMENT_INVALID");
     assert.match(validation.message, /ne peut pas créer un PNJ/);
   }
+});
+
+test("le maître champion exige trois preuves établies", () => {
+  const hidden = { champion: {} };
+  const assignment = {
+    target_ref: "hidden:champion", profile_id: "NPC-MASTER-CHAMPION", basis: "established_fiction" as const,
+    rationale: "Plusieurs exploits observés établissent une maîtrise exceptionnelle.",
+  };
+  const insufficient = validateCheck(context(hidden), request({
+    opposition: { kind: "defense", target_ref: "hidden:champion", visibility: "hidden" },
+    profile_assignments: [{ ...assignment, evidence_refs: ["EVT-1", "EVT-2"] }],
+  }));
+  assert.equal(insufficient.status, "unresolved");
+  if (insufficient.status === "unresolved") assert.match(insufficient.message, /au moins 3 preuves/);
+
+  const valid = validateCheck(context(hidden), request({
+    opposition: { kind: "defense", target_ref: "hidden:champion", visibility: "hidden" },
+    profile_assignments: [{ ...assignment, evidence_refs: ["EVT-1", "EVT-2", "EVT-3"] }],
+  }));
+  assert.equal(valid.status, "ready");
+});
+
+test("une fiche préparée nommée exige le bon acteur vivant", () => {
+  const assignment = {
+    profile_id: "CHAR-AVELINE-SOR", basis: "established_fiction" as const,
+    rationale: "Aveline est présente et son identité est établie.", evidence_refs: ["EVT-0719R-0007"],
+  };
+  const valid = validateCheck(context({}, { Aveline_Sor: {} }), request({
+    opposition: { kind: "defense", target_ref: "hidden:Aveline_Sor", visibility: "hidden" },
+    profile_assignments: [{ ...assignment, target_ref: "hidden:Aveline_Sor" }],
+  }));
+  assert.equal(valid.status, "ready");
+
+  const wrongActor = validateCheck(context({ stranger: {} }), request({
+    opposition: { kind: "defense", target_ref: "hidden:stranger", visibility: "hidden" },
+    profile_assignments: [{ ...assignment, target_ref: "hidden:stranger" }],
+  }));
+  assert.equal(wrongActor.status, "unresolved");
+  if (wrongActor.status === "unresolved") assert.match(wrongActor.message, /ne correspond pas/);
+
+  const absent = validateCheck(context({}), request({
+    opposition: { kind: "defense", target_ref: "hidden:Aveline_Sor", visibility: "hidden" },
+    profile_assignments: [{ ...assignment, target_ref: "hidden:Aveline_Sor" }],
+  }));
+  assert.equal(absent.status, "unresolved");
+  if (absent.status === "unresolved") assert.match(absent.message, /ne peut pas créer un PNJ/);
+
+  const forgedExisting = validateCheck(context({
+    stranger: { mechanical_profile_id: "CHAR-AVELINE-SOR" },
+  }), request({
+    opposition: { kind: "defense", target_ref: "hidden:stranger", visibility: "hidden" },
+  }));
+  assert.equal(forgedExisting.status, "unresolved");
+  if (forgedExisting.status === "unresolved") assert.match(forgedExisting.message, /ne correspond pas/);
 });

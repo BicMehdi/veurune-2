@@ -85,17 +85,36 @@ test("les dialogues ordinaires restent sans jet et les actions sociales à enjeu
   assert.ok(fixtures.cases.filter((entry) => entry.expected_roll === "public").length >= 4);
 });
 
-test("les sept profils génériques de PNJ restent bornés et non actifs par eux-mêmes", async () => {
+test("les huit profils génériques de PNJ restent bornés et non actifs par eux-mêmes", async () => {
   const catalog = JSON.parse(await readFile(mechanicalProfilesPath, "utf8"));
   const generic = Object.entries(catalog.profiles).filter(([id]) => id.startsWith("NPC-"));
-  assert.equal(generic.length, 7);
+  assert.equal(generic.length, 8);
   assert.equal(catalog.profiles["NPC-CIVIL-ORDINARY"].minimal_default_allowed, true);
   assert.ok(generic.filter(([id]) => id !== "NPC-CIVIL-ORDINARY").every(([, profile]) => profile.minimal_default_allowed === false));
   assert.ok(generic.every(([, profile]) => profile.fallback_assignable === true));
   assert.equal(catalog.profiles["NPC-WORKER-ROBUST"].mechanics.capabilities.vigor, 2);
   assert.equal(catalog.profiles["NPC-VETERAN"].mechanics.masteries.athletics, 3);
   assert.equal(catalog.profiles["NPC-COMBATANT-ELITE"].mechanics.defense, 15);
+  assert.equal(catalog.profiles["NPC-MASTER-CHAMPION"].mechanics.defense, 16);
+  assert.equal(catalog.profiles["NPC-MASTER-CHAMPION"].minimum_evidence_refs, 3);
   assert.match(catalog.policy, /avant le premier jet/);
+});
+
+test("les neuf fiches préparées de compagnons ne créent aucun état vivant", async () => {
+  const catalog = JSON.parse(await readFile(mechanicalProfilesPath, "utf8"));
+  const companions = Object.entries(catalog.profiles).filter(([id]) => id.startsWith("CHAR-"));
+  assert.equal(companions.length, 9);
+  assert.ok(companions.every(([, profile]) => profile.prepared_character_profile === true));
+  assert.ok(companions.every(([, profile]) => profile.fallback_assignable === false));
+  assert.ok(companions.every(([, profile]) => profile.activation_requires_live_github_instance === true));
+  assert.equal(catalog.profiles["CHAR-AVELINE-SOR"].mechanics.endurance, 12);
+  assert.deepEqual(catalog.profiles["CHAR-AVELINE-SOR"].mechanics.techniques, ["angle_vivant", "interception_d_amorce"]);
+  assert.equal(catalog.profiles["CHAR-ALDREN-VAUL"].mechanics.masteries.melee, 5);
+  assert.equal(catalog.profiles["CHAR-VAERA-NHAL"].mechanics.capabilities.presence, 5);
+  assert.equal(catalog.deferred_characters.Sive.mechanical_status, "deferred_unresolved");
+  assert.equal(catalog.deferred_characters.Lysa.mechanical_status, "deferred_unresolved");
+  assert.equal(catalog.profiles.Sive, undefined);
+  assert.equal(catalog.profiles.Lysa, undefined);
 });
 
 test("la matrice de délégation réserve toutes les décisions majeures au joueur", async () => {

@@ -18,6 +18,8 @@ Serveur MCP personnel qui permet à ChatGPT mobile de charger et sauvegarder Vey
 
 Les PNJ improvisés utilisent les profils génériques `NPC-*` de `reference/MECHANICAL_PROFILES.json`. L'attribution est fournie à `validate_check` et `roll_check` avant les dés, avec justification et références. `roll_check` renvoie `required_profile_persistence`; `save_turn` exige sa copie exacte dans `HIDDEN`, puis interdit toute réattribution. Sans preuve d'un niveau particulier, seul le profil civil ordinaire est accepté.
 
+Le catalogue comprend également le niveau rarissime `NPC-MASTER-CHAMPION`, qui exige trois preuves, et neuf fiches préparées `CHAR-*`. Une fiche nommée ne peut être attribuée qu'à l'acteur correspondant déjà vivant dans GitHub. Elle ne l'active jamais. Sive et Lysa restent dans le registre différé sans valeurs mécaniques.
+
 ## Sauvegarde rapide sans perte
 
 Le mode recommandé `save_turn({ mode: "patch", ... })` envoie seulement les changements du tour. Le Worker recharge les projections au même commit GitHub, applique une fusion récursive (`null` supprime une clé et un tableau remplace le tableau entier), reconstruit le checkpoint complet, puis exécute les validations ordinaires. Le mode complet ancien bénéficie désormais de la même préservation des champs omis. Le dépôt continue donc de contenir des snapshots complets : seule la quantité transmise par le MJ diminue.
