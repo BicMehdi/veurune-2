@@ -26,7 +26,7 @@ test("les règles Dark Fantasy permanentes conservent les invariants du jeu", as
     "limites de sécurité obligatoires de ChatGPT",
     "La violence sexuelle n'est jamais détaillée ni érotisée.",
     "Le tour a-t-il été sauvegardé avec succès",
-    "Tout jet a-t-il été généré par `roll_dice`",
+    "Tout test a-t-il été validé et généré par `roll_check`",
     "🎲 Test — Intimidation",
   ]) {
     assert.ok(text.includes(required), `règle obligatoire absente: ${required}`);
@@ -52,7 +52,9 @@ test("le document narratif est exposé par search et fetch", async () => {
   assert.match(text, /"fetch_master_section"/);
   assert.match(text, /"check_save_status"/);
   assert.match(text, /"roll_dice"/);
-  assert.match(text, /Compatibility: if roll_dice is absent/);
+  assert.match(text, /"validate_check"/);
+  assert.match(text, /"roll_check"/);
+  assert.match(text, /Compatibility for an old catalog/);
   assert.match(text, /compatibility_bridge/);
   assert.match(text, /state\/MEHDI_SHEET\.yaml/);
 });

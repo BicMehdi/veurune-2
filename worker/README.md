@@ -7,12 +7,14 @@ Serveur MCP personnel qui permet à ChatGPT mobile de charger et sauvegarder Vey
 - `search` et `fetch` : consultation des documents canoniques visibles joueur ;
 - `load_game` : chargement des règles de persistance et de narration, de l’état courant, des événements récents et de l’état MJ ;
 - `roll_dice` : génération impartiale des dés, liée au canon chargé et accompagnée d’un reçu vérifié par `save_turn`, sans avancer la fiction ;
+- `validate_check` : validation sans dé des références d’acteur, caractéristiques, maîtrises, modificateurs et opposition ;
+- `roll_check` : résolution mécanique complète et reçu chiffré, avec projections MJ et joueur séparées ;
 - `search_master` et `fetch_master_section` : consultation ciblée du Master MJ sans charger ses 154 Ko à chaque tour ;
 - `save_turn` : validation puis commit Git atomique d’un nouveau tour ;
 - `check_save_status` : résolution idempotente d’une réponse réseau perdue après un commit ;
 - `check_health` : vérification authentifiée de GitHub et de l’état courant.
 
-`save_turn` refuse les parents ou commits périmés, les tours discontinus, un mauvais `save_id`, les secrets dans les projections joueur, les reconstructions historiques injectées et toute modification non append-only du journal.
+`save_turn` refuse les parents ou commits périmés, les tours discontinus, un mauvais `save_id`, les secrets dans les projections joueur, les reconstructions historiques injectées, toute modification non append-only du journal et tout calcul mécanique différent de son reçu serveur.
 
 ## Sauvegarde rapide sans perte
 
@@ -22,7 +24,7 @@ L'écriture GitHub utilise une création d'arbre avec contenu intégré. Les hui
 
 Les champs `mehdi_sheet` et `narration_rules` sont lus au même commit GitHub que le reste du canon. Le MJ utilise la fiche avant tout test et applique les règles d’affichage avant de présenter le résultat.
 
-Si un ancien catalogue de connecteur ne montre pas encore `roll_dice`, `search("roll_dice 2d10 <headSha> <next_save_id> <label>")` renvoie un identifiant que `fetch` exécute avec exactement le même générateur et le même reçu signé. Ce pont peut être retiré lorsque tous les clients rafraîchissent correctement leur catalogue.
+Si un ancien catalogue ne montre pas encore les nouveaux outils, `search("validate_check <JSON>")` ou `search("roll_check <JSON>")` renvoie un identifiant que `fetch` exécute avec exactement le même moteur. `search("roll_dice 2d10 <headSha> <next_save_id> <label>")` reste disponible pour les dés bruts. Ce pont peut être retiré lorsque tous les clients rafraîchissent correctement leur catalogue.
 
 ## Tests de non-régression
 

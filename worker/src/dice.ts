@@ -1,3 +1,5 @@
+import { signJson, verifySignedJson } from "./receipt.ts";
+
 export type DiceRoll = {
   roll_id: string;
   label: string | null;
@@ -48,31 +50,6 @@ type ReceiptPayload = {
   expected_save_id: string;
 };
 
-function bytesToBase64Url(bytes: Uint8Array) {
-  const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-}
-
-function base64UrlToBytes(value: string) {
-  const base64 = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
-  return Uint8Array.from(atob(base64), (character) => character.charCodeAt(0));
-}
-
-async function hmacKey(secret: string) {
-  if (!secret) throw new Error("clé de reçu de jet absente");
-  const derived = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(`veyrune:dice-receipt:v1:${secret}`),
-  );
-  return crypto.subtle.importKey(
-    "raw",
-    derived,
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign", "verify"],
-  );
-}
-
 export async function issueDiceRoll(
   count: number,
   sides: number,
@@ -94,27 +71,16 @@ export async function issueDiceRoll(
     expected_head_sha: expectedHeadSha,
     expected_save_id: expectedSaveId,
   };
-  const encodedPayload = bytesToBase64Url(new TextEncoder().encode(JSON.stringify(payload)));
-  const signature = new Uint8Array(await crypto.subtle.sign("HMAC", await hmacKey(secret), new TextEncoder().encode(encodedPayload)));
   return {
     ...roll,
     expected_head_sha: expectedHeadSha,
     expected_save_id: expectedSaveId,
-    roll_receipt: `${encodedPayload}.${bytesToBase64Url(signature)}`,
+    roll_receipt: await signJson(payload, secret, "veyrune:dice-receipt:v1"),
   };
 }
 
 async function verifyReceipt(receipt: string, secret: string): Promise<ReceiptPayload> {
-  const [encodedPayload, encodedSignature, extra] = receipt.split(".");
-  if (!encodedPayload || !encodedSignature || extra) throw new Error("reçu de jet invalide");
-  const valid = await crypto.subtle.verify(
-    "HMAC",
-    await hmacKey(secret),
-    base64UrlToBytes(encodedSignature),
-    new TextEncoder().encode(encodedPayload),
-  );
-  if (!valid) throw new Error("signature du reçu de jet invalide");
-  const payload = JSON.parse(new TextDecoder().decode(base64UrlToBytes(encodedPayload))) as ReceiptPayload;
+  const payload = await verifySignedJson<ReceiptPayload>(receipt, secret, "veyrune:dice-receipt:v1");
   if (payload.version !== 1 || !Array.isArray(payload.dice)) throw new Error("contenu du reçu de jet invalide");
   return payload;
 }
@@ -127,6 +93,7 @@ export async function verifyEventRollReceipts(
 ) {
   const seen = new Set<string>();
   for (const event of events) {
+    if ("mechanical_check" in event) continue;
     const hasRoll = "dice" in event || "roll_id" in event || "roll_receipt" in event;
     if (!hasRoll) continue;
     if (typeof event.roll_id !== "string" || typeof event.notation !== "string" || !Array.isArray(event.dice) || typeof event.roll_receipt !== "string") {

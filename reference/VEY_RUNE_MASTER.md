@@ -1724,7 +1724,7 @@ Les numéros renvoient aux blocs `# FICHIER` du corpus concaténé `VEY_RUNE_V3.
 | procédure détaillée archivée | règle spécialisée du Master, puis bloc ciblé de `VEY_RUNE_REFERENCE_DETAILS_P12.md` |
 | alias et arbitrages | `REF-ALIAS`, registres `CON-*` et `DUP-*` |
 
-Les 127 identifiants de section sont uniques au moment de l’audit. Les identifiants de contenu scellé — 60 nœuds, 40 storylets et 12 antagonistes — ont leur propre cardinalité contrôlée.
+Les 152 identifiants de section sont uniques après l’extension mécanique P14.1. Les identifiants de contenu scellé — 60 nœuds, 40 storylets et 12 antagonistes — ont leur propre cardinalité contrôlée.
 
 ## `QA-GLOBAL-MATRIX` — Résultats de l’audit P9, complétés en P11/P12
 
@@ -1733,7 +1733,7 @@ Les 127 identifiants de section sont uniques au moment de l’audit. Les identif
 | autorité GitHub | PASS | `AUTH-ABSOLUTE`, anciennes capsules explicitement abrogées |
 | ordre `load_game` | PASS | `persistence` → `narration_rules` → `current` → `world` → `recentEvents` → `hidden` |
 | sauvegarde | PASS | exactement un `save_turn` après vrai tour, avant narration finale |
-| identifiants de section | PASS | 127 identifiants, aucun doublon |
+| identifiants de section | PASS | 152 identifiants, aucun doublon |
 | campagne | PASS | 60 nœuds et 40 storylets uniques |
 | antagonistes | PASS | 12 dossiers scellés, aucune activation présumée |
 | écologie | PASS | 13 espèces, statistiques/populations/chaînes séparées |
@@ -2074,6 +2074,24 @@ Le validateur local et le Worker partagent les invariants de `HIDDEN`. Les pushe
 ## `MECH-RANDOM-SERVER` — Dés impartiaux
 
 `roll_dice` produit les dés au moyen du générateur cryptographique du Worker, sans créer de tour. Le jet est lié au `headSha` chargé et au prochain `save_id`, puis signé par un `roll_receipt`. Le MJ reprend exactement le reçu, le `roll_id` et les valeurs obtenues dans l’événement du test. `save_turn` refuse un dé modifié, un reçu falsifié ou un reçu réutilisé pour un autre tour. Le MJ ne choisit, ne corrige et ne relance jamais les dés pour obtenir une issue narrative.
+
+## `MECH-CHECK-VALIDATE` — Validation sans dé
+
+Avant un test mécanique structuré, `validate_check` vérifie au même `headSha` l’acteur, sa caractéristique, sa maîtrise, les modificateurs déclarés et l’opposition. Aucun dé n’est lancé pendant cette étape. Une fiche absente retourne `ACTOR_UNRESOLVED` ; une statistique adverse absente retourne `OPPOSITION_UNRESOLVED`. Le MJ ne remplace jamais ce refus par une valeur improvisée.
+
+## `MECH-CHECK-SERVER` — Résolution complète signée
+
+Après validation, `roll_check` relit le même canon, tire `2d10` par le générateur cryptographique du Worker, puis calcule caractéristique, maîtrise, modificateurs, total, opposition, marge et degré. Le reçu est lié au `headSha`, au prochain `save_id`, à l’acteur, à l’action et à toute la résolution. `save_turn` refuse un dé, une valeur, un total, une marge, un degré ou une projection publique modifiés.
+
+`roll_dice` reste la primitive des hasards sans résolution complète : dégâts, localisation, table ou autre tirage explicitement demandé par une règle. Il ne remplace pas `roll_check` lorsqu’un test dépend de statistiques.
+
+## `MECH-CHECK-VISIBILITY` — Deux projections sans fuite
+
+`gm_resolution` contient la résolution complète nécessaire au MJ. `public_display` contient uniquement ce qui peut être montré au joueur. Lorsque l’opposition est cachée, sa valeur, la marge et le degré exacts ne figurent pas dans `public_display`. Le reçu complet est chiffré et authentifié : il peut être vérifié par `save_turn` sans publier les statistiques secrètes.
+
+## `MECH-PROFILE-INDEX` — Profils mécaniques et état vivant
+
+`reference/MECHANICAL_PROFILES.json` est un index lisible par le serveur, strictement subordonné aux profils numériques du Master. Une entrée de cet index ne crée jamais une personne ou une créature dans la campagne. Elle devient applicable seulement lorsqu’un acteur vivant de `state/` référence explicitement son `mechanical_profile_id`; les valeurs directes et états sauvegardés de cette instance prévalent.
 
 ## `MECH-PUBLIC-DISPLAY` — Jets visibles
 

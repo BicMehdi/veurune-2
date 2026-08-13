@@ -21,7 +21,9 @@
 19. `MEHDI_PROFILE` reste descriptif, sourcé et révisable ; il ne prescrit jamais un choix majeur. `NARRATIVE_MEMORY` est un index de rappel et ne remplace jamais les événements.
 20. Une réponse réseau absente après `save_turn` se résout par `check_save_status`, jamais par une nouvelle supposition de tour.
 21. `state/MEHDI_SHEET.yaml` est la projection mécanique courante visible du protagoniste. Elle reste synchronisée avec `CURRENT` et ne change que par événement mécanique explicite.
-22. Tout hasard mécanique provient de `roll_dice`. Son `roll_id`, son `roll_receipt`, ses dés et son résultat exact sont repris dans l’événement du test ; le serveur lie le reçu au `headSha` et au `save_id` attendus et refuse toute modification ou réutilisation.
+22. Tout hasard mécanique provient du serveur. Utiliser `validate_check` puis `roll_check` pour un test complet ; réserver `roll_dice` au hasard brut sans caractéristique ni opposition. Le `roll_id`, le `roll_receipt`, les dés et `mechanical_check` sont repris exactement dans l’événement. Le serveur lie le reçu au `headSha` et au `save_id` attendus et refuse toute modification ou réutilisation.
 23. Un jet public conserve formule, valeurs, DD ou défense, total, marge, degré et conséquence. Une opposition secrète conserve son détail uniquement dans `HIDDEN` et ne publie que les éléments perceptibles.
+24. `validate_check` ne lance aucun dé. Une statistique d’acteur ou d’opposition absente de l’état canonique retourne `ACTOR_UNRESOLVED` ou `OPPOSITION_UNRESOLVED` ; le MJ ne la remplace jamais par une valeur improvisée.
+25. `roll_check` relit les statistiques au commit attendu, calcule le test, chiffre et authentifie la résolution complète. `public_display` est la seule projection montrable au joueur ; `gm_resolution` et le contenu du reçu restent MJ.
 
 Les fichiers `.yaml` de ce dépôt utilisent le sous-ensemble JSON de YAML 1.2. Ils restent des documents YAML valides tout en permettant une validation reproductible avec Node.js sans bibliothèque externe.

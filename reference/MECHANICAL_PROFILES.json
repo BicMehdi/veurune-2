@@ -1,0 +1,26 @@
+{
+  "authority": "machine_readable_index_subordinate_to_VEY_RUNE_MASTER",
+  "policy": "Un profil ne prouve jamais la présence d'un acteur. Il devient utilisable seulement lorsqu'un acteur vivant de state/ le référence explicitement.",
+  "source": "reference/VEY_RUNE_MASTER.md#RULE-HUMAN-PROFILES et #BESTIARY-STATS",
+  "profiles": {
+    "HUM-GARDE-URBAIN": { "mechanics": { "endurance": 8, "defense": 12, "protection": 2 } },
+    "HUM-SOLDAT-LOURD": { "mechanics": { "endurance": 12, "defense": 12, "protection": 4 } },
+    "HUM-DUELLISTE": { "mechanics": { "endurance": 9, "defense": 15, "protection": 1 } },
+    "HUM-BANDIT-AFFAME": { "mechanics": { "endurance": 6, "defense": 11, "protection_range": [0, 1] } },
+    "HUM-CHASSEUR-MARCHES": { "mechanics": { "endurance": 9, "defense": 13, "protection": 2 } },
+    "HUM-FANATIQUE-PORTE": { "mechanics": { "endurance": 8, "defense": 12, "protection": 2 } },
+    "BST-CHIEN-SUIE": { "mechanics": { "endurance": 8, "defense": 12, "protection": 1, "initiative": 3 } },
+    "BST-LAMPROIE-NOM": { "mechanics": { "endurance": 4, "defense": 13, "protection": 0, "initiative": 4 } },
+    "BST-VEUVE-SEL": { "mechanics": { "endurance": 14, "defense": 14, "protection": 2, "initiative": 4 } },
+    "BST-CERF-ORAGE": { "mechanics": { "endurance": 18, "defense": 13, "protection": 2, "initiative": 3 } },
+    "BST-PALE-FOSSE": { "mechanics": { "endurance": 16, "defense": 12, "protection": 3, "initiative": 2 } },
+    "BST-RONCE-PEAU": { "mechanics": { "endurance": 20, "defense": 10, "protection": 4, "initiative": 0 } },
+    "BST-MORT-REPETANT": { "mechanics": { "endurance": 12, "defense": 13, "protection": 2, "initiative": 3 } },
+    "BST-ASSEMBLE-CHARNIERE": { "mechanics": { "endurance": 28, "defense": 11, "protection": 5, "initiative": 0 } },
+    "BST-DELIE-CORRESPONDANCE": { "mechanics": { "endurance": 18, "defense": 15, "protection": 2, "initiative": 5 } },
+    "BST-ECORCHE-SERMENT": { "mechanics": { "endurance": 22, "defense": 14, "protection": 3, "initiative": 4 } },
+    "BST-VELDRINE": { "mechanics": { "endurance": 16, "defense": 15, "protection": 1, "initiative": 5 } },
+    "BST-PORTE-NOM": { "mechanics": { "endurance": 7, "defense": 14, "protection": 0, "initiative": 5 } },
+    "BST-ANGEUILLE-DETTE": { "mechanics": { "endurance": 6, "defense": 13, "protection": 0, "initiative": 4 } }
+  }
+}

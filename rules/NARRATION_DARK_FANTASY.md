@@ -71,7 +71,7 @@ Chaque réplique poursuit un objectif concret : obtenir, cacher, tester, menacer
 
 Une simple parole, question ou réponse ne demande aucun jet. Lancer seulement lorsqu’une action est possible, incertaine, porteuse d’une conséquence significative et réellement opposée. Convaincre, intimider, tromper, résister ou lire des signes peut exiger un test ; parler ne suffit pas.
 
-Tout hasard utilise `roll_dice`, lié au `headSha` chargé et au prochain `save_id`. Ne jamais choisir, corriger ou relancer un résultat pour protéger Mehdi ou rejoindre une intrigue. Utiliser les valeurs de `mehdi_sheet`, puis enregistrer le `roll_id`, le `roll_receipt`, les dés et la résolution dans l’événement canonique. La sauvegarde refuse un dé modifié ou un reçu réutilisé pour un autre tour.
+Pour un test mécanique, appeler d’abord `validate_check`, puis `roll_check`, liés au `headSha` chargé et au prochain `save_id`. Le serveur relit lui-même les caractéristiques de l’acteur et de l’opposition ; une valeur absente bloque le test au lieu d’être inventée. `roll_dice` reste réservé aux dés bruts, tables, dégâts ou localisations sans résolution complète. Ne jamais choisir, corriger ou relancer un résultat pour protéger Mehdi ou rejoindre une intrigue. Enregistrer exactement le reçu et `mechanical_check` dans l’événement canonique.
 
 Tout jet public est affiché hors de la prose, immédiatement avant sa conséquence :
 
@@ -82,7 +82,7 @@ DD 17 • marge +3 • réussite
 Conséquence : ...
 ```
 
-Ne jamais masquer un jet public sous une formule comme « après vérification » ou seulement raconter son résultat. Si le DD ou la marge révèle un secret, montrer les dés et le total public de Mehdi, écrire `opposition cachée`, puis seulement l’indice ou la conséquence perceptible. La valeur secrète reste dans `hidden`.
+Ne jamais masquer un jet public sous une formule comme « après vérification » ou seulement raconter son résultat. Afficher uniquement `public_display`. Si le DD ou la marge révèle un secret, montrer les dés et le total public de Mehdi, écrire `opposition cachée`, puis seulement l’indice ou la conséquence perceptible. Ne jamais recopier `gm_resolution` dans la réponse joueur ; le reçu chiffré permet à `save_turn` de vérifier cette partie sans la publier.
 
 Un test social modifie un comportement possible, jamais le consentement, les valeurs profondes, une connaissance absente ou la vérité objective. Une lecture sociale donne des signes observables, jamais un accès direct aux pensées ni la certitude automatique qu’une personne ment.
 
@@ -110,7 +110,7 @@ Avant chaque réponse de jeu, vérifier :
 4. La noirceur découle-t-elle de la causalité plutôt que d'une escalade gratuite ?
 5. Les voix et objectifs des PNJ restent-ils cohérents ?
 6. La réponse respecte-t-elle le rythme de la scène et la longueur cible ?
-7. Tout jet a-t-il été généré par `roll_dice`, enregistré et affiché selon sa visibilité ?
+7. Tout test a-t-il été validé et généré par `roll_check` — ou par `roll_dice` pour un hasard brut — puis enregistré et affiché selon sa visibilité ?
 8. Le tour a-t-il été sauvegardé avec succès avant d'être présenté comme canonique ?
 
 Un échec sur les points 1 à 5, 7 ou 8 bloque l'envoi jusqu'à correction.

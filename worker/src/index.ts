@@ -6,6 +6,8 @@ import { canonicalUrl, checkSaveStatus, commitTurn, fetchMasterSection, getHeadS
 import { GitHubHandler } from "./github-handler";
 import type { VeyruneEnv } from "./env";
 import { issueDiceRoll } from "./dice.ts";
+import { issueMechanicalCheck, validateCheck } from "./checks.ts";
+import type { CheckRequest } from "./checks.ts";
 import { eventFileForTurn, parseDocument, validateHiddenState, validateMehdiSheet } from "./validation.mjs";
 import type { Props } from "./utils";
 
@@ -26,6 +28,47 @@ const eventTimeSchema = z.union([
     clock: z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/),
   }),
 ]);
+
+const checkModifierSchema = z.object({
+  id: z.string().min(1).max(80),
+  label: z.string().min(1).max(120),
+  value: z.number().int().min(-10).max(10),
+  source: z.string().min(1).max(240),
+});
+
+const checkOppositionSchema = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("difficulty"),
+    value: z.number().int().min(1).max(40),
+    visibility: z.enum(["public", "hidden"]),
+    source: z.string().min(1).max(240),
+  }),
+  z.object({
+    kind: z.literal("defense"),
+    target_ref: z.string().min(1).max(160),
+    visibility: z.enum(["public", "hidden"]),
+  }),
+  z.object({
+    kind: z.literal("derived"),
+    target_ref: z.string().min(1).max(160),
+    base: z.number().int().min(0).max(30).default(10),
+    capability: z.string().min(1).max(80),
+    mastery: z.string().min(1).max(80).optional(),
+    visibility: z.enum(["public", "hidden"]),
+  }),
+]);
+
+const checkRequestSchema = z.object({
+  actor_ref: z.string().min(1).max(160),
+  actor_visibility: z.enum(["public", "hidden"]).default("public"),
+  action: z.string().min(1).max(160),
+  capability: z.string().min(1).max(80),
+  mastery: z.string().min(1).max(80),
+  modifiers: z.array(checkModifierSchema).max(10).default([]),
+  opposition: checkOppositionSchema,
+  expected_head_sha: z.string().regex(/^[0-9a-f]{40}$/i),
+  expected_save_id: z.string().regex(/^VEY-\d{4}[A-Z]*$/),
+});
 
 const fullSaveTurnSchema = z.object({
   mode: z.literal("full").optional(),
@@ -68,7 +111,7 @@ const patchSaveTurnSchema = z.object({
     "Uniquement les changements mécaniques explicitement causés pendant le tour: Endurance, ressources, états, valeurs, équipement ou progression. Une valeur inchangée est omise.",
   ),
   events: z.array(z.record(z.string(), z.unknown())).min(1).max(50).describe(
-    "Événements atomiques nouveaux. Fournir event_id et les faits; le serveur ajoute automatiquement filiation, tour et horodatages. Pour un test, reprendre exactement roll_id, notation et dice de roll_dice, puis capacité, maîtrise, modificateurs, total, cible publique ou hidden, marge publique si permise, degré et conséquence.",
+    "Événements atomiques nouveaux. Fournir event_id et les faits; le serveur ajoute automatiquement filiation, tour et horodatages. Pour un test structuré, reprendre exactement roll_id, notation, dice, roll_receipt et mechanical_check de roll_check. Pour un hasard brut, reprendre la sortie exacte de roll_dice.",
   ),
 });
 
@@ -104,6 +147,26 @@ function parseDiceRequest(id: string) {
   };
 }
 
+function encodeCheckRequest(operation: "validate_check" | "roll_check", request: CheckRequest) {
+  return `check_request:${operation}:${encodeURIComponent(JSON.stringify(request))}`;
+}
+
+function parseCheckSearch(query: string) {
+  const match = query.trim().match(/^(validate_check|roll_check)\s+([\s\S]+)$/);
+  if (!match) return null;
+  let decoded: unknown;
+  try { decoded = JSON.parse(match[2]); } catch { throw new Error("requête de test invalide: JSON attendu après validate_check ou roll_check"); }
+  return { operation: match[1] as "validate_check" | "roll_check", request: checkRequestSchema.parse(decoded) as CheckRequest };
+}
+
+function parseCheckRequest(id: string) {
+  const match = id.match(/^check_request:(validate_check|roll_check):(.+)$/);
+  if (!match) return null;
+  let decoded: unknown;
+  try { decoded = JSON.parse(decodeURIComponent(match[2])); } catch { throw new Error("identifiant de test mécanique invalide"); }
+  return { operation: match[1] as "validate_check" | "roll_check", request: checkRequestSchema.parse(decoded) as CheckRequest };
+}
+
 async function issueCanonicalDiceRoll(
   env: VeyruneEnv,
   count: number,
@@ -124,6 +187,39 @@ async function issueCanonicalDiceRoll(
   return issueDiceRoll(count, sides, label, expectedHeadSha, expectedSaveId, env.COOKIE_ENCRYPTION_KEY);
 }
 
+async function canonicalCheckContext(env: VeyruneEnv, request: CheckRequest) {
+  const actualHeadSha = await getHeadSha(env);
+  if (actualHeadSha !== request.expected_head_sha) {
+    throw new Error(`canon modifié avant le test: HEAD attendu ${request.expected_head_sha}, HEAD actuel ${actualHeadSha}; recharger avec load_game`);
+  }
+  const [currentText, worldText, hiddenText, sheetText, profilesText] = await Promise.all([
+    readFile(env, "state/CURRENT.yaml", actualHeadSha),
+    readFile(env, "state/WORLD.yaml", actualHeadSha),
+    readFile(env, "state/HIDDEN.yaml", actualHeadSha),
+    readFile(env, "state/MEHDI_SHEET.yaml", actualHeadSha),
+    readFile(env, "reference/MECHANICAL_PROFILES.json", actualHeadSha),
+  ]);
+  const current = parseDocument(currentText, "CURRENT avant test");
+  const nextSave = current.next_expected_save as Record<string, unknown> | undefined;
+  if (nextSave?.save_id !== request.expected_save_id) {
+    throw new Error(`save_id de test invalide: attendu ${String(nextSave?.save_id || "inconnu")}, reçu ${request.expected_save_id}`);
+  }
+  return {
+    current,
+    world: parseDocument(worldText, "WORLD avant test"),
+    hidden: parseDocument(hiddenText, "HIDDEN avant test"),
+    mehdiSheet: validateMehdiSheet(parseDocument(sheetText, "MEHDI_SHEET avant test"), "MEHDI_SHEET avant test"),
+    mechanicalProfiles: parseDocument(profilesText, "MECHANICAL_PROFILES"),
+  };
+}
+
+async function resolveCanonicalCheck(env: VeyruneEnv, request: CheckRequest, roll: boolean) {
+  const context = await canonicalCheckContext(env, request);
+  const validation = validateCheck(context, request);
+  if (validation.status !== "ready" || !roll) return validation;
+  return issueMechanicalCheck(context, request, env.DICE_RECEIPT_KEY || env.COOKIE_ENCRYPTION_KEY);
+}
+
 function assertOwner(env: VeyruneEnv) {
   const props = getMcpAuthContext()?.props as Props | undefined;
   const login = props?.login;
@@ -135,21 +231,34 @@ function assertOwner(env: VeyruneEnv) {
 
 function createVeyruneServer(env: VeyruneEnv) {
   const server = new McpServer(
-    { name: "veyrune-cloud-save", version: "1.3.0" },
+    { name: "veyrune-cloud-save", version: "1.4.0" },
     {
-      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. Tout hasard passe par roll_dice. Afficher chaque jet public selon narration_rules, y compris au milieu d'un dialogue; garder seulement l'opposition sensible cachée. Consulter le Master par section ciblée. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale. Ne jamais annoncer un tour comme acquis si save_turn échoue. Ne jamais révéler hidden ni une section MJ non découverte.",
+      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Les statistiques viennent du canon serveur, jamais de valeurs recopiées ou inventées. Afficher public_display selon narration_rules et ne jamais révéler gm_resolution ni hidden. Consulter le Master par section ciblée. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale. Ne jamais annoncer un tour comme acquis si save_turn échoue.",
     },
   );
 
   server.registerTool(
     "search",
     {
-      description: "Use this when you need to locate a player-visible canonical Veyrune document. Compatibility: if roll_dice is absent from the connector catalog, call search with `roll_dice 2d10 <headSha> <next_save_id> <label>`, then fetch the returned id to generate the signed roll.",
+      description: "Use this to locate a player-visible canonical document. Compatibility for an old catalog: pass `validate_check <JSON>` or `roll_check <JSON>`, then fetch the returned id. Raw dice remain available with `roll_dice 2d10 <headSha> <next_save_id> <label>`.",
       inputSchema: z.object({ query: z.string() }),
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true, idempotentHint: true },
     },
     async ({ query }) => {
       assertOwner(env);
+      const checkRequest = parseCheckSearch(query);
+      if (checkRequest) {
+        const id = encodeCheckRequest(checkRequest.operation, checkRequest.request);
+        return textResult(JSON.stringify({
+          results: [{
+            id,
+            title: `${checkRequest.operation === "validate_check" ? "Validation" : "Résolution"} mécanique — ${checkRequest.request.action}`,
+            url: canonicalUrl(env, "rules/NARRATION_DARK_FANTASY.md"),
+          }],
+          compatibility_bridge: true,
+          next_step: "Appeler fetch avec cet id. validate_check ne lance aucun dé; roll_check ne lance un dé que si toutes les statistiques sont résolues. Aucun des deux n'avance la fiction.",
+        }));
+      }
       const diceRequest = parseDiceSearch(query);
       if (diceRequest) {
         const id = encodeDiceRequest(
@@ -180,12 +289,16 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "fetch",
     {
-      description: "Use this when you need the full text of one player-visible Veyrune document returned by search, or to execute a signed roll_dice compatibility id returned by search.",
+      description: "Use this to fetch a public document or execute a validate_check, roll_check, or roll_dice compatibility id returned by search.",
       inputSchema: z.object({ id: z.string() }),
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true, idempotentHint: true },
     },
     async ({ id }) => {
       assertOwner(env);
+      const checkRequest = parseCheckRequest(id);
+      if (checkRequest) {
+        return textResult(JSON.stringify(await resolveCanonicalCheck(env, checkRequest.request, checkRequest.operation === "roll_check")));
+      }
       const diceRequest = parseDiceRequest(id);
       if (diceRequest) {
         return textResult(JSON.stringify(await issueCanonicalDiceRoll(
@@ -237,6 +350,32 @@ function createVeyruneServer(env: VeyruneEnv) {
   );
 
   server.registerTool(
+    "validate_check",
+    {
+      description: "Vérifie sans lancer de dé qu'un test est résoluble depuis le même commit canonique: acteur, caractéristique, maîtrise, modificateurs et opposition. Retourne OPPOSITION_UNRESOLVED plutôt que d'inventer une statistique.",
+      inputSchema: checkRequestSchema,
+      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
+    },
+    async (request) => {
+      assertOwner(env);
+      return textResult(JSON.stringify(await resolveCanonicalCheck(env, request as CheckRequest, false)));
+    },
+  );
+
+  server.registerTool(
+    "roll_check",
+    {
+      description: "Résout un test Veyrune complet depuis les statistiques canoniques, lance 2d10 avec Web Crypto, calcule total, opposition, marge et degré, puis chiffre et authentifie le reçu pour save_turn. Ne lance aucun dé si validate_check échoue.",
+      inputSchema: checkRequestSchema,
+      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: false },
+    },
+    async (request) => {
+      assertOwner(env);
+      return textResult(JSON.stringify(await resolveCanonicalCheck(env, request as CheckRequest, true)));
+    },
+  );
+
+  server.registerTool(
     "search_master",
     {
       description: "Recherche MJ ciblée dans le Master consolidé. Un résultat décrit du lore ou de la préparation et ne constitue jamais un état courant. Ne jamais exposer directement une donnée HIDDEN_MJ au joueur.",
@@ -265,7 +404,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "save_turn",
     {
-      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch: send only changed facts; the server reconstructs and validates the complete checkpoint without losing untouched depth. Preserve mehdi_sheet unless an explicit mechanical event changes it. Every roll event must reuse the exact roll_dice output. Legacy full mode remains accepted. Atomically commits the complete save, projections, hidden state, and append-only events to GitHub main. If it fails, the narrative turn is not committed.",
+      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch. Preserve mehdi_sheet unless an explicit mechanical event changes it. Every structured test must reuse the exact roll_check output; save_turn decrypts and verifies the full resolution without publishing hidden opposition. Raw rolls must reuse roll_dice. Legacy full mode remains accepted. If it fails, the narrative turn is not committed.",
       inputSchema: z.union([patchSaveTurnSchema, fullSaveTurnSchema]),
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true, idempotentHint: false },
     },
@@ -298,18 +437,21 @@ function createVeyruneServer(env: VeyruneEnv) {
     async () => {
       assertOwner(env);
       const headSha = await getHeadSha(env);
-      const [currentText, hiddenText, profileText, memoryText, sheetText] = await Promise.all([
+      const [currentText, hiddenText, profileText, memoryText, sheetText, mechanicalProfilesText] = await Promise.all([
         readFile(env, "state/CURRENT.yaml", headSha),
         readFile(env, "state/HIDDEN.yaml", headSha),
         readFile(env, "state/MEHDI_PROFILE.yaml", headSha),
         readFile(env, "state/NARRATIVE_MEMORY.yaml", headSha),
         readFile(env, "state/MEHDI_SHEET.yaml", headSha),
+        readFile(env, "reference/MECHANICAL_PROFILES.json", headSha),
       ]);
       const current = parseDocument(currentText, "CURRENT");
       const hidden = validateHiddenState(parseDocument(hiddenText, "HIDDEN"), "HIDDEN");
       const profile = parseDocument(profileText, "MEHDI_PROFILE");
       const memory = parseDocument(memoryText, "NARRATIVE_MEMORY");
       const sheet = validateMehdiSheet(parseDocument(sheetText, "MEHDI_SHEET"), "MEHDI_SHEET");
+      const mechanicalProfiles = parseDocument(mechanicalProfilesText, "MECHANICAL_PROFILES");
+      if (!mechanicalProfiles.profiles || typeof mechanicalProfiles.profiles !== "object") throw new Error("MECHANICAL_PROFILES invalide");
       const synchronizedProjections: Array<[Record<string, unknown>, string]> = [
         [hidden, "HIDDEN"],
         [profile, "MEHDI_PROFILE"],
@@ -329,6 +471,7 @@ function createVeyruneServer(env: VeyruneEnv) {
         mehdiProfileLoaded: true,
         narrativeMemoryLoaded: true,
         mehdiSheetLoaded: true,
+        mechanicalProfilesLoaded: true,
       }));
     },
   );

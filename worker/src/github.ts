@@ -1,5 +1,6 @@
 import { eventFileForTurn, materializeTurnPayload, parseDocument, validateTurnPayload } from "./validation.mjs";
 import { verifyEventRollReceipts } from "./dice.ts";
+import { verifyEventCheckReceipts } from "./checks.ts";
 
 export interface GitHubEnv {
   GITHUB_REPO_TOKEN: string;
@@ -208,6 +209,7 @@ export async function commitTurn(env: GitHubEnv, payload: unknown) {
   }
 
   await verifyEventRollReceipts(candidateEvents, env.DICE_RECEIPT_KEY || env.COOKIE_ENCRYPTION_KEY || "", expectedHead, candidateSaveId);
+  await verifyEventCheckReceipts(candidateEvents, env.DICE_RECEIPT_KEY || env.COOKIE_ENCRYPTION_KEY || "", expectedHead, candidateSaveId);
 
   const eventPath = eventFileForTurn(candidateSave.turn as number);
   const [baseCurrentText, baseWorldText, baseHiddenText, baseProfileText, baseMemoryText, baseSheetText, existingEvents, existingSave] = await Promise.all([
