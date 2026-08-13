@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0726",
-  "turn": 716,
+  "save_id": "VEY-0727",
+  "turn": 717,
   "time": {
     "year": 347,
     "day": 513,
@@ -15,36 +15,58 @@
     "time_of_day": "night",
     "combat_active": false,
     "tactical_alert": "very_high",
-    "meeting_active": true
+    "meeting_active": true,
+    "physical_confrontation_active": true
   },
   "last_action": {
     "actor": "bridge_contact",
     "dialogue_sequence": [
-      "Là. Pas plus près.",
-      "Marquée comment ?"
+      "Lâche-moi.",
+      "Tu voulais une preuve. Termine ta question."
     ],
-    "intent": "preserve_separation_and_request_mark_detail"
+    "intent": "demand_release_and_continue_identity_verification"
+  },
+  "Mehdi": {
+    "positioning": {
+      "holds_contact_clothing": true,
+      "contact_immobilized": false
+    }
   },
   "bridge_contact": {
     "response": {
-      "reacts_to_Mehdi_approach": true,
-      "preserves_separation": true,
-      "does_not_leave_meeting": true,
+      "clothing_grabbed_by_Mehdi": true,
+      "immobilized": false,
       "does_not_attack": true,
+      "does_not_leave_meeting": true,
       "identity_confirmed": false,
       "identity_denied": false,
-      "does_not_confirm_caravan_marking": true,
-      "asks_how_caravan_was_marked": true
+      "demands_release": true,
+      "continues_identity_verification": true
     },
     "dialogue": [
-      "Là. Pas plus près.",
-      "Marquée comment ?"
+      "Lâche-moi.",
+      "Tu voulais une preuve. Termine ta question."
     ],
     "identity": {
       "whether_Meren": "unresolved",
       "true_identity": "unresolved",
       "exact_role": "unresolved",
       "affiliation": "unresolved"
+    }
+  },
+  "mechanics": {
+    "last_roll": {
+      "type": "close_distance_and_grab_clothing",
+      "dice": [
+        7,
+        10
+      ],
+      "vigor": 5,
+      "athletics": 3,
+      "total": 25,
+      "DD": 17,
+      "result": "success",
+      "effect": "clothing_grabbed_not_immobilized"
     }
   },
   "open_threads": {
@@ -55,7 +77,9 @@
       "cargo_attack_objective_details_unresolved": true,
       "caravan_marking_objective_details_unresolved": true,
       "contact_knowledge_of_cargo_attack_unresolved": true,
-      "contact_knowledge_of_caravan_marking_unresolved": true
+      "contact_knowledge_of_caravan_marking_unresolved": true,
+      "Mehdi_holds_contact_clothing": true,
+      "contact_not_immobilized": true
     }
   },
   "information_firewall": {
