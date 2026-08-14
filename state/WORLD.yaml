@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0734",
-  "turn": 724,
+  "save_id": "VEY-0735",
+  "turn": 725,
   "time": {
     "year": 347,
     "day": 513,
@@ -23,7 +23,7 @@
     "dialogue_sequence": [
       "À ce rendez-vous ? Oui. Je suis venu seul."
     ],
-    "intent": "violently_grapple_and_restrain_bridge_contact"
+    "intent": "bind_restrained_bridge_contact_with_cord"
   },
   "bridge_contact": {
     "response": {
@@ -38,11 +38,10 @@
       "claim_establishes_objective_site_status": false,
       "physically_restrained": true,
       "hostile_counterattack_started": false,
-      "leaves_meeting": false
+      "leaves_meeting": false,
+      "bound_with_cord": true
     },
-    "dialogue": [
-      "Lâche-moi. Maintenant."
-    ],
+    "dialogue": [],
     "identity": {
       "whether_Meren": "unresolved",
       "true_identity": "unresolved",
