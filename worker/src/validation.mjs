@@ -2,6 +2,13 @@ const ISO_INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/;
 const CLOCK = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 const SAVE_ID = /^VEY-(\d{4})(?:[A-Z]+)?$/;
 const HIDDEN_KEYS = new Set(["hidden_state", "secrets", "private_agendas", "sealed_revelations", "gm_only"]);
+const MECHANICAL_REDACTION_PATHS = new Set([
+  "mechanical_check.actor_ref",
+  "mechanical_check.capability.visibility",
+  "mechanical_check.mastery.visibility",
+  "mechanical_check.total",
+  "mechanical_check.opposition.visibility",
+]);
 
 function fail(message) {
   throw new Error(message);
@@ -42,17 +49,19 @@ export function nextSaveId(parentSaveId) {
   return `VEY-${String(sequence(parentSaveId) + 1).padStart(4, "0")}`;
 }
 
-function assertPlayerVisible(value, label, path = []) {
-  if (value === "hidden") fail(`${label}: marqueur hidden interdit: ${path.join(".")}`);
+function assertPlayerVisible(value, label, path = [], allowedHiddenMarkers = new Set()) {
+  if (value === "hidden" && !allowedHiddenMarkers.has(path.join("."))) {
+    fail(`${label}: marqueur hidden interdit: ${path.join(".")}`);
+  }
   if (Array.isArray(value)) {
-    value.forEach((child, index) => assertPlayerVisible(child, label, [...path, index]));
+    value.forEach((child, index) => assertPlayerVisible(child, label, [...path, index], allowedHiddenMarkers));
     return;
   }
   if (!value || typeof value !== "object") return;
   if (value.status === "unresolved_hidden") fail(`${label}: état MJ interdit: ${path.join(".")}`);
   for (const [key, child] of Object.entries(value)) {
     if (HIDDEN_KEYS.has(key)) fail(`${label}: clé MJ interdite: ${[...path, key].join(".")}`);
-    assertPlayerVisible(child, label, [...path, key]);
+    assertPlayerVisible(child, label, [...path, key], allowedHiddenMarkers);
   }
 }
 
@@ -422,7 +431,9 @@ export function validateTurnPayload(baseCurrentValue, existingEventsText, payloa
     if (event.historical_reconstruction === true) fail(`${event.event_id}: un nouveau tour ne peut pas être une reconstruction historique`);
     eventTime(event.event_time, `${event.event_id}.event_time`);
     instant(event.record_time, `${event.event_id}.record_time`);
-    assertPlayerVisible(event, event.event_id);
+    // Ces chemins sont les marqueurs de censure du public_display authentifié.
+    // commitTurn vérifie le reçu avant d'appeler cette validation.
+    assertPlayerVisible(event, event.event_id, [], MECHANICAL_REDACTION_PATHS);
   }
   const lastEvent = payload.events[payload.events.length - 1];
   if (current.last_event_id !== lastEvent.event_id) fail("current.last_event_id ne correspond pas au dernier événement envoyé");

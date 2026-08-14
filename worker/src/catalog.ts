@@ -1,4 +1,4 @@
-export const WORKER_VERSION = "1.8.2";
+export const WORKER_VERSION = "1.8.3";
 export const API_SCHEMA_VERSION = "P15.2";
 
 const AVAILABLE_ACTIONS = Object.freeze([
@@ -22,6 +22,7 @@ const FEATURE_FLAGS = Object.freeze({
   companion_changes: true,
   patch_saves: true,
   hidden_rolls: true,
+  signed_hidden_redactions: true,
   master_targeted_access: true,
   save_idempotency_check: true,
   legacy_five_tool_bridge: true,

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { issueMechanicalCheck, normalizeAndVerifyEventCheckReceipts, validateCheck, verifyEventCheckReceipts, verifyPersistedProfileAssignments } from "../src/checks.ts";
+import { materializeTurnPayload, validateTurnPayload } from "../src/validation.mjs";
 import type { CheckContext, CheckRequest } from "../src/checks.ts";
 
 const HEAD = "a".repeat(40);
@@ -132,6 +133,70 @@ test("filtre l'opposition cachée et chiffre la résolution MJ", async () => {
   assert.equal(display.degree, "hidden_publicly");
   assert.ok(!result.roll_receipt.includes("bridge_contact"));
   assert.equal((result.gm_resolution.opposition as Record<string, unknown>).value, 14);
+});
+
+test("la chaîne signée accepte la censure d'opposition sans relâcher le filtre anti-secret", async () => {
+  const hidden = {
+    save_id: "VEY-0733",
+    turn: 723,
+    audience: "gm_only",
+    unresolved_secrets: [],
+    invented_secret_values: [],
+    bridge_contact: { stats: { capabilities: { vigor: 2 }, masteries: { athletics: 1 }, defense: 14 } },
+  };
+  const rolled = await issueMechanicalCheck(context(hidden), request({
+    opposition: { kind: "defense", target_ref: "hidden:bridge_contact", visibility: "hidden" },
+  }), SECRET);
+  const normalized = await normalizeAndVerifyEventCheckReceipts([{
+    event_id: "EVT-0734-0001",
+    signed_check: rolled.signed_check,
+  }], SECRET, HEAD, SAVE_ID);
+  const base = {
+    save_id: "VEY-0733",
+    turn: 723,
+    last_event_id: "EVT-0733-0001",
+    next_expected_save: { save_id: SAVE_ID, parent_save_id: "VEY-0733", turn: 724 },
+  };
+  const patch = {
+    mode: "patch",
+    expected_head_sha: HEAD,
+    expected_current_save_id: "VEY-0733",
+    save_id: SAVE_ID,
+    turn: 724,
+    event_time: { year: 347, day: 513, clock: "01:26" },
+    record_time: "2026-08-14T01:26:00Z",
+    current_patch: {},
+    world_patch: {},
+    hidden_patch: {},
+    events: normalized.events,
+  };
+  const world = { save_id: "VEY-0733", turn: 723, audience: "player_visible" };
+  const materialized = materializeTurnPayload(base, world, hidden, patch);
+  assert.doesNotThrow(() => validateTurnPayload(
+    base,
+    '{"event_id":"EVT-0733-0001"}\n',
+    materialized,
+    { hidden },
+  ));
+
+  const leakedElsewhere = structuredClone(materialized) as Record<string, unknown>;
+  ((leakedElsewhere.events as Record<string, unknown>[])[0]).summary = "hidden";
+  assert.throws(() => validateTurnPayload(
+    base,
+    '{"event_id":"EVT-0733-0001"}\n',
+    leakedElsewhere,
+    { hidden },
+  ), /marqueur hidden interdit: summary/);
+
+  const forgedRedactionPath = structuredClone(materialized) as Record<string, unknown>;
+  const forgedEvent = (forgedRedactionPath.events as Record<string, unknown>[])[0];
+  (forgedEvent.mechanical_check as Record<string, unknown>).action = "hidden";
+  assert.throws(() => validateTurnPayload(
+    base,
+    '{"event_id":"EVT-0733-0001"}\n',
+    forgedRedactionPath,
+    { hidden },
+  ), /marqueur hidden interdit: mechanical_check.action/);
 });
 
 test("refuse une opposition non résolue avant tout jet", async () => {

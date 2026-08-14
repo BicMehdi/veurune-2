@@ -4,13 +4,14 @@ import { compatibilityToolHelp, parseCompatibilitySearch, runtimeManifest } from
 
 test("annonce le catalogue P15 complet même à un ancien client", () => {
   const manifest = runtimeManifest();
-  assert.equal(manifest.runtime.worker_version, "1.8.2");
+  assert.equal(manifest.runtime.worker_version, "1.8.3");
   assert.equal(manifest.runtime.api_schema_version, "P15.2");
   assert.deepEqual(manifest.capabilities.actions, [
     "search", "fetch", "load_game", "roll_dice", "validate_check", "roll_check",
     "search_master", "fetch_master_section", "save_turn", "check_save_status", "check_health",
   ]);
   assert.equal(manifest.capabilities.features.signed_checks, true);
+  assert.equal(manifest.capabilities.features.signed_hidden_redactions, true);
   assert.equal(manifest.capabilities.features.companion_changes, true);
   assert.equal(manifest.capabilities.features.legacy_five_tool_bridge, true);
 });
