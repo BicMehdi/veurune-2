@@ -2,18 +2,6 @@
   "authority": "machine_readable_index_subordinate_to_VEY_RUNE_MASTER",
   "policy": "Un profil ne prouve jamais la présence d'un acteur. Il devient utilisable seulement lorsqu'un acteur vivant de state/ le référence explicitement. Un profil générique ou une fiche préparée est choisi avant le premier jet, verrouillé par son reçu et persisté dans HIDDEN par le même save_turn. Une fiche préparée ne devient jamais un état vivant.",
   "source": "reference/VEY_RUNE_MASTER.md#RULE-HUMAN-PROFILES, #BESTIARY-STATS, #MECH-GENERIC-NPC-PROFILES et #MECH-PREPARED-COMPANION-PROFILES",
-  "deferred_characters": {
-    "Sive": {
-      "mechanical_status": "deferred_unresolved",
-      "reason": "relation canonique attestée mais identité mécanique, rôle et localisation actuels insuffisamment établis",
-      "source_refs": ["saves/VEY-0719R.yaml#other_relationships.Sive", "state/HIDDEN.yaml#other_relationships.Sive.location"]
-    },
-    "Lysa": {
-      "mechanical_status": "deferred_unresolved",
-      "reason": "compagnonnage canonique attesté mais identité mécanique, rôle et localisation actuels insuffisamment établis",
-      "source_refs": ["saves/VEY-0719R.yaml#other_relationships.Lysa", "state/HIDDEN.yaml#other_relationships.Lysa.location"]
-    }
-  },
   "profiles": {
     "NPC-CIVIL-ORDINARY": {
       "label": "civil ordinaire", "fallback_assignable": true, "minimal_default_allowed": true,
@@ -90,6 +78,31 @@
         "capabilities": { "vigor": 2, "address": 3, "instinct": 2, "reason": 1, "will": 2, "presence": 1 },
         "masteries": { "melee": 4, "athletics": 3, "vigilance": 3, "stealth": 0, "influence": 0 },
         "techniques": ["angle_vivant", "interception_d_amorce"]
+      }
+    },
+    "CHAR-SIVE": {
+      "label": "Sive", "fallback_assignable": false, "prepared_character_profile": true,
+      "canonical_actor_keys": ["Sive"], "activation_requires_live_github_instance": true,
+      "reconstruction_status": "ooc_reconstructed_from_partial_recovery",
+      "prepared_role": "éclaireuse, infiltratrice et agente de terrain",
+      "source_refs": ["saves/VEY-0719R.yaml#other_relationships.Sive", "OOC:P14.4-authorized-reconstruction"],
+      "mechanics": {
+        "endurance": 10, "defense": 14, "protection": 2,
+        "capabilities": { "vigor": 2, "address": 3, "instinct": 4, "reason": 3, "will": 3, "presence": 3 },
+        "masteries": { "melee": 3, "tir": 2, "athletics": 2, "mobility": 3, "stealth": 4, "vigilance": 4, "survival": 2, "influence": 3, "tromperie": 4 }
+      }
+    },
+    "CHAR-LYSA": {
+      "label": "Lysa", "fallback_assignable": false, "prepared_character_profile": true,
+      "canonical_actor_keys": ["Lysa"], "activation_requires_live_github_instance": true,
+      "reconstruction_status": "ooc_reconstructed_from_partial_recovery",
+      "prepared_role": "soigneuse, observatrice et négociatrice",
+      "identity_disambiguation": "La compagne Lysa reste distincte de Lysa Onne et de Lysa Venn sauf futur établissement explicite par GitHub.",
+      "source_refs": ["saves/VEY-0719R.yaml#other_relationships.Lysa", "OOC:P14.4-authorized-reconstruction"],
+      "mechanics": {
+        "endurance": 10, "defense": 13, "protection": 1,
+        "capabilities": { "vigor": 1, "address": 2, "instinct": 3, "reason": 4, "will": 4, "presence": 3 },
+        "masteries": { "melee": 2, "athletics": 1, "mobility": 2, "vigilance": 4, "medecine": 4, "erudition": 3, "rites": 2, "influence": 4, "commandement": 2 }
       }
     },
     "CHAR-ALDREN-VAUL": {

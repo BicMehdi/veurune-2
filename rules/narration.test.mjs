@@ -100,10 +100,10 @@ test("les huit profils génériques de PNJ restent bornés et non actifs par eux
   assert.match(catalog.policy, /avant le premier jet/);
 });
 
-test("les neuf fiches préparées de compagnons ne créent aucun état vivant", async () => {
+test("les onze fiches préparées de compagnons ne créent aucun état vivant", async () => {
   const catalog = JSON.parse(await readFile(mechanicalProfilesPath, "utf8"));
   const companions = Object.entries(catalog.profiles).filter(([id]) => id.startsWith("CHAR-"));
-  assert.equal(companions.length, 9);
+  assert.equal(companions.length, 11);
   assert.ok(companions.every(([, profile]) => profile.prepared_character_profile === true));
   assert.ok(companions.every(([, profile]) => profile.fallback_assignable === false));
   assert.ok(companions.every(([, profile]) => profile.activation_requires_live_github_instance === true));
@@ -111,10 +111,12 @@ test("les neuf fiches préparées de compagnons ne créent aucun état vivant", 
   assert.deepEqual(catalog.profiles["CHAR-AVELINE-SOR"].mechanics.techniques, ["angle_vivant", "interception_d_amorce"]);
   assert.equal(catalog.profiles["CHAR-ALDREN-VAUL"].mechanics.masteries.melee, 5);
   assert.equal(catalog.profiles["CHAR-VAERA-NHAL"].mechanics.capabilities.presence, 5);
-  assert.equal(catalog.deferred_characters.Sive.mechanical_status, "deferred_unresolved");
-  assert.equal(catalog.deferred_characters.Lysa.mechanical_status, "deferred_unresolved");
-  assert.equal(catalog.profiles.Sive, undefined);
-  assert.equal(catalog.profiles.Lysa, undefined);
+  assert.equal(catalog.profiles["CHAR-SIVE"].prepared_role, "éclaireuse, infiltratrice et agente de terrain");
+  assert.equal(catalog.profiles["CHAR-SIVE"].mechanics.masteries.stealth, 4);
+  assert.equal(catalog.profiles["CHAR-LYSA"].prepared_role, "soigneuse, observatrice et négociatrice");
+  assert.equal(catalog.profiles["CHAR-LYSA"].mechanics.masteries.medecine, 4);
+  assert.match(catalog.profiles["CHAR-LYSA"].identity_disambiguation, /distincte de Lysa Onne/);
+  assert.equal(catalog.deferred_characters, undefined);
 });
 
 test("la matrice de délégation réserve toutes les décisions majeures au joueur", async () => {

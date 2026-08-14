@@ -75,7 +75,7 @@ Pour un test mécanique, appeler d’abord `validate_check`, puis `roll_check`, 
 
 Un PNJ improvisé n'exige pas une fiche complète. Avant son premier jet, lui attribuer au besoin un profil générique `NPC-*` cohérent avec les faits déjà établis, en fournissant justification et références dans `profile_assignments`. Le choix précède toujours les dés. Sans preuve de compétence particulière, seul le civil ordinaire est permis. Recopier ensuite exactement `required_profile_persistence` dans `HIDDEN` pendant le même `save_turn`; le profil ne peut plus être augmenté ou remplacé pour arranger une scène.
 
-Le niveau maître/champion exige au moins trois preuves distinctes et demeure exceptionnel. Les fiches `CHAR-*` sont des calibrations préparées pour les compagnons nommés : les employer seulement si GitHub établit l'instance vivante correspondante, jamais pour introduire le personnage ou supposer sa présence. Blessures, équipement, Endurance actuelle et techniques viennent toujours de l'état vivant; Sive et Lysa restent sans chiffres tant que leur rôle mécanique demeure non résolu.
+Le niveau maître/champion exige au moins trois preuves distinctes et demeure exceptionnel. Les fiches `CHAR-*` sont des calibrations préparées pour les compagnons nommés : les employer seulement si GitHub établit l'instance vivante correspondante, jamais pour introduire le personnage ou supposer sa présence. Blessures, équipement, Endurance actuelle et techniques viennent toujours de l'état vivant. Les rôles reconstruits de Sive et Lysa commencent comme bases OOC et ne créent aucun passé, équipement ou souvenir.
 
 Tout jet public est affiché hors de la prose, immédiatement avant sa conséquence :
 

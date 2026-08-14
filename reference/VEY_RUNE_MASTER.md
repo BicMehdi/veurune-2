@@ -1724,7 +1724,7 @@ Les numéros renvoient aux blocs `# FICHIER` du corpus concaténé `VEY_RUNE_V3.
 | procédure détaillée archivée | règle spécialisée du Master, puis bloc ciblé de `VEY_RUNE_REFERENCE_DETAILS_P12.md` |
 | alias et arbitrages | `REF-ALIAS`, registres `CON-*` et `DUP-*` |
 
-Les 154 identifiants de section sont uniques après l’extension mécanique P14.3. Les identifiants de contenu scellé — 60 nœuds, 40 storylets et 12 antagonistes — ont leur propre cardinalité contrôlée.
+Les 154 identifiants de section sont uniques après l’extension mécanique P14.4. Les identifiants de contenu scellé — 60 nœuds, 40 storylets et 12 antagonistes — ont leur propre cardinalité contrôlée.
 
 ## `QA-GLOBAL-MATRIX` — Résultats de l’audit P9, complétés en P11/P12
 
@@ -2119,6 +2119,8 @@ Les fiches `CHAR-*` ci-dessous sont des calibrations mécaniques `STATIC_PREPARE
 | Fiche | E/D/P | Capacités | Maîtrises principales | Provenance mécanique |
 |---|---:|---|---|---|
 | `CHAR-AVELINE-SOR` | 12/15/3 | Vig 2, Adr 3, Ins 2, Rai 1, Vol 2, Pré 1 | Mêlée 4, Athlétisme 3, Vigilance 3 | valeurs attestées par `VEY-0719R`; les 11/12 Endurance de ce checkpoint restent un état historique, pas son état actuel |
+| `CHAR-SIVE` | 10/14/2 | Vig 2, Adr 3, Ins 4, Rai 3, Vol 3, Pré 3 | Mêlée 3, Furtivité 4, Vigilance 4, Tromperie 4, Mobilité 3 | reconstruction OOC P14.4 : éclaireuse, infiltratrice et agente de terrain |
+| `CHAR-LYSA` | 10/13/1 | Vig 1, Adr 2, Ins 3, Rai 4, Vol 4, Pré 3 | Médecine 4, Vigilance 4, Influence 4, Érudition 3, Rites 2 | reconstruction OOC P14.4 : soigneuse, observatrice et négociatrice |
 | `CHAR-ALDREN-VAUL` | 16/16/4 | Vig 4, Adr 4, Ins 4, Rai 2, Vol 4, Pré 3 | Mêlée 5, Athlétisme 5, Vigilance 4, Commandement 4, Équitation 4 | calibration P14.3 de maître militaire préparé |
 | `CHAR-ADRASTE-DE-LICE` | 12/15/3 | Vig 3, Adr 3, Ins 3, Rai 2, Vol 3, Pré 3 | Mêlée 4, Athlétisme 3, Vigilance 3, Commandement 4, Équitation 4 | calibration P14.3 d'héritière guerrière préparée |
 | `CHAR-ILYE-NAMAR` | 8/12/1 | Vig 1, Adr 2, Ins 2, Rai 4, Vol 3, Pré 3 | Vigilance 3, Érudition 3, Influence 3, Commandement 4, Navigation 3 | calibration P14.3 d'organisatrice et logisticienne préparée |
@@ -2128,7 +2130,9 @@ Les fiches `CHAR-*` ci-dessous sont des calibrations mécaniques `STATIC_PREPARE
 | `CHAR-YSRA-KELD` | 13/14/2 | Vig 4, Adr 3, Ins 4, Rai 1, Vol 3, Pré 2 | Mêlée 4, Athlétisme 4, Vigilance 4, Survie 5, Tir 3 | calibration P14.3 de chasseuse des Marches préparée |
 | `CHAR-VAERA-NHAL` | 9/14/1 | Vig 1, Adr 3, Ins 4, Rai 4, Vol 4, Pré 5 | Vigilance 4, Influence 5, Tromperie 5, Commandement 4 | calibration P14.3 d'organisatrice sociale préparée |
 
-Les valeurs directes, blessures, Endurance actuelle, équipement et techniques sauvegardés pour une instance prévalent toujours. Aveline conserve comme techniques attestées `angle_vivant` et `interception_d_amorce`; aucune technique nouvelle n'est créée pour les autres fiches. `Sive` et `Lysa` possèdent des relations historiques attestées mais pas assez d'identité mécanique pour recevoir des chiffres sans invention : leurs entrées restent `deferred_unresolved` dans l'index et ne sont pas des profils utilisables.
+Les valeurs directes, blessures, Endurance actuelle, équipement et techniques sauvegardés pour une instance prévalent toujours. Aveline conserve comme techniques attestées `angle_vivant` et `interception_d_amorce`; aucune technique nouvelle n'est créée pour les autres fiches.
+
+Les données anciennes de Sive et Lysa ayant été perdues, leur reconstruction P14.4 est une **extension OOC explicitement autorisée**, pas la récupération prétendue d'une vérité cachée. Elle fixe seulement leurs rôles et bases mécaniques à partir de maintenant. Elle ne leur invente aucun ancien exploit, équipement, secret, souvenir, localisation ou événement. La compagne `Lysa` reste une identité propre, distincte de Lysa Onne et de l'inspectrice Lysa Venn tant qu'un futur fait GitHub n'établit pas volontairement un lien.
 
 ## `MECH-PUBLIC-DISPLAY` — Jets visibles
 

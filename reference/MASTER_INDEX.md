@@ -32,7 +32,7 @@
 - `MECH-SHEET-PERSISTENT` — fiche mécanique courante ;
 - `MECH-RANDOM-SERVER` — génération impartiale ;
 - `MECH-GENERIC-NPC-PROFILES` — huit profils génériques, du civil au maître/champion ;
-- `MECH-PREPARED-COMPANION-PROFILES` — neuf fiches nommées sans activation implicite ;
+- `MECH-PREPARED-COMPANION-PROFILES` — onze fiches nommées sans activation implicite ;
 - `MECH-PUBLIC-DISPLAY` — présentation obligatoire ;
 - `MECH-HIDDEN-ROLL` — opposition sensible.
 
