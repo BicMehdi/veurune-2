@@ -13,6 +13,16 @@ async function derivedBytes(secret: string, domain: string) {
   return crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${domain}:${secret}`));
 }
 
+async function compress(bytes: Uint8Array) {
+  const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream("gzip"));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function decompress(bytes: Uint8Array) {
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
 export async function signJson(value: unknown, secret: string, domain: string) {
   const encodedPayload = bytesToBase64Url(new TextEncoder().encode(JSON.stringify(value)));
   const key = await crypto.subtle.importKey(
@@ -55,17 +65,20 @@ export async function encryptJson(value: unknown, secret: string, domain: string
     ["encrypt", "decrypt"],
   );
   const iv = crypto.getRandomValues(new Uint8Array(12));
+  const plaintext = await compress(new TextEncoder().encode(JSON.stringify(value)));
   const ciphertext = new Uint8Array(await crypto.subtle.encrypt(
     { name: "AES-GCM", iv },
     key,
-    new TextEncoder().encode(JSON.stringify(value)),
+    plaintext,
   ));
-  return `v1.${bytesToBase64Url(iv)}.${bytesToBase64Url(ciphertext)}`;
+  return `v2.${bytesToBase64Url(iv)}.${bytesToBase64Url(ciphertext)}`;
 }
 
 export async function decryptJson<T>(receipt: string, secret: string, domain: string): Promise<T> {
   const [version, encodedIv, encodedCiphertext, extra] = receipt.split(".");
-  if (version !== "v1" || !encodedIv || !encodedCiphertext || extra) throw new Error("reçu chiffré invalide");
+  if ((version !== "v1" && version !== "v2") || !encodedIv || !encodedCiphertext || extra) {
+    throw new Error("reçu chiffré invalide");
+  }
   const key = await crypto.subtle.importKey(
     "raw",
     await derivedBytes(secret, domain),
@@ -74,11 +87,12 @@ export async function decryptJson<T>(receipt: string, secret: string, domain: st
     ["decrypt"],
   );
   try {
-    const plaintext = await crypto.subtle.decrypt(
+    const decrypted = new Uint8Array(await crypto.subtle.decrypt(
       { name: "AES-GCM", iv: base64UrlToBytes(encodedIv) },
       key,
       base64UrlToBytes(encodedCiphertext),
-    );
+    ));
+    const plaintext = version === "v2" ? await decompress(decrypted) : decrypted;
     return JSON.parse(new TextDecoder().decode(plaintext)) as T;
   } catch {
     throw new Error("authenticité du reçu chiffré invalide");

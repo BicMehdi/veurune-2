@@ -1,7 +1,7 @@
 # VEY_RUNE MASTER — Architecture de consolidation
 
 > **Statut :** consolidation complète auditée, persistance et résolution renforcées — document MJ uniquement
-> **Version de référence :** `MASTER-P16-NPC-DESIGN`
+> **Version de référence :** `MASTER-P16.1-COMPACT-HANDOFF`
 > **Sources consolidées :** corpus V3.2, bootstrap d’autorité GitHub, extensions de worldbuilding validées dans la conversation « Reprendre aventure chat »  
 > **Portée actuelle :** toutes les couches prévues sont intégrées et auditées. Les fichiers `sources/` restent inchangés et ne doivent faire l’objet d’aucune suppression ou migration sans décision OOC distincte.
 
@@ -2083,7 +2083,7 @@ Avant un test mécanique structuré, `validate_check` vérifie au même `headSha
 
 Après validation, `roll_check` relit le même canon, tire `2d10` par le générateur cryptographique du Worker, puis calcule caractéristique, maîtrise, modificateurs, total, opposition, marge et degré. Le reçu est lié au `headSha`, au prochain `save_id`, à l’acteur, à l’action et à toute la résolution. `save_turn` refuse un dé, une valeur, un total, une marge, un degré ou une projection publique modifiés.
 
-Le transfert recommandé entre les deux outils est atomique : le MJ recopie intact dans l’événement le petit bloc `signed_check` renvoyé par `roll_check`. À partir de son reçu, `save_turn` reconstruit lui-même `roll_id`, notation, dés, total et `mechanical_check` avant d’écrire le journal. Les anciens événements qui répètent ces champs restent compatibles, mais toute valeur répétée doit être identique au reçu. Un champ redondant oublié ne peut donc plus invalider un jet authentique, tandis qu’une altération demeure impossible.
+Le transfert recommandé entre les deux outils est atomique : le MJ recopie intact dans l’événement `structuredContent.signed_check` renvoyé nativement par `roll_check`, ou `signed_check` du JSON texte avec le pont historique. Le reçu P16.1 est compressé avant chiffrement pour limiter la retransmission opaque ; les reçus P16 antérieurs restent lisibles. À partir de ce reçu, `save_turn` reconstruit lui-même `roll_id`, notation, dés, total et `mechanical_check` avant d’écrire le journal. Les anciens événements qui répètent ces champs restent compatibles, mais toute valeur répétée doit être identique au reçu. Un champ redondant oublié ne peut donc plus invalider un jet authentique, tandis qu’une altération demeure impossible.
 
 Le Worker annonce ses versions, capacités et onze actions dans `load_game` et `check_health`. Si une conversation conserve l’ancien catalogue limité à cinq outils, le pont `search` → `fetch` donne accès sans écriture à `validate_check`, `roll_check`, `roll_dice`, `search_master`, `fetch_master_section` et `check_save_status`. `search("capabilities")` ou la recherche du nom exact d’un outil fournit la syntaxe. Le pont ne réalise jamais `save_turn`; pour transmettre `mode: patch` et `companion_changes` avec leur schéma visible, le catalogue MCP doit être rafraîchi et une nouvelle conversation commencée.
 

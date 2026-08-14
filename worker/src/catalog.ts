@@ -1,5 +1,5 @@
-export const WORKER_VERSION = "1.9.0";
-export const API_SCHEMA_VERSION = "P16.0";
+export const WORKER_VERSION = "1.9.1";
+export const API_SCHEMA_VERSION = "P16.1";
 
 const AVAILABLE_ACTIONS = Object.freeze([
   "search",
@@ -25,6 +25,8 @@ const FEATURE_FLAGS = Object.freeze({
   signed_hidden_redactions: true,
   npc_functional_classification: true,
   gm_hidden_profile_choice: true,
+  structured_check_handoff: true,
+  compressed_check_receipts: true,
   master_targeted_access: true,
   save_idempotency_check: true,
   legacy_five_tool_bridge: true,
@@ -91,7 +93,7 @@ export function parseCompatibilityRequest(id: string) {
 export function compatibilityToolHelp(action: string) {
   const usage: Record<string, string> = {
     validate_check: "search avec `validate_check <JSON conforme au schéma P16>`, puis fetch sur l'id retourné.",
-    roll_check: "search avec `roll_check <JSON conforme au schéma P16>`, puis fetch sur l'id retourné. Copier ensuite signed_check dans l'événement.",
+    roll_check: "search avec `roll_check <JSON conforme au schéma P16>`, puis fetch sur l'id retourné. Copier ensuite signed_check du JSON retourné; l'outil direct fournit structuredContent.signed_check.",
     roll_dice: "search avec `roll_dice 2d10 <headSha> <next_save_id> <libellé>`, puis fetch sur l'id retourné.",
     search_master: "search avec `search_master <termes>`, puis fetch sur l'id retourné.",
     fetch_master_section: "search avec `fetch_master_section <SECTION_ID>`, puis fetch sur l'id retourné.",

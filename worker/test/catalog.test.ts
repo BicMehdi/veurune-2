@@ -4,8 +4,8 @@ import { compatibilityToolHelp, parseCompatibilitySearch, runtimeManifest } from
 
 test("annonce le catalogue P16 complet même à un ancien client", () => {
   const manifest = runtimeManifest();
-  assert.equal(manifest.runtime.worker_version, "1.9.0");
-  assert.equal(manifest.runtime.api_schema_version, "P16.0");
+  assert.equal(manifest.runtime.worker_version, "1.9.1");
+  assert.equal(manifest.runtime.api_schema_version, "P16.1");
   assert.deepEqual(manifest.capabilities.actions, [
     "search", "fetch", "load_game", "roll_dice", "validate_check", "roll_check",
     "search_master", "fetch_master_section", "save_turn", "check_save_status", "check_health",
@@ -14,6 +14,8 @@ test("annonce le catalogue P16 complet même à un ancien client", () => {
   assert.equal(manifest.capabilities.features.signed_hidden_redactions, true);
   assert.equal(manifest.capabilities.features.npc_functional_classification, true);
   assert.equal(manifest.capabilities.features.gm_hidden_profile_choice, true);
+  assert.equal(manifest.capabilities.features.structured_check_handoff, true);
+  assert.equal(manifest.capabilities.features.compressed_check_receipts, true);
   assert.equal(manifest.capabilities.features.companion_changes, true);
   assert.equal(manifest.capabilities.features.legacy_five_tool_bridge, true);
 });

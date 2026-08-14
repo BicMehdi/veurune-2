@@ -59,6 +59,8 @@ test("le document narratif est exposé par search et fetch", async () => {
   assert.match(text, /"validate_check"/);
   assert.match(text, /"roll_check"/);
   assert.match(text, /signed_check/);
+  assert.match(text, /outputSchema: rollCheckOutputSchema/);
+  assert.match(text, /structuredContent/);
   assert.match(text, /compatibility_bridge/);
   assert.match(text, /runtimeManifest/);
   assert.match(text, /legacy five-tool bridge/i);

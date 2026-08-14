@@ -315,6 +315,8 @@ test("un PNJ important_mysterious reçoit un profil secret de conception avant l
   assert.equal(validation.status, "ready");
   const rolled = await issueMechanicalCheck(context(hidden, {}, registry), check, SECRET);
   const assignment = rolled.required_profile_persistence[0];
+  assert.match(rolled.roll_receipt, /^v2\./);
+  assert.ok(rolled.roll_receipt.length < 4096, "le reçu doit rester assez compact pour le transfert MCP");
   assert.equal(assignment.profile_id, "NPC-VETERAN");
   assert.equal(assignment.npc_classification?.npc_class, "important_mysterious");
   assert.equal(JSON.stringify(rolled.public_display).includes("NPC-VETERAN"), false);

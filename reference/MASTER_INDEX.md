@@ -25,6 +25,7 @@
 - `P14` — fiche mécanique, difficultés, marges, jets sociaux, dés serveur, profils génériques persistants et fiches préparées des compagnons.
 - `P15` — fiches vivantes des compagnons, blessures, équipement, progression, relations, émotions, objectifs et journal causal serveur.
 - `P16` — classement fonctionnel des PNJ, conception cachée pré-jet et verrouillage conjoint de la classe et du profil.
+- `P16.1` — transfert MCP structuré de `signed_check`, reçu compressé et lecture rétrocompatible des reçus P16.
 
 ## Accès mécanique rapide
 
@@ -33,7 +34,7 @@
 - `RULE-SOCIAL-CHECKS` — dialogues à enjeu et oppositions ;
 - `MECH-SHEET-PERSISTENT` — fiche mécanique courante ;
 - `MECH-RANDOM-SERVER` — génération impartiale ;
-- `MECH-CHECK-SERVER` — résolution signée et transfert atomique par `signed_check` ;
+- `MECH-CHECK-SERVER` — résolution signée et transfert atomique par `structuredContent.signed_check` ;
 - `MECH-NPC-FUNCTIONAL-CLASSIFICATION` — `incidental`, `established`, `important`, `mysterious` et `important_mysterious` sans présumer la puissance ;
 - `MECH-GENERIC-NPC-PROFILES` — huit profils génériques, du civil au maître/champion ;
 - `MECH-PREPARED-COMPANION-PROFILES` — onze fiches nommées sans activation implicite ;

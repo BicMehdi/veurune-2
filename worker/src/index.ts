@@ -95,6 +95,16 @@ const checkRequestSchema = z.object({
   expected_save_id: z.string().regex(/^VEY-\d{4}[A-Z]*$/),
 });
 
+const rollCheckOutputSchema = z.object({
+  roll_id: z.string().optional(),
+  roll_receipt: z.string().optional(),
+  signed_check: z.object({
+    roll_id: z.string(),
+    roll_receipt: z.string(),
+  }).optional(),
+  status: z.string().optional(),
+}).passthrough();
+
 const companionChangeSchema = z.object({
   change_id: z.string().min(1).max(100).regex(/^[A-Za-z0-9_-]+$/),
   profile_id: z.string().regex(/^CHAR-[A-Z0-9-]+$/),
@@ -122,7 +132,7 @@ const fullSaveTurnSchema = z.object({
   mehdi_sheet: z.record(z.string(), z.unknown()).optional(),
   companion_changes: z.array(companionChangeSchema).max(20).default([]),
   events: z.array(z.record(z.string(), z.unknown())).min(1).max(50).describe(
-    "Événements atomiques nouveaux. Pour un test structuré, copier signed_check intact depuis roll_check; le serveur reconstruit et vérifie les autres champs signés.",
+    "Événements atomiques nouveaux. Pour un test structuré, copier structuredContent.signed_check intact depuis roll_check; le serveur reconstruit et vérifie les autres champs signés.",
   ),
 });
 
@@ -156,12 +166,19 @@ const patchSaveTurnSchema = z.object({
     "Changements causaux des fiches vivantes CHAR-*. Le serveur vérifie before, applique after et exige cause + source_event_id; l’événement source doit lister le profile_id dans companion_refs. Le serveur inscrit ensuite le journal append-only dans HIDDEN. Ne jamais modifier companion_sheets directement dans hidden_patch.",
   ),
   events: z.array(z.record(z.string(), z.unknown())).min(1).max(50).describe(
-    "Événements atomiques nouveaux. Fournir event_id et les faits; le serveur ajoute automatiquement filiation, tour et horodatages. Pour un test structuré, copier signed_check intact depuis roll_check; le serveur reconstruit les autres champs signés. Pour un hasard brut, reprendre la sortie exacte de roll_dice.",
+    "Événements atomiques nouveaux. Fournir event_id et les faits; le serveur ajoute automatiquement filiation, tour et horodatages. Pour un test structuré, copier structuredContent.signed_check intact depuis roll_check; le serveur reconstruit les autres champs signés. Pour un hasard brut, reprendre la sortie exacte de roll_dice.",
   ),
 });
 
 function textResult(text: string) {
   return { content: [{ type: "text" as const, text }] };
+}
+
+function jsonObjectResult(value: Record<string, unknown>) {
+  return {
+    content: [{ type: "text" as const, text: JSON.stringify(value) }],
+    structuredContent: value,
+  };
 }
 
 function encodeDiceRequest(count: number, sides: number, expectedHeadSha: string, expectedSaveId: string, label?: string) {
@@ -349,7 +366,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   const server = new McpServer(
     { name: "veyrune-cloud-save", version: WORKER_VERSION },
     {
-      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. load_game annonce runtime et capabilities. Si cette conversation n'affiche que cinq outils, appeler search avec capabilities ou le nom de l'outil, puis fetch sur l'id renvoyé. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Copier signed_check intact dans l’événement de save_turn: le serveur reconstruit lui-même notation, dés et mechanical_check depuis le reçu. Les statistiques viennent du canon serveur. Un PNJ vivant sans fiche est d'abord classé par fonction narrative et degré de préconstruction, jamais par puissance. Un PNJ important ou mystérieux peut recevoir un profil NPC-* choisi secrètement par le MJ selon sa conception antérieure au dé; un banal sans preuve reste au défaut minimal. Le reçu verrouille npc_class et profil, et save_turn impose leur persistance exacte dans HIDDEN. Un compagnon nommé réellement présent peut recevoir uniquement son profil CHAR-* correspondant. Une fiche vivante présente sous hidden.companion_sheets prévaut ensuite; tout changement durable passe par companion_changes et un événement qui cite le profil dans companion_refs. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn directement avant d'afficher la narration finale.",
+      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. load_game annonce runtime et capabilities. Si cette conversation n'affiche que cinq outils, appeler search avec capabilities ou le nom de l'outil, puis fetch sur l'id renvoyé. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Copier structuredContent.signed_check intact dans l’événement de save_turn (ou signed_check du JSON texte sur le pont historique): le serveur reconstruit lui-même notation, dés et mechanical_check depuis le reçu compact. Les statistiques viennent du canon serveur. Un PNJ vivant sans fiche est d'abord classé par fonction narrative et degré de préconstruction, jamais par puissance. Un PNJ important ou mystérieux peut recevoir un profil NPC-* choisi secrètement par le MJ selon sa conception antérieure au dé; un banal sans preuve reste au défaut minimal. Le reçu verrouille npc_class et profil, et save_turn impose leur persistance exacte dans HIDDEN. Un compagnon nommé réellement présent peut recevoir uniquement son profil CHAR-* correspondant. Une fiche vivante présente sous hidden.companion_sheets prévaut ensuite; tout changement durable passe par companion_changes et un événement qui cite le profil dans companion_refs. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn directement avant d'afficher la narration finale.",
     },
   );
 
@@ -428,7 +445,8 @@ function createVeyruneServer(env: VeyruneEnv) {
       assertOwner(env);
       const checkRequest = parseCheckRequest(id);
       if (checkRequest) {
-        return textResult(JSON.stringify(await resolveCanonicalCheck(env, checkRequest.request, checkRequest.operation === "roll_check")));
+        const result = await resolveCanonicalCheck(env, checkRequest.request, checkRequest.operation === "roll_check");
+        return checkRequest.operation === "roll_check" ? jsonObjectResult(result) : textResult(JSON.stringify(result));
       }
       const diceRequest = parseDiceRequest(id);
       if (diceRequest) {
@@ -518,13 +536,14 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "roll_check",
     {
-      description: "Résout un test complet depuis les statistiques canoniques, lance 2d10 avec Web Crypto, calcule total, opposition, marge et degré, puis chiffre le reçu. Dans l’événement de save_turn, copier signed_check intact; le serveur hydrate et vérifie les autres champs du jet. Tout npc_class et profil générique sont verrouillés avant les dés et doivent être recopiés exactement de required_profile_persistence vers hidden_patch.",
+      description: "Résout un test complet depuis les statistiques canoniques, lance 2d10 avec Web Crypto, calcule total, opposition, marge et degré, puis chiffre un reçu compact. Dans l’événement de save_turn, copier structuredContent.signed_check intact; le serveur hydrate et vérifie les autres champs du jet. Tout npc_class et profil générique sont verrouillés avant les dés et doivent être recopiés exactement de required_profile_persistence vers hidden_patch.",
       inputSchema: checkRequestSchema,
+      outputSchema: rollCheckOutputSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: false },
     },
     async (request) => {
       assertOwner(env);
-      return textResult(JSON.stringify(await resolveCanonicalCheck(env, request as CheckRequest, true)));
+      return jsonObjectResult(await resolveCanonicalCheck(env, request as CheckRequest, true));
     },
   );
 
@@ -557,7 +576,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "save_turn",
     {
-      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch. Preserve mehdi_sheet unless an explicit mechanical event changes it. Put every lasting companion change in companion_changes with exact before/after, cause, duration and a source event; companion_sheets is server-managed. For each structured test, copy signed_check intact from roll_check into the event; the server reconstructs and verifies notation, dice and mechanical_check. If required_profile_persistence is returned, hidden_patch must persist mechanical_profile_id, mechanical_profile_assignment, npc_class and npc_classification exactly; later reassignment or reclassification is rejected. Raw rolls must reuse roll_dice. If save_turn fails, the narrative turn is not committed.",
+      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch. Preserve mehdi_sheet unless an explicit mechanical event changes it. Put every lasting companion change in companion_changes with exact before/after, cause, duration and a source event; companion_sheets is server-managed. For each structured test, copy structuredContent.signed_check intact from roll_check into the event; the server reconstructs and verifies notation, dice and mechanical_check. If required_profile_persistence is returned, hidden_patch must persist mechanical_profile_id, mechanical_profile_assignment, npc_class and npc_classification exactly; later reassignment or reclassification is rejected. Raw rolls must reuse roll_dice. If save_turn fails, the narrative turn is not committed.",
       inputSchema: z.union([patchSaveTurnSchema, fullSaveTurnSchema]),
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true, idempotentHint: false },
     },
