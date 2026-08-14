@@ -1,7 +1,7 @@
 # VEY_RUNE MASTER — Architecture de consolidation
 
 > **Statut :** consolidation complète auditée, persistance et résolution renforcées — document MJ uniquement
-> **Version de référence :** `MASTER-P16.1-COMPACT-HANDOFF`
+> **Version de référence :** `MASTER-P16.2-PUBLIC-DD`
 > **Sources consolidées :** corpus V3.2, bootstrap d’autorité GitHub, extensions de worldbuilding validées dans la conversation « Reprendre aventure chat »  
 > **Portée actuelle :** toutes les couches prévues sont intégrées et auditées. Les fichiers `sources/` restent inchangés et ne doivent faire l’objet d’aucune suppression ou migration sans décision OOC distincte.
 
@@ -2091,7 +2091,7 @@ Le Worker annonce ses versions, capacités et onze actions dans `load_game` et `
 
 ## `MECH-CHECK-VISIBILITY` — Deux projections sans fuite
 
-`gm_resolution` contient la résolution complète nécessaire au MJ. `public_display` contient uniquement ce qui peut être montré au joueur. Lorsque l’opposition est cachée, sa valeur, la marge et le degré exacts ne figurent pas dans `public_display`. Le reçu complet est chiffré et authentifié : il peut être vérifié par `save_turn` sans publier les statistiques secrètes.
+`gm_resolution` contient la résolution complète nécessaire au MJ. `public_display` contient uniquement ce qui peut être montré au joueur. Pour toute opposition directement perceptible — combat, saisie, résistance physique, poursuite ou obstacle visible — la visibilité est `public` et `success_target` fournit le DD total ainsi que le résultat minimal des dés requis ; le MJ les affiche avec le total, la marge et le degré. Le Worker force notamment toute opposition de type `defense` à devenir publique, même si la demande la marquait cachée. Le profil, l’identité réelle et les autres statistiques du PNJ restent cachés. Le seul caractère mystérieux d’un PNJ ne justifie donc jamais de masquer le DD d’une résistance que Mehdi éprouve directement. Une opposition reste `hidden` uniquement si sa valeur révélerait un fait encore indétecté, comme un piège, un mensonge, une embuscade, une influence ou un mécanisme secret. Dans ce cas, la valeur, la marge et le degré exacts ne figurent pas dans `public_display`. Le reçu complet est chiffré et authentifié : il peut être vérifié par `save_turn` sans publier les statistiques secrètes.
 
 ## `MECH-PROFILE-INDEX` — Profils mécaniques et état vivant
 

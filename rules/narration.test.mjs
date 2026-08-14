@@ -31,6 +31,8 @@ test("les règles Dark Fantasy permanentes conservent les invariants du jeu", as
     "La violence sexuelle n'est jamais détaillée ni érotisée.",
     "Le tour a-t-il été sauvegardé avec succès",
     "Tout test a-t-il été validé et généré par `roll_check`",
+    "montrer `success_target.dd`",
+    "Le fait qu’un PNJ soit mystérieux",
     "🎲 Test — Intimidation",
   ]) {
     assert.ok(text.includes(required), `règle obligatoire absente: ${required}`);
@@ -44,6 +46,7 @@ test("le bootstrap ChatGPT désigne GitHub main et load_game comme autorité", a
   assert.match(text, /appeler `load_game`/);
   assert.match(text, /appliquer `persistence` et `narration_rules`/);
   assert.match(text, /appeler exactement une fois `save_turn`/);
+  assert.match(text, /success_target\.dd/);
   assert.match(text, /ne jamais restaurer automatiquement `VEY_SAVE_V1`/);
 });
 

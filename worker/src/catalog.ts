@@ -1,5 +1,5 @@
-export const WORKER_VERSION = "1.9.1";
-export const API_SCHEMA_VERSION = "P16.1";
+export const WORKER_VERSION = "1.9.2";
+export const API_SCHEMA_VERSION = "P16.2";
 
 const AVAILABLE_ACTIONS = Object.freeze([
   "search",
@@ -27,6 +27,7 @@ const FEATURE_FLAGS = Object.freeze({
   gm_hidden_profile_choice: true,
   structured_check_handoff: true,
   compressed_check_receipts: true,
+  public_perceptible_difficulty_class: true,
   master_targeted_access: true,
   save_idempotency_check: true,
   legacy_five_tool_bridge: true,

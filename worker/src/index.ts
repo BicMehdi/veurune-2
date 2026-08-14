@@ -62,13 +62,13 @@ const checkOppositionSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("difficulty"),
     value: z.number().int().min(1).max(40),
-    visibility: z.enum(["public", "hidden"]),
+    visibility: z.enum(["public", "hidden"]).describe("Public pour toute difficulté directement perceptible; hidden seulement si le nombre révèle un fait, piège, mensonge ou mécanisme encore indétecté."),
     source: z.string().min(1).max(240),
   }),
   z.object({
     kind: z.literal("defense"),
     target_ref: z.string().min(1).max(160),
-    visibility: z.enum(["public", "hidden"]),
+    visibility: z.enum(["public", "hidden"]).describe("La Défense est toujours rendue publique par le serveur, même si le profil du PNJ reste secret; utiliser public."),
   }),
   z.object({
     kind: z.literal("derived"),
@@ -76,7 +76,7 @@ const checkOppositionSchema = z.discriminatedUnion("kind", [
     base: z.number().int().min(0).max(30).default(10),
     capability: z.string().min(1).max(80),
     mastery: z.string().min(1).max(80).optional(),
-    visibility: z.enum(["public", "hidden"]),
+    visibility: z.enum(["public", "hidden"]).describe("Public pour toute résistance directement éprouvée; hidden seulement si sa valeur révèle un secret non perceptible."),
   }),
 ]);
 
@@ -366,7 +366,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   const server = new McpServer(
     { name: "veyrune-cloud-save", version: WORKER_VERSION },
     {
-      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. load_game annonce runtime et capabilities. Si cette conversation n'affiche que cinq outils, appeler search avec capabilities ou le nom de l'outil, puis fetch sur l'id renvoyé. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Copier structuredContent.signed_check intact dans l’événement de save_turn (ou signed_check du JSON texte sur le pont historique): le serveur reconstruit lui-même notation, dés et mechanical_check depuis le reçu compact. Les statistiques viennent du canon serveur. Un PNJ vivant sans fiche est d'abord classé par fonction narrative et degré de préconstruction, jamais par puissance. Un PNJ important ou mystérieux peut recevoir un profil NPC-* choisi secrètement par le MJ selon sa conception antérieure au dé; un banal sans preuve reste au défaut minimal. Le reçu verrouille npc_class et profil, et save_turn impose leur persistance exacte dans HIDDEN. Un compagnon nommé réellement présent peut recevoir uniquement son profil CHAR-* correspondant. Une fiche vivante présente sous hidden.companion_sheets prévaut ensuite; tout changement durable passe par companion_changes et un événement qui cite le profil dans companion_refs. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn directement avant d'afficher la narration finale.",
+      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. load_game annonce runtime et capabilities. Si cette conversation n'affiche que cinq outils, appeler search avec capabilities ou le nom de l'outil, puis fetch sur l'id renvoyé. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Copier structuredContent.signed_check intact dans l’événement de save_turn (ou signed_check du JSON texte sur le pont historique): le serveur reconstruit lui-même notation, dés et mechanical_check depuis le reçu compact. Les statistiques viennent du canon serveur. Un PNJ vivant sans fiche est d'abord classé par fonction narrative et degré de préconstruction, jamais par puissance. Un PNJ important ou mystérieux peut recevoir un profil NPC-* choisi secrètement par le MJ selon sa conception antérieure au dé; un banal sans preuve reste au défaut minimal. Le reçu verrouille npc_class et profil, et save_turn impose leur persistance exacte dans HIDDEN. Une opposition directement perceptible utilise visibility=public: afficher toujours success_target.dd et la marge signée, sans révéler le profil source. Hidden est réservé au nombre qui révélerait un fait, piège, mensonge ou mécanisme non découvert. Un compagnon nommé réellement présent peut recevoir uniquement son profil CHAR-* correspondant. Une fiche vivante présente sous hidden.companion_sheets prévaut ensuite; tout changement durable passe par companion_changes et un événement qui cite le profil dans companion_refs. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn directement avant d'afficher la narration finale.",
     },
   );
 
@@ -536,7 +536,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "roll_check",
     {
-      description: "Résout un test complet depuis les statistiques canoniques, lance 2d10 avec Web Crypto, calcule total, opposition, marge et degré, puis chiffre un reçu compact. Dans l’événement de save_turn, copier structuredContent.signed_check intact; le serveur hydrate et vérifie les autres champs du jet. Tout npc_class et profil générique sont verrouillés avant les dés et doivent être recopiés exactement de required_profile_persistence vers hidden_patch.",
+      description: "Résout un test complet depuis les statistiques canoniques, lance 2d10 avec Web Crypto, calcule total, opposition, marge et degré, puis chiffre un reçu compact. Pour une opposition public, public_display.success_target fournit le DD total et le résultat minimal des dés requis; l’afficher au joueur. Dans l’événement de save_turn, copier structuredContent.signed_check intact; le serveur hydrate et vérifie les autres champs du jet. Tout npc_class et profil générique sont verrouillés avant les dés et doivent être recopiés exactement de required_profile_persistence vers hidden_patch.",
       inputSchema: checkRequestSchema,
       outputSchema: rollCheckOutputSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: false },

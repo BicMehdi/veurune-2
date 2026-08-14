@@ -483,7 +483,7 @@ function prepareCheck(context: CheckContext, request: CheckRequest): PreparedChe
       }
       opposition = {
         kind: "defense",
-        visibility: request.opposition.visibility,
+        visibility: "public",
         value: target.defense,
         source: target.source,
         target_ref: request.opposition.target_ref,
@@ -580,6 +580,17 @@ export async function issueMechanicalCheck(context: CheckContext, request: Check
   };
   const actorHidden = request.actor_visibility === "hidden";
   const oppositionHidden = prepared.opposition.visibility === "hidden";
+  const publicTarget = oppositionHidden || actorHidden
+    ? { visibility: "hidden" }
+    : {
+        visibility: "public",
+        dd: prepared.opposition.value,
+        comparison: "total_gte_dd",
+        dice_total_required: prepared.opposition.value
+          - prepared.capability.value
+          - prepared.mastery.value
+          - prepared.modifier_total,
+      };
   const publicDisplay: Json = {
     action: request.action,
     actor_ref: actorHidden ? "hidden" : prepared.actor.actor_ref,
@@ -593,6 +604,7 @@ export async function issueMechanicalCheck(context: CheckContext, request: Check
     opposition: oppositionHidden
       ? { visibility: "hidden" }
       : { kind: prepared.opposition.kind, visibility: "public", value: prepared.opposition.value },
+    success_target: publicTarget,
     margin: oppositionHidden || actorHidden ? "hidden_publicly" : margin,
     degree: oppositionHidden || actorHidden ? "hidden_publicly" : degree,
   };

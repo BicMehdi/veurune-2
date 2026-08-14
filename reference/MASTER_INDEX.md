@@ -26,6 +26,7 @@
 - `P15` — fiches vivantes des compagnons, blessures, équipement, progression, relations, émotions, objectifs et journal causal serveur.
 - `P16` — classement fonctionnel des PNJ, conception cachée pré-jet et verrouillage conjoint de la classe et du profil.
 - `P16.1` — transfert MCP structuré de `signed_check`, reçu compressé et lecture rétrocompatible des reçus P16.
+- `P16.2` — DD signé et public pour toute opposition directement perceptible, sans révéler le profil source.
 
 ## Accès mécanique rapide
 

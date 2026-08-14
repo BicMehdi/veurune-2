@@ -8,6 +8,7 @@ const MECHANICAL_REDACTION_PATHS = new Set([
   "mechanical_check.mastery.visibility",
   "mechanical_check.total",
   "mechanical_check.opposition.visibility",
+  "mechanical_check.success_target.visibility",
 ]);
 
 function fail(message) {

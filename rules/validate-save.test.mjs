@@ -75,8 +75,8 @@ test("ne déduit jamais save_id depuis turn", () => {
 });
 
 test("CURRENT vivant reste relié au checkpoint terminal", () => {
-  assert.equal(importedCurrent.save_id, "VEY-0733");
-  assert.equal(importedCurrent.turn, 723);
+  assert.equal(importedCurrent.save_id, "VEY-0734");
+  assert.equal(importedCurrent.turn, 724);
   assert.equal(importedCurrent.scene.meeting_active, true);
   assert.equal(importedCurrent.next_expected_save.parent_save_id, importedCurrent.save_id);
 });

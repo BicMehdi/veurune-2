@@ -105,6 +105,9 @@ test("résout et authentifie le calcul mécanique complet", async () => {
   const publicDisplay = result.public_display as Record<string, unknown>;
   assert.equal(publicDisplay.total, result.dice_total + 5 + 3 - 1);
   assert.equal(publicDisplay.margin, Number(publicDisplay.total) - 15);
+  assert.deepEqual(publicDisplay.success_target, {
+    visibility: "public", dd: 15, comparison: "total_gte_dd", dice_total_required: 8,
+  });
   const event = {
     event_id: "EVT-0734-0001",
     roll_id: result.roll_id,
@@ -154,14 +157,31 @@ test("répare automatiquement l’événement signé incomplet observé en jeu",
 test("filtre l'opposition cachée et chiffre la résolution MJ", async () => {
   const hidden = { bridge_contact: { stats: { capabilities: { vigor: 2 }, masteries: { athletics: 1 }, defense: 14 } } };
   const result = await issueMechanicalCheck(context(hidden), request({
-    opposition: { kind: "defense", target_ref: "hidden:bridge_contact", visibility: "hidden" },
+    opposition: {
+      kind: "derived", target_ref: "hidden:bridge_contact", base: 10,
+      capability: "vigor", mastery: "athletics", visibility: "hidden",
+    },
   }), SECRET);
   const display = result.public_display as Record<string, unknown>;
   assert.deepEqual(display.opposition, { visibility: "hidden" });
+  assert.deepEqual(display.success_target, { visibility: "hidden" });
   assert.equal(display.margin, "hidden_publicly");
   assert.equal(display.degree, "hidden_publicly");
   assert.ok(!result.roll_receipt.includes("bridge_contact"));
-  assert.equal((result.gm_resolution.opposition as Record<string, unknown>).value, 14);
+  assert.equal((result.gm_resolution.opposition as Record<string, unknown>).value, 13);
+});
+
+test("rend toujours public le DD d'une Défense directement éprouvée", async () => {
+  const hidden = { bridge_contact: { stats: { capabilities: { vigor: 2 }, masteries: { athletics: 1 }, defense: 14 } } };
+  const result = await issueMechanicalCheck(context(hidden), request({
+    opposition: { kind: "defense", target_ref: "hidden:bridge_contact", visibility: "hidden" },
+  }), SECRET);
+  const display = result.public_display as Record<string, unknown>;
+  assert.deepEqual(display.opposition, { kind: "defense", visibility: "public", value: 14 });
+  assert.deepEqual(display.success_target, {
+    visibility: "public", dd: 14, comparison: "total_gte_dd", dice_total_required: 7,
+  });
+  assert.equal(JSON.stringify(display).includes("bridge_contact.stats"), false);
 });
 
 test("la chaîne signée accepte la censure d'opposition sans relâcher le filtre anti-secret", async () => {
@@ -174,7 +194,10 @@ test("la chaîne signée accepte la censure d'opposition sans relâcher le filtr
     bridge_contact: { stats: { capabilities: { vigor: 2 }, masteries: { athletics: 1 }, defense: 14 } },
   };
   const rolled = await issueMechanicalCheck(context(hidden), request({
-    opposition: { kind: "defense", target_ref: "hidden:bridge_contact", visibility: "hidden" },
+    opposition: {
+      kind: "derived", target_ref: "hidden:bridge_contact", base: 10,
+      capability: "vigor", mastery: "athletics", visibility: "hidden",
+    },
   }), SECRET);
   const normalized = await normalizeAndVerifyEventCheckReceipts([{
     event_id: "EVT-0734-0001",
@@ -302,7 +325,7 @@ test("un PNJ important_mysterious reçoit un profil secret de conception avant l
     },
   };
   const check = request({
-    opposition: { kind: "defense", target_ref: "hidden:bridge_contact", visibility: "hidden" },
+    opposition: { kind: "defense", target_ref: "hidden:bridge_contact", visibility: "public" },
     profile_assignments: [{
       target_ref: "hidden:bridge_contact",
       profile_id: "NPC-VETERAN",
@@ -321,6 +344,9 @@ test("un PNJ important_mysterious reçoit un profil secret de conception avant l
   assert.equal(assignment.npc_classification?.npc_class, "important_mysterious");
   assert.equal(JSON.stringify(rolled.public_display).includes("NPC-VETERAN"), false);
   assert.equal(JSON.stringify(rolled.public_display).includes("important_mysterious"), false);
+  assert.deepEqual((rolled.public_display as Record<string, unknown>).success_target, {
+    visibility: "public", dd: 14, comparison: "total_gte_dd", dice_total_required: 7,
+  });
 
   const persisted = {
     ...hidden,
@@ -351,7 +377,7 @@ test("un PNJ important_mysterious reçoit un profil secret de conception avant l
   if (weakByDefault.status === "unresolved") assert.match(weakByDefault.message, /ne peut pas être déclaré faible par défaut/);
 });
 
-test("le contact canonique actuel est résoluble par P16 sans profil présélectionné", () => {
+test("le contact canonique actuel reste résoluble par P16 après verrouillage de son profil", () => {
   const load = (path: string) => JSON.parse(readFileSync(new URL(path, import.meta.url), "utf8"));
   const actualContext: CheckContext = {
     current: load("../../state/CURRENT.yaml"),
@@ -364,21 +390,17 @@ test("le contact canonique actuel est résoluble par P16 sans profil présélect
   const contactDesign = (actualContext.npcDesignRegistry?.classifications as Record<string, Record<string, unknown>>)["hidden:bridge_contact"];
   assert.equal(contactDesign.npc_class, "important_mysterious");
   assert.equal(contactDesign.mechanical_profile_id, null);
-  for (const profileId of contactDesign.allowed_profile_ids as string[]) {
-    const validation = validateCheck(actualContext, request({
-      opposition: { kind: "defense", target_ref: "hidden:bridge_contact", visibility: "hidden" },
-      profile_assignments: [{
-        target_ref: "hidden:bridge_contact",
-        profile_id: profileId,
-        basis: "hidden_conception",
-        rationale: "Validation locale de l'enveloppe autorisée, sans dé ni persistance.",
-        evidence_refs: ["reference/NPC_DESIGN_REGISTRY.json#hidden:bridge_contact"],
-      }],
-    }));
-    assert.equal(validation.status, "ready", `${profileId} doit rester un choix possible non présélectionné`);
-    if (validation.status === "ready") {
-      assert.equal(validation.profile_assignments_required[0].npc_classification?.npc_class, "important_mysterious");
-    }
+  const liveContact = actualContext.hidden.bridge_contact as Record<string, unknown>;
+  assert.equal(liveContact.npc_class, "important_mysterious");
+  assert.equal(typeof liveContact.mechanical_profile_id, "string");
+  const validation = validateCheck(actualContext, request({
+    opposition: { kind: "defense", target_ref: "hidden:bridge_contact", visibility: "public" },
+  }));
+  assert.equal(validation.status, "ready", "le profil désormais verrouillé doit résoudre le contact sans réattribution");
+  if (validation.status === "ready") {
+    assert.equal(validation.profile_assignments_required.length, 0);
+    assert.equal(validation.opposition.visibility, "public");
+    assert.equal(typeof validation.opposition.value, "number");
   }
 });
 

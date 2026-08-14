@@ -86,7 +86,7 @@ DD 17 • marge +3 • réussite
 Conséquence : ...
 ```
 
-Ne jamais masquer un jet public sous une formule comme « après vérification » ou seulement raconter son résultat. Afficher uniquement `public_display`. Si le DD ou la marge révèle un secret, montrer les dés et le total public de Mehdi, écrire `opposition cachée`, puis seulement l’indice ou la conséquence perceptible. Ne jamais recopier `gm_resolution` dans la réponse joueur ; le reçu chiffré permet à `save_turn` de vérifier cette partie sans la publier.
+Ne jamais masquer un jet public sous une formule comme « après vérification » ou seulement raconter son résultat. Afficher uniquement `public_display`. Pour toute opposition directement perceptible — combat, saisie, résistance physique, poursuite ou obstacle visible — utiliser `visibility: public` et montrer `success_target.dd`, `dice_total_required`, le total, la marge et le degré. Le fait qu’un PNJ soit mystérieux ou que son profil soit caché ne suffit jamais à masquer ce DD. Utiliser `visibility: hidden` seulement si le nombre révélerait l’existence ou la nature d’un fait encore indétecté : piège, mensonge, embuscade, influence ou mécanisme secret. Dans ce seul cas, montrer les dés et le total public de Mehdi, écrire `DD caché`, puis seulement l’indice ou la conséquence perceptible. Ne jamais recopier `gm_resolution` dans la réponse joueur ; le reçu chiffré permet à `save_turn` de vérifier cette partie sans la publier.
 
 Un test social modifie un comportement possible, jamais le consentement, les valeurs profondes, une connaissance absente ou la vérité objective. Une lecture sociale donne des signes observables, jamais un accès direct aux pensées ni la certitude automatique qu’une personne ment.
 
