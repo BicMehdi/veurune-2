@@ -8,6 +8,7 @@ import type { VeyruneEnv } from "./env";
 import { issueDiceRoll } from "./dice.ts";
 import { issueMechanicalCheck, validateCheck } from "./checks.ts";
 import type { CheckRequest } from "./checks.ts";
+import { WORKER_VERSION, compatibilityToolHelp, encodeCompatibilityRequest, parseCompatibilityRequest, parseCompatibilitySearch, runtimeManifest } from "./catalog.ts";
 import { eventFileForTurn, parseDocument, validateHiddenState, validateMehdiSheet } from "./validation.mjs";
 import type { Props } from "./utils";
 
@@ -251,6 +252,70 @@ async function resolveCanonicalCheck(env: VeyruneEnv, request: CheckRequest, rol
   return issueMechanicalCheck(context, request, env.DICE_RECEIPT_KEY || env.COOKIE_ENCRYPTION_KEY);
 }
 
+async function runHealthCheck(env: VeyruneEnv) {
+  const headSha = await getHeadSha(env);
+  const [currentText, hiddenText, profileText, memoryText, sheetText, mechanicalProfilesText] = await Promise.all([
+    readFile(env, "state/CURRENT.yaml", headSha),
+    readFile(env, "state/HIDDEN.yaml", headSha),
+    readFile(env, "state/MEHDI_PROFILE.yaml", headSha),
+    readFile(env, "state/NARRATIVE_MEMORY.yaml", headSha),
+    readFile(env, "state/MEHDI_SHEET.yaml", headSha),
+    readFile(env, "reference/MECHANICAL_PROFILES.json", headSha),
+  ]);
+  const current = parseDocument(currentText, "CURRENT");
+  const hidden = validateHiddenState(parseDocument(hiddenText, "HIDDEN"), "HIDDEN");
+  const profile = parseDocument(profileText, "MEHDI_PROFILE");
+  const memory = parseDocument(memoryText, "NARRATIVE_MEMORY");
+  const sheet = validateMehdiSheet(parseDocument(sheetText, "MEHDI_SHEET"), "MEHDI_SHEET");
+  const mechanicalProfiles = parseDocument(mechanicalProfilesText, "MECHANICAL_PROFILES");
+  if (!mechanicalProfiles.profiles || typeof mechanicalProfiles.profiles !== "object") throw new Error("MECHANICAL_PROFILES invalide");
+  const synchronizedProjections: Array<[Record<string, unknown>, string]> = [
+    [hidden, "HIDDEN"],
+    [profile, "MEHDI_PROFILE"],
+    [memory, "NARRATIVE_MEMORY"],
+    [sheet, "MEHDI_SHEET"],
+  ];
+  for (const [projection, label] of synchronizedProjections) {
+    if (projection.save_id !== current.save_id || projection.turn !== current.turn) throw new Error(`${label} désynchronisé de CURRENT`);
+  }
+  return {
+    status: "ok",
+    headSha,
+    saveId: current.save_id,
+    turn: current.turn,
+    eventFile: eventFileForTurn(current.turn as number),
+    protectedHiddenRegistry: true,
+    mehdiProfileLoaded: true,
+    narrativeMemoryLoaded: true,
+    mehdiSheetLoaded: true,
+    mechanicalProfilesLoaded: true,
+    ...runtimeManifest(),
+    canon: {
+      head_sha: headSha,
+      save_id: current.save_id,
+      turn: current.turn,
+      next_save_id: (current.next_expected_save as Record<string, unknown> | undefined)?.save_id,
+      next_turn: (current.next_expected_save as Record<string, unknown> | undefined)?.turn,
+      event_file: eventFileForTurn(current.turn as number),
+    },
+    checks: {
+      github_main: "ok",
+      current_state: "ok",
+      hidden_registry: "ok",
+      mehdi_profile: "ok",
+      narrative_memory: "ok",
+      mehdi_sheet: "ok",
+      mechanical_profiles: "ok",
+      projection_synchronization: "ok",
+      signed_checks: "available",
+      patch_saves: "available",
+      companion_changes: "available",
+      master_access: "available",
+      save_status_recovery: "available",
+    },
+  };
+}
+
 function assertOwner(env: VeyruneEnv) {
   const props = getMcpAuthContext()?.props as Props | undefined;
   const login = props?.login;
@@ -262,16 +327,16 @@ function assertOwner(env: VeyruneEnv) {
 
 function createVeyruneServer(env: VeyruneEnv) {
   const server = new McpServer(
-    { name: "veyrune-cloud-save", version: "1.8.1" },
+    { name: "veyrune-cloud-save", version: WORKER_VERSION },
     {
-      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Copier signed_check intact dans l’événement de save_turn: le serveur reconstruit lui-même notation, dés et mechanical_check depuis le reçu. Les statistiques viennent du canon serveur. Un PNJ vivant sans fiche peut recevoir avant le dé un profil NPC-* cohérent; un compagnon nommé réellement présent peut recevoir uniquement son profil CHAR-* correspondant. Le reçu verrouille le choix et save_turn impose sa persistance exacte dans HIDDEN. Une fiche vivante présente sous hidden.companion_sheets prévaut ensuite; tout changement durable passe par companion_changes et un événement qui cite le profil dans companion_refs. Sans preuve, seul NPC-CIVIL-ORDINARY est permis. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale.",
+      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. load_game annonce runtime et capabilities. Si cette conversation n'affiche que cinq outils, appeler search avec capabilities ou le nom de l'outil, puis fetch sur l'id renvoyé. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Copier signed_check intact dans l’événement de save_turn: le serveur reconstruit lui-même notation, dés et mechanical_check depuis le reçu. Les statistiques viennent du canon serveur. Un PNJ vivant sans fiche peut recevoir avant le dé un profil NPC-* cohérent; un compagnon nommé réellement présent peut recevoir uniquement son profil CHAR-* correspondant. Le reçu verrouille le choix et save_turn impose sa persistance exacte dans HIDDEN. Une fiche vivante présente sous hidden.companion_sheets prévaut ensuite; tout changement durable passe par companion_changes et un événement qui cite le profil dans companion_refs. Sans preuve, seul NPC-CIVIL-ORDINARY est permis. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn directement avant d'afficher la narration finale.",
     },
   );
 
   server.registerTool(
     "search",
     {
-      description: "Use this to locate a player-visible canonical document. Compatibility for an old catalog: pass `validate_check <JSON>` or `roll_check <JSON>`, then fetch the returned id. Raw dice remain available with `roll_dice 2d10 <headSha> <next_save_id> <label>`.",
+      description: "Use this to locate a player-visible canonical document. Legacy five-tool bridge: search `capabilities` or a tool name for help; execute validate_check/roll_check/roll_dice/search_master/fetch_master_section/check_save_status by passing its documented command, then fetch the returned id.",
       inputSchema: z.object({ query: z.string() }),
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true, idempotentHint: true },
     },
@@ -309,6 +374,21 @@ function createVeyruneServer(env: VeyruneEnv) {
           next_step: "Appeler fetch avec cet id. Cela exécute le même générateur signé que roll_dice et n'avance pas la fiction.",
         }));
       }
+      const compatibilityRequest = parseCompatibilitySearch(query);
+      if (compatibilityRequest) {
+        const id = encodeCompatibilityRequest(compatibilityRequest.operation, compatibilityRequest.payload);
+        return textResult(JSON.stringify({
+          results: [{
+            id,
+            title: compatibilityRequest.operation === "tool_help"
+              ? `Aide outil Veyrune — ${String(compatibilityRequest.payload.action)}`
+              : `Compatibilité Veyrune — ${compatibilityRequest.operation}`,
+            url: canonicalUrl(env, "SYSTEM/CHATGPT_PROJECT_SOURCE.md"),
+          }],
+          compatibility_bridge: true,
+          next_step: "Appeler fetch avec cet id. Le pont n'effectue aucune écriture et n'avance jamais la fiction.",
+        }));
+      }
       const needle = query.toLowerCase();
       const results = Object.entries(PUBLIC_DOCUMENTS)
         .filter(([, item]) => `${item.title} ${item.path}`.toLowerCase().includes(needle))
@@ -320,9 +400,9 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "fetch",
     {
-      description: "Use this to fetch a public document or execute a validate_check, roll_check, or roll_dice compatibility id returned by search.",
+      description: "Use this to fetch a public document or execute a compatibility id returned by search: mechanics, targeted Master access, save-status recovery, capabilities, or doctor diagnostics. This bridge never writes a turn.",
       inputSchema: z.object({ id: z.string() }),
-      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true, idempotentHint: true },
+      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true, idempotentHint: false },
     },
     async ({ id }) => {
       assertOwner(env);
@@ -341,6 +421,25 @@ function createVeyruneServer(env: VeyruneEnv) {
           diceRequest.expectedSaveId,
         )));
       }
+      const compatibilityRequest = parseCompatibilityRequest(id);
+      if (compatibilityRequest) {
+        if (compatibilityRequest.operation === "capabilities") return textResult(JSON.stringify(runtimeManifest()));
+        if (compatibilityRequest.operation === "doctor") return textResult(JSON.stringify(await runHealthCheck(env)));
+        if (compatibilityRequest.operation === "tool_help") {
+          return textResult(JSON.stringify(compatibilityToolHelp(String(compatibilityRequest.payload.action || ""))));
+        }
+        if (compatibilityRequest.operation === "search_master") {
+          return textResult(JSON.stringify(await searchMaster(env, String(compatibilityRequest.payload.query || ""))));
+        }
+        if (compatibilityRequest.operation === "fetch_master_section") {
+          return textResult(JSON.stringify(await fetchMasterSection(env, String(compatibilityRequest.payload.id || ""))));
+        }
+        return textResult(JSON.stringify(await checkSaveStatus(
+          env,
+          String(compatibilityRequest.payload.save_id || ""),
+          compatibilityRequest.payload.expected_event_id ? String(compatibilityRequest.payload.expected_event_id) : undefined,
+        )));
+      }
       const item = PUBLIC_DOCUMENTS[id];
       if (!item) throw new Error(`document public inconnu: ${id}`);
       const text = await readFile(env, item.path);
@@ -351,13 +450,16 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "load_game",
     {
-      description: "Use this before resuming Veyrune or resolving a new turn. Loads rules, current state, Mehdi's current mechanical sheet, recent events, player projection, and GM-only continuity from canonical GitHub main.",
+      description: "Use this before resuming Veyrune or resolving a new turn. Loads runtime versions and capabilities, rules, current state, Mehdi's current mechanical sheet, recent events, player projection, and GM-only continuity from canonical GitHub main.",
       inputSchema: z.object({}),
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true, idempotentHint: true },
     },
     async () => {
       assertOwner(env);
-      return textResult(JSON.stringify(await loadGame(env)));
+      return textResult(JSON.stringify({
+        ...runtimeManifest(),
+        ...(await loadGame(env)),
+      }));
     },
   );
 
@@ -461,49 +563,13 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "check_health",
     {
-      description: "Use this when diagnosing whether the Veyrune cloud save service can authenticate and reach canonical GitHub main.",
+      description: "Use this for a complete Veyrune doctor diagnostic: Worker/API versions, registered actions, feature flags, GitHub main, synchronized projections, mechanics, Master access and recovery capabilities.",
       inputSchema: z.object({}),
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true, idempotentHint: true },
     },
     async () => {
       assertOwner(env);
-      const headSha = await getHeadSha(env);
-      const [currentText, hiddenText, profileText, memoryText, sheetText, mechanicalProfilesText] = await Promise.all([
-        readFile(env, "state/CURRENT.yaml", headSha),
-        readFile(env, "state/HIDDEN.yaml", headSha),
-        readFile(env, "state/MEHDI_PROFILE.yaml", headSha),
-        readFile(env, "state/NARRATIVE_MEMORY.yaml", headSha),
-        readFile(env, "state/MEHDI_SHEET.yaml", headSha),
-        readFile(env, "reference/MECHANICAL_PROFILES.json", headSha),
-      ]);
-      const current = parseDocument(currentText, "CURRENT");
-      const hidden = validateHiddenState(parseDocument(hiddenText, "HIDDEN"), "HIDDEN");
-      const profile = parseDocument(profileText, "MEHDI_PROFILE");
-      const memory = parseDocument(memoryText, "NARRATIVE_MEMORY");
-      const sheet = validateMehdiSheet(parseDocument(sheetText, "MEHDI_SHEET"), "MEHDI_SHEET");
-      const mechanicalProfiles = parseDocument(mechanicalProfilesText, "MECHANICAL_PROFILES");
-      if (!mechanicalProfiles.profiles || typeof mechanicalProfiles.profiles !== "object") throw new Error("MECHANICAL_PROFILES invalide");
-      const synchronizedProjections: Array<[Record<string, unknown>, string]> = [
-        [hidden, "HIDDEN"],
-        [profile, "MEHDI_PROFILE"],
-        [memory, "NARRATIVE_MEMORY"],
-        [sheet, "MEHDI_SHEET"],
-      ];
-      for (const [projection, label] of synchronizedProjections) {
-        if (projection.save_id !== current.save_id || projection.turn !== current.turn) throw new Error(`${label} désynchronisé de CURRENT`);
-      }
-      return textResult(JSON.stringify({
-        status: "ok",
-        headSha,
-        saveId: current.save_id,
-        turn: current.turn,
-        eventFile: eventFileForTurn(current.turn as number),
-        protectedHiddenRegistry: true,
-        mehdiProfileLoaded: true,
-        narrativeMemoryLoaded: true,
-        mehdiSheetLoaded: true,
-        mechanicalProfilesLoaded: true,
-      }));
+      return textResult(JSON.stringify(await runHealthCheck(env)));
     },
   );
   return server;

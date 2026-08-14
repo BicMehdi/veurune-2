@@ -32,7 +32,9 @@ L'écriture GitHub utilise une création d'arbre avec contenu intégré. Les hui
 
 Les champs `mehdi_sheet` et `narration_rules` sont lus au même commit GitHub que le reste du canon. Le MJ utilise la fiche avant tout test et applique les règles d’affichage avant de présenter le résultat.
 
-Si un ancien catalogue ne montre pas encore les nouveaux outils, `search("validate_check <JSON>")` ou `search("roll_check <JSON>")` renvoie un identifiant que `fetch` exécute avec exactement le même moteur. `search("roll_dice 2d10 <headSha> <next_save_id> <label>")` reste disponible pour les dés bruts. Ce pont peut être retiré lorsque tous les clients rafraîchissent correctement leur catalogue.
+Le Worker 1.8.2 annonce dans `load_game` et `check_health` son schéma `P15.2`, ses onze actions et ses capacités. Si un ancien catalogue ne montre encore que cinq outils, `search("capabilities")` ou `search("roll_check")` explique la compatibilité disponible. `search("validate_check <JSON>")`, `search("roll_check <JSON>")`, `search("roll_dice 2d10 <headSha> <next_save_id> <label>")`, `search("search_master <termes>")`, `search("fetch_master_section <ID>")` et `search("check_save_status <save_id> [event_id]")` renvoient un identifiant que `fetch` exécute avec le moteur direct correspondant. Le pont reste strictement sans écriture : `save_turn` doit toujours être appelé directement.
+
+Après une modification de noms, descriptions ou schémas MCP, un catalogue connecté en mode développeur doit être rafraîchi dans la page de la connexion, puis testé dans une nouvelle conversation. Un plugin publié utilise un instantané de métadonnées révisé et nécessite la publication d’une nouvelle version pour modifier cet instantané.
 
 ## Tests de non-régression
 
@@ -47,6 +49,7 @@ Si un ancien catalogue ne montre pas encore les nouveaux outils, `search("valida
 - la détection d’une sauvegarde déjà commitée après une réponse réseau perdue ;
 - la création causale d’une fiche vivante, son activation par jet signé et la lecture de ses statistiques par les jets suivants ;
 - la réparation automatique d’un événement mécanique incomplet à partir de son bloc `signed_check`, jusque dans le journal atomique ;
+- l’annonce des onze actions et le pont complet d’un ancien catalogue à cinq outils vers mécanique, Master, diagnostic et récupération ;
 - le refus d’une mutation directe, d’un événement source absent, d’un `before` faux ou d’une progression supérieure à +1 par événement.
 
 Ces simulations utilisent uniquement des données en mémoire et ne créent aucun tour narratif dans le dépôt canonique.

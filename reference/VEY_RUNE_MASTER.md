@@ -2085,6 +2085,8 @@ Après validation, `roll_check` relit le même canon, tire `2d10` par le génér
 
 Le transfert recommandé entre les deux outils est atomique : le MJ recopie intact dans l’événement le petit bloc `signed_check` renvoyé par `roll_check`. À partir de son reçu, `save_turn` reconstruit lui-même `roll_id`, notation, dés, total et `mechanical_check` avant d’écrire le journal. Les anciens événements qui répètent ces champs restent compatibles, mais toute valeur répétée doit être identique au reçu. Un champ redondant oublié ne peut donc plus invalider un jet authentique, tandis qu’une altération demeure impossible.
 
+Le Worker annonce ses versions, capacités et onze actions dans `load_game` et `check_health`. Si une conversation conserve l’ancien catalogue limité à cinq outils, le pont `search` → `fetch` donne accès sans écriture à `validate_check`, `roll_check`, `roll_dice`, `search_master`, `fetch_master_section` et `check_save_status`. `search("capabilities")` ou la recherche du nom exact d’un outil fournit la syntaxe. Le pont ne réalise jamais `save_turn`; pour transmettre `mode: patch` et `companion_changes` avec leur schéma visible, le catalogue MCP doit être rafraîchi et une nouvelle conversation commencée.
+
 `roll_dice` reste la primitive des hasards sans résolution complète : dégâts, localisation, table ou autre tirage explicitement demandé par une règle. Il ne remplace pas `roll_check` lorsqu’un test dépend de statistiques.
 
 ## `MECH-CHECK-VISIBILITY` — Deux projections sans fuite

@@ -58,8 +58,9 @@ test("le document narratif est exposé par search et fetch", async () => {
   assert.match(text, /"validate_check"/);
   assert.match(text, /"roll_check"/);
   assert.match(text, /signed_check/);
-  assert.match(text, /Compatibility for an old catalog/);
   assert.match(text, /compatibility_bridge/);
+  assert.match(text, /runtimeManifest/);
+  assert.match(text, /legacy five-tool bridge/i);
   assert.match(text, /state\/MEHDI_SHEET\.yaml/);
 });
 

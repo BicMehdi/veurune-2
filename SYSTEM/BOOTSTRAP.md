@@ -14,6 +14,8 @@ Ce dépôt est la mémoire persistante de Veyrune. Une reprise ne doit jamais in
 8. Vérifier que le dernier événement, le `save_id`, le `parent_save_id` et le `turn` concordent avec `CURRENT.yaml`.
 9. Reprendre seulement après réussite de ces contrôles. Le chargement et un checkpoint technique n’avancent jamais la fiction.
 
+`load_game` annonce aussi `runtime` et `capabilities`. Si le client ChatGPT conserve un ancien catalogue à cinq outils, utiliser le pont en lecture seule `search` → `fetch` : rechercher d’abord `capabilities` ou le nom de l’outil, puis suivre la syntaxe renvoyée pour les jets, l’accès ciblé au Master ou `check_save_status`. Ce pont ne remplace jamais l’appel direct à `save_turn`.
+
 ## État de récupération initial
 
 - checkpoint canonique : `VEY-0719R` ;
