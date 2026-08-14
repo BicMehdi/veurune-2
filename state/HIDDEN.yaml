@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "gm_only",
-  "save_id": "VEY-0733",
-  "turn": 723,
+  "save_id": "VEY-0734",
+  "turn": 724,
   "canonical_source": {
     "type": "technical_hidden_registry_recovery",
     "recovered_from_commit": "f47a7dca871afd7648c8029ff2529c213e1d1fdd",
@@ -543,5 +543,64 @@
       "value_known_to_persistence": false
     }
   ],
-  "invented_secret_values": []
+  "invented_secret_values": [],
+  "bridge_contact": {
+    "npc_class": "important_mysterious",
+    "npc_classification": {
+      "npc_class": "important_mysterious",
+      "classification_basis": "ooc_explicit",
+      "classified_before_roll": true,
+      "rationale": "Le contact est au centre d'une rencontre préparée et de plusieurs fils immédiats, tandis que son identité, son rôle exact, son affiliation, ses intentions et ses capacités restent volontairement non résolus.",
+      "criteria": [
+        "determinative_information_or_resource",
+        "durable_consequence_capacity",
+        "identity_unresolved",
+        "role_unresolved",
+        "capabilities_unresolved",
+        "affiliation_unresolved",
+        "intentions_unresolved"
+      ],
+      "evidence_refs": [
+        "state/CURRENT.yaml#open_threads.immediate",
+        "state/HIDDEN.yaml#unresolved_secrets.bridge_contact",
+        "OOC:player-authorized-important_mysterious-2026-08-14"
+      ],
+      "source_ref": "OOC:player-authorized-important_mysterious-2026-08-14"
+    },
+    "mechanical_profile_id": "NPC-MERCENARY-TRAINED",
+    "mechanical_profile_assignment": {
+      "target_ref": "hidden:bridge_contact",
+      "profile_id": "NPC-MERCENARY-TRAINED",
+      "basis": "hidden_conception",
+      "rationale": "Contact central d'un rendez-vous clandestin à très haut risque, conçu avant le jet comme physiquement entraîné sans statut d'élite.",
+      "evidence_refs": [
+        "EVT-0719R-0001",
+        "EVT-0723-0001",
+        "EVT-0733-0002"
+      ],
+      "npc_classification": {
+        "npc_class": "important_mysterious",
+        "classification_basis": "ooc_explicit",
+        "classified_before_roll": true,
+        "rationale": "Le contact est au centre d'une rencontre préparée et de plusieurs fils immédiats, tandis que son identité, son rôle exact, son affiliation, ses intentions et ses capacités restent volontairement non résolus.",
+        "criteria": [
+          "determinative_information_or_resource",
+          "durable_consequence_capacity",
+          "identity_unresolved",
+          "role_unresolved",
+          "capabilities_unresolved",
+          "affiliation_unresolved",
+          "intentions_unresolved"
+        ],
+        "evidence_refs": [
+          "state/CURRENT.yaml#open_threads.immediate",
+          "state/HIDDEN.yaml#unresolved_secrets.bridge_contact",
+          "OOC:player-authorized-important_mysterious-2026-08-14"
+        ],
+        "source_ref": "OOC:player-authorized-important_mysterious-2026-08-14"
+      },
+      "locked_by_roll_id": "1ba88e94-8f81-4f3e-87be-01f199b3f2b3",
+      "assigned_in_save_id": "VEY-0734"
+    }
+  }
 }

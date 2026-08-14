@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0733",
-  "turn": 723,
+  "save_id": "VEY-0734",
+  "turn": 724,
   "authority": "current_mechanical_projection",
   "ruleset": "V3.2.2",
   "formula": "2d10 + capability + mastery + modifiers",

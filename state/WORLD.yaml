@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0733",
-  "turn": 723,
+  "save_id": "VEY-0734",
+  "turn": 724,
   "time": {
     "year": 347,
     "day": 513,
@@ -16,14 +16,14 @@
     "combat_active": false,
     "tactical_alert": "very_high",
     "meeting_active": true,
-    "physical_confrontation_active": false
+    "physical_confrontation_active": true
   },
   "last_action": {
-    "actor": "bridge_contact",
+    "actor": "Mehdi",
     "dialogue_sequence": [
       "À ce rendez-vous ? Oui. Je suis venu seul."
     ],
-    "intent": "answer_whether_he_came_alone_without_establishing_objective_site_status"
+    "intent": "violently_grapple_and_restrain_bridge_contact"
   },
   "bridge_contact": {
     "response": {
@@ -35,10 +35,13 @@
       "agreement_establishes_objective_history": false,
       "continues_identity_verification": true,
       "claims_came_alone": true,
-      "claim_establishes_objective_site_status": false
+      "claim_establishes_objective_site_status": false,
+      "physically_restrained": true,
+      "hostile_counterattack_started": false,
+      "leaves_meeting": false
     },
     "dialogue": [
-      "À ce rendez-vous ? Oui. Je suis venu seul."
+      "Lâche-moi. Maintenant."
     ],
     "identity": {
       "whether_Meren": "unresolved",
