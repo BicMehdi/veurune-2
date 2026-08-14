@@ -1,6 +1,8 @@
 import { eventFileForTurn, materializeTurnPayload, parseDocument, validateTurnPayload } from "./validation.mjs";
 import { verifyEventRollReceipts } from "./dice.ts";
 import { verifyEventCheckReceipts, verifyPersistedProfileAssignments } from "./checks.ts";
+import { applyCompanionPersistence } from "./companions.ts";
+import type { CompanionChange } from "./companions.ts";
 
 export interface GitHubEnv {
   GITHUB_REPO_TOKEN: string;
@@ -217,13 +219,14 @@ export async function commitTurn(env: GitHubEnv, payload: unknown) {
   );
 
   const eventPath = eventFileForTurn(candidateSave.turn as number);
-  const [baseCurrentText, baseWorldText, baseHiddenText, baseProfileText, baseMemoryText, baseSheetText, existingEvents, existingSave] = await Promise.all([
+  const [baseCurrentText, baseWorldText, baseHiddenText, baseProfileText, baseMemoryText, baseSheetText, mechanicalProfilesText, existingEvents, existingSave] = await Promise.all([
     readFile(env, "state/CURRENT.yaml", actualHead),
     readFile(env, "state/WORLD.yaml", actualHead),
     readFile(env, "state/HIDDEN.yaml", actualHead),
     readFile(env, "state/MEHDI_PROFILE.yaml", actualHead),
     readFile(env, "state/NARRATIVE_MEMORY.yaml", actualHead),
     readFile(env, "state/MEHDI_SHEET.yaml", actualHead),
+    readFile(env, "reference/MECHANICAL_PROFILES.json", actualHead),
     readFile(env, eventPath, actualHead, true),
     readFile(env, `saves/${String(candidateSave.save_id)}.yaml`, actualHead, true),
   ]);
@@ -240,6 +243,7 @@ export async function commitTurn(env: GitHubEnv, payload: unknown) {
   const baseProfile = parseDocument(baseProfileText, "MEHDI_PROFILE distant");
   const baseMemory = parseDocument(baseMemoryText, "NARRATIVE_MEMORY distant");
   const baseSheet = parseDocument(baseSheetText, "MEHDI_SHEET distant");
+  const mechanicalProfiles = parseDocument(mechanicalProfilesText, "MECHANICAL_PROFILES distant");
   const materializedPayload = materializeTurnPayload(
     baseCurrent,
     baseWorld,
@@ -248,6 +252,16 @@ export async function commitTurn(env: GitHubEnv, payload: unknown) {
     baseMemory,
     baseSheet,
     payload,
+  );
+  materializedPayload.hidden = applyCompanionPersistence(
+    baseHidden,
+    materializedPayload.hidden,
+    materializedPayload.events as Json[],
+    (Array.isArray(input.companion_changes) ? input.companion_changes : []) as CompanionChange[],
+    requiredProfilePersistence,
+    mechanicalProfiles,
+    candidateSaveId,
+    candidateTurn,
   );
   verifyPersistedProfileAssignments(requiredProfilePersistence, baseHidden, materializedPayload.hidden);
   const transaction = validateTurnPayload(baseCurrent, existingEvents, materializedPayload, { hidden: baseHidden });

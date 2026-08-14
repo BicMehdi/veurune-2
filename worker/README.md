@@ -20,6 +20,8 @@ Les PNJ improvisés utilisent les profils génériques `NPC-*` de `reference/MEC
 
 Le catalogue comprend également le niveau rarissime `NPC-MASTER-CHAMPION`, qui exige trois preuves, et onze fiches préparées `CHAR-*`. Une fiche nommée ne peut être attribuée qu'à l'acteur correspondant déjà vivant dans GitHub. Elle ne l'active jamais. Sive et Lysa disposent de reconstructions OOC explicites, sans passé ni état courant inventés.
 
+Les fiches vivantes `CHAR-*` sont stockées côté MJ dans `HIDDEN.companion_sheets`. Un premier jet signé initialise automatiquement la fiche exacte du personnage ; un changement narratif peut aussi l’initialiser s’il cite un événement du même tour. `save_turn.companion_changes` porte l’ancien état, le nouvel état, la cause, la durée et l’événement source, lequel cite le profil dans `companion_refs`. Le Worker applique lui-même la mutation et ajoute `HIDDEN.companion_change_log`, afin de bloquer les changements directs, les progressions gonflées et les évolutions sans cause. Les domaines suivis sont mécanique, blessures, équipement, techniques, relations multidimensionnelles, émotions et objectifs.
+
 ## Sauvegarde rapide sans perte
 
 Le mode recommandé `save_turn({ mode: "patch", ... })` envoie seulement les changements du tour. Le Worker recharge les projections au même commit GitHub, applique une fusion récursive (`null` supprime une clé et un tableau remplace le tableau entier), reconstruit le checkpoint complet, puis exécute les validations ordinaires. Le mode complet ancien bénéficie désormais de la même préservation des champs omis. Le dépôt continue donc de contenir des snapshots complets : seule la quantité transmise par le MJ diminue.
@@ -40,7 +42,9 @@ Si un ancien catalogue ne montre pas encore les nouveaux outils, `search("valida
 - le refus d’un `HEAD` GitHub périmé avant toute écriture ;
 - la création atomique des huit fichiers d’un tour et la mise à jour de `main` sans `force` ;
 - la préservation de `HIDDEN`, de la fiche mécanique, du profil de Mehdi et de la mémoire narrative lorsqu’un ancien client les omet ;
-- la détection d’une sauvegarde déjà commitée après une réponse réseau perdue.
+- la détection d’une sauvegarde déjà commitée après une réponse réseau perdue ;
+- la création causale d’une fiche vivante, son activation par jet signé et la lecture de ses statistiques par les jets suivants ;
+- le refus d’une mutation directe, d’un événement source absent, d’un `before` faux ou d’une progression supérieure à +1 par événement.
 
 Ces simulations utilisent uniquement des données en mémoire et ne créent aucun tour narratif dans le dépôt canonique.
 

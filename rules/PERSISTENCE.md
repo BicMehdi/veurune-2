@@ -32,4 +32,9 @@
 30. Les profils `CHAR-*` sont des fiches mécaniques préparées, non des états vivants. Ils sont attribuables uniquement à leur acteur nommé réellement présent selon GitHub; ils ne créent ni rencontre, ni compagnonnage, ni localisation, ni survie.
 31. Les valeurs directes sauvegardées prévalent sur la base `CHAR-*`. Endurance actuelle, blessures, équipement et techniques exigent leur propre état ou événement. Les reconstructions OOC de Sive et Lysa fournissent une base future sans fabriquer de passé, de souvenir, de localisation ou d'événement.
 
+32. Les fiches vivantes des compagnons résident dans `HIDDEN.companion_sheets`. Elles ne sont jamais créées par une opération OOC : un premier jet signé ou un `companion_change` causé par un événement du tour est obligatoire.
+33. Toute modification durable ou temporaire d’une fiche `CHAR-*` passe par `save_turn.companion_changes` avec `before`, `after`, `cause`, `source_event_id` et `duration`. L’événement source cite aussi la fiche dans `companion_refs`. Le serveur applique la mutation et ajoute son entrée à `HIDDEN.companion_change_log`; le client ne modifie jamais directement ces deux registres.
+34. Blessures, équipement, techniques, progression, relations, émotions durables et objectifs personnels restent distincts. Une émotion momentanée peut disparaître avec la scène ; une relation durable conserve ses dimensions, ancres, promesses, dettes et limites au lieu d’être réduite à une jauge unique.
+35. Une fiche vivante ne prouve aucun ancien événement. Son initialisation reprend seulement la base préparée exacte du personnage au moment où un événement canonique établit son usage ; tout écart d’état exige ensuite sa propre cause jouée.
+
 Les fichiers `.yaml` de ce dépôt utilisent le sous-ensemble JSON de YAML 1.2. Ils restent des documents YAML valides tout en permettant une validation reproductible avec Node.js sans bibliothèque externe.

@@ -11,6 +11,8 @@ const memoryPath = new URL("../state/NARRATIVE_MEMORY.yaml", import.meta.url);
 const sheetPath = new URL("../state/MEHDI_SHEET.yaml", import.meta.url);
 const mechanicsEvalsPath = new URL("./mechanics-evals.json", import.meta.url);
 const mechanicalProfilesPath = new URL("../reference/MECHANICAL_PROFILES.json", import.meta.url);
+const hiddenPath = new URL("../state/HIDDEN.yaml", import.meta.url);
+const masterPath = new URL("../reference/VEY_RUNE_MASTER.md", import.meta.url);
 
 test("les règles Dark Fantasy permanentes conservent les invariants du jeu", async () => {
   const text = await readFile(narrationPath, "utf8");
@@ -117,6 +119,20 @@ test("les onze fiches préparées de compagnons ne créent aucun état vivant", 
   assert.equal(catalog.profiles["CHAR-LYSA"].mechanics.masteries.medecine, 4);
   assert.match(catalog.profiles["CHAR-LYSA"].identity_disambiguation, /distincte de Lysa Onne/);
   assert.equal(catalog.deferred_characters, undefined);
+});
+
+test("P15 prépare les fiches vivantes sans modifier l’état courant", async () => {
+  const hidden = JSON.parse(await readFile(hiddenPath, "utf8"));
+  const master = await readFile(masterPath, "utf8");
+  const source = await readFile(projectSourcePath, "utf8");
+  assert.equal(hidden.companion_sheets, undefined);
+  assert.equal(hidden.companion_change_log, undefined);
+  for (const id of ["COMP-LIVE-SHEETS", "COMP-CAUSAL-CHANGES", "COMP-RELATION-EMOTION", "COMP-NO-CURRENT-STATE-CREATED"]) {
+    assert.ok(master.includes(`\`${id}\``), `section P15 absente: ${id}`);
+  }
+  assert.match(source, /companion_changes/);
+  assert.match(source, /companion_refs/);
+  assert.match(source, /OOC.*aucun tour/s);
 });
 
 test("la matrice de délégation réserve toutes les décisions majeures au joueur", async () => {

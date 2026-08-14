@@ -23,6 +23,7 @@
 - `P9-P12` — audits, provenance, extensions sociales, détails archivés et contrôles de non-régression.
 - `P13` — mémoire persistante, HIDDEN non destructif, profil, chapitres et reprise idempotente ;
 - `P14` — fiche mécanique, difficultés, marges, jets sociaux, dés serveur, profils génériques persistants et fiches préparées des compagnons.
+- `P15` — fiches vivantes des compagnons, blessures, équipement, progression, relations, émotions, objectifs et journal causal serveur.
 
 ## Accès mécanique rapide
 
@@ -34,7 +35,10 @@
 - `MECH-GENERIC-NPC-PROFILES` — huit profils génériques, du civil au maître/champion ;
 - `MECH-PREPARED-COMPANION-PROFILES` — onze fiches nommées sans activation implicite ;
 - `MECH-PUBLIC-DISPLAY` — présentation obligatoire ;
-- `MECH-HIDDEN-ROLL` — opposition sensible.
+- `MECH-HIDDEN-ROLL` — opposition sensible ;
+- `COMP-LIVE-SHEETS` — projection vivante cachée des compagnons ;
+- `COMP-CAUSAL-CHANGES` — changements `before/after` liés à un événement ;
+- `COMP-RELATION-EMOTION` — relations multidimensionnelles, émotions et objectifs persistants.
 
 ## Cloisonnement
 

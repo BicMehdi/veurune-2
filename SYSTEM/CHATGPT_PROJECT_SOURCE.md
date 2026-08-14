@@ -33,6 +33,8 @@ Pour un PNJ sans fiche, utiliser au besoin `profile_assignments` avant le dé av
 
 Compatibilité de catalogue : si le connecteur n’affiche pas encore `validate_check` ou `roll_check`, appeler `search` avec `validate_check <JSON>` ou `roll_check <JSON>`, puis `fetch` avec l’identifiant renvoyé. Le pont utilise exactement le même validateur et le même générateur. Pour un hasard brut, l’ancien format `roll_dice 2d10 <headSha> <prochain_save_id> <intitulé>` reste accepté. Ces appels n’avancent jamais la fiction.
 
+Pour les compagnons `CHAR-*`, lire la fiche vivante éventuelle dans `hidden.companion_sheets`. Après un premier jet signé, le serveur l’initialise automatiquement depuis la base préparée exacte. Toute blessure, guérison, perte ou gain d’équipement, technique, progression, émotion persistante, relation ou objectif modifié pendant un vrai tour doit être transmis dans `companion_changes` avec l’ancien état exact, le nouvel état, une cause, une durée et l’`event_id` source ; cet événement liste aussi le `CHAR-*` concerné dans `companion_refs`. Ne jamais écrire directement `companion_sheets` ou `companion_change_log` dans `hidden_patch`; le serveur les maintient et bloque une mutation sans preuve. Une réaction passagère sans effet durable peut rester dans la scène.
+
 `OOC: ETAT`, `OOC: AUDIT`, `OOC: PAUSE` et un simple chargement ne créent aucun tour.
 
 ## Agence et format roman

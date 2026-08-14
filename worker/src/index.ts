@@ -81,6 +81,20 @@ const checkRequestSchema = z.object({
   expected_save_id: z.string().regex(/^VEY-\d{4}[A-Z]*$/),
 });
 
+const companionChangeSchema = z.object({
+  change_id: z.string().min(1).max(100).regex(/^[A-Za-z0-9_-]+$/),
+  profile_id: z.string().regex(/^CHAR-[A-Z0-9-]+$/),
+  character_key: z.string().min(1).max(100),
+  domain: z.enum(["mechanics", "wound", "equipment", "technique", "relation", "emotion", "objective"]),
+  path: z.string().min(3).max(180).regex(/^[a-z0-9_.-]+$/),
+  operation: z.enum(["set", "remove"]),
+  before: z.unknown(),
+  after: z.unknown().optional(),
+  cause: z.string().min(1).max(500),
+  source_event_id: z.string().min(1).max(120),
+  duration: z.enum(["momentary", "scene", "temporary", "durable", "permanent"]),
+});
+
 const fullSaveTurnSchema = z.object({
   mode: z.literal("full").optional(),
   expected_head_sha: z.string().regex(/^[0-9a-f]{40}$/i),
@@ -92,6 +106,7 @@ const fullSaveTurnSchema = z.object({
   mehdi_profile: z.record(z.string(), z.unknown()).optional(),
   narrative_memory: z.record(z.string(), z.unknown()).optional(),
   mehdi_sheet: z.record(z.string(), z.unknown()).optional(),
+  companion_changes: z.array(companionChangeSchema).max(20).default([]),
   events: z.array(z.record(z.string(), z.unknown())).min(1).max(50),
 });
 
@@ -120,6 +135,9 @@ const patchSaveTurnSchema = z.object({
   ),
   mehdi_sheet_patch: z.record(z.string(), z.unknown()).optional().describe(
     "Uniquement les changements mécaniques explicitement causés pendant le tour: Endurance, ressources, états, valeurs, équipement ou progression. Une valeur inchangée est omise.",
+  ),
+  companion_changes: z.array(companionChangeSchema).max(20).default([]).describe(
+    "Changements causaux des fiches vivantes CHAR-*. Le serveur vérifie before, applique after et exige cause + source_event_id; l’événement source doit lister le profile_id dans companion_refs. Le serveur inscrit ensuite le journal append-only dans HIDDEN. Ne jamais modifier companion_sheets directement dans hidden_patch.",
   ),
   events: z.array(z.record(z.string(), z.unknown())).min(1).max(50).describe(
     "Événements atomiques nouveaux. Fournir event_id et les faits; le serveur ajoute automatiquement filiation, tour et horodatages. Pour un test structuré, reprendre exactement roll_id, notation, dice, roll_receipt et mechanical_check de roll_check. Pour un hasard brut, reprendre la sortie exacte de roll_dice.",
@@ -242,9 +260,9 @@ function assertOwner(env: VeyruneEnv) {
 
 function createVeyruneServer(env: VeyruneEnv) {
   const server = new McpServer(
-    { name: "veyrune-cloud-save", version: "1.7.0" },
+    { name: "veyrune-cloud-save", version: "1.8.0" },
     {
-      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Les statistiques viennent du canon serveur. Un PNJ vivant sans fiche peut recevoir avant le dé un profil NPC-* cohérent; un compagnon nommé réellement présent peut recevoir uniquement son profil CHAR-* correspondant. Le reçu verrouille le choix et save_turn impose sa persistance exacte dans HIDDEN. Sans preuve, seul NPC-CIVIL-ORDINARY est permis. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale.",
+      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Les statistiques viennent du canon serveur. Un PNJ vivant sans fiche peut recevoir avant le dé un profil NPC-* cohérent; un compagnon nommé réellement présent peut recevoir uniquement son profil CHAR-* correspondant. Le reçu verrouille le choix et save_turn impose sa persistance exacte dans HIDDEN. Une fiche vivante présente sous hidden.companion_sheets prévaut ensuite; tout changement durable passe par companion_changes et un événement qui cite le profil dans companion_refs. Sans preuve, seul NPC-CIVIL-ORDINARY est permis. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale.",
     },
   );
 
@@ -415,7 +433,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "save_turn",
     {
-      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch. Preserve mehdi_sheet unless an explicit mechanical event changes it. Every structured test must reuse the exact roll_check output. If required_profile_persistence is returned, hidden_patch must persist it exactly; later reassignment is rejected. Raw rolls must reuse roll_dice. If save_turn fails, the narrative turn is not committed.",
+      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch. Preserve mehdi_sheet unless an explicit mechanical event changes it. Put every lasting companion change in companion_changes with exact before/after, cause, duration and a source event; companion_sheets is server-managed. Every structured test must reuse the exact roll_check output. If required_profile_persistence is returned, hidden_patch must persist it exactly; later reassignment is rejected. Raw rolls must reuse roll_dice. If save_turn fails, the narrative turn is not committed.",
       inputSchema: z.union([patchSaveTurnSchema, fullSaveTurnSchema]),
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true, idempotentHint: false },
     },

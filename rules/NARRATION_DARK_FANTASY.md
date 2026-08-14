@@ -116,5 +116,6 @@ Avant chaque réponse de jeu, vérifier :
 6. La réponse respecte-t-elle le rythme de la scène et la longueur cible ?
 7. Tout test a-t-il été validé et généré par `roll_check` — ou par `roll_dice` pour un hasard brut — puis enregistré et affiché selon sa visibilité ?
 8. Le tour a-t-il été sauvegardé avec succès avant d'être présenté comme canonique ?
+9. Toute blessure, perte, progression, émotion durable, promesse, dette, limite ou évolution d’objectif d’un compagnon est-elle enregistrée comme `companion_change` avec sa cause et son événement source ?
 
-Un échec sur les points 1 à 5, 7 ou 8 bloque l'envoi jusqu'à correction.
+Un échec sur les points 1 à 5 et 7 à 9 bloque l'envoi jusqu'à correction.

@@ -132,6 +132,7 @@ test("met à jour main en fast-forward et jamais avec force", async (t) => {
       masteries: { melee: 3, athletics: 3 },
       techniques: ["heavy_strike"], mechanical_equipment: { Yared: { damage: 5 } }, wounds: {}, resources: { personal_crowns: 246 },
     }));
+    if (url.includes("/contents/reference/MECHANICAL_PROFILES.json")) return new Response(JSON.stringify({ profiles: {} }));
     if (url.includes("/contents/events/0700-0799.jsonl")) return new Response('{"event_id":"EVT-0719R-0008"}\n');
     if (url.includes("/contents/saves/VEY-0720.yaml")) return new Response("not found", { status: 404 });
     if (url.endsWith("/git/trees")) return Response.json({ sha: "new-tree" });
@@ -204,6 +205,7 @@ test("reconstruit un checkpoint complet depuis un patch compact", async (t) => {
         techniques: ["heavy_strike"], mechanical_equipment: { Yared: { damage: 5 } }, wounds: {}, resources: { personal_crowns: 246 },
       }));
     }
+    if (url.includes("/contents/reference/MECHANICAL_PROFILES.json")) return new Response(JSON.stringify({ profiles: {} }));
     if (url.includes("/contents/events/0700-0799.jsonl")) return new Response('{"event_id":"EVT-0719R-0008"}\n');
     if (url.includes("/contents/saves/VEY-0720.yaml")) return new Response("not found", { status: 404 });
     if (url.endsWith("/git/trees")) return Response.json({ sha: "new-tree" });

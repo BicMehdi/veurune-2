@@ -2091,7 +2091,7 @@ Après validation, `roll_check` relit le même canon, tire `2d10` par le génér
 
 ## `MECH-PROFILE-INDEX` — Profils mécaniques et état vivant
 
-`reference/MECHANICAL_PROFILES.json` est un index lisible par le serveur, strictement subordonné aux profils numériques du Master. Une entrée de cet index ne crée jamais une personne ou une créature dans la campagne. Elle devient applicable seulement lorsqu’un acteur vivant de `state/` référence explicitement son `mechanical_profile_id`; les valeurs directes et états sauvegardés de cette instance prévalent.
+`reference/MECHANICAL_PROFILES.json` est un index lisible par le serveur, strictement subordonné aux profils numériques du Master. Une entrée de cet index ne crée jamais une personne ou une créature dans la campagne. Elle devient applicable seulement lorsqu’un acteur vivant de `state/` référence explicitement son `mechanical_profile_id` ou lorsque P15 crée causalement sa fiche nommée exacte ; les valeurs directes et états sauvegardés de cette instance prévalent.
 
 ## `MECH-GENERIC-NPC-PROFILES` — Secours persistant pour PNJ improvisés
 
@@ -2114,7 +2114,7 @@ Lorsque le profil est utilisé pour lancer les dés, `roll_check` le verrouille 
 
 ## `MECH-PREPARED-COMPANION-PROFILES` — Fiches mécaniques préparées sans activation
 
-Les fiches `CHAR-*` ci-dessous sont des calibrations mécaniques `STATIC_PREPARED`. Elles ne prouvent ni présence, ni rencontre, ni compagnonnage actuel, ni équipement, ni blessure, ni survie. Elles deviennent utilisables seulement si GitHub établit l'instance vivante correspondante et si `roll_check` verrouille son identifiant exact avant le premier jet. Une fiche nommée ne peut jamais être attribuée à un autre acteur.
+Les fiches `CHAR-*` ci-dessous sont des calibrations mécaniques `STATIC_PREPARED`. Elles ne prouvent ni présence, ni rencontre, ni compagnonnage actuel, ni équipement, ni blessure, ni survie. Elles deviennent vivantes seulement si GitHub établit l’instance correspondante puis si un premier jet signé ou un changement causal P15 initialise son identifiant exact. Une fiche nommée ne peut jamais être attribuée à un autre acteur.
 
 | Fiche | E/D/P | Capacités | Maîtrises principales | Provenance mécanique |
 |---|---:|---|---|---|
@@ -2150,3 +2150,33 @@ La règle vaut aussi pendant une conversation. L’absence de jet est normale po
 ## `MECH-HIDDEN-ROLL` — Opposition sensible
 
 Si révéler le DD, la marge ou même la nature exacte de l’opposition dévoilerait un secret, la réponse montre les dés, les valeurs publiques et le total de Mehdi, puis `opposition cachée` et l’effet perceptible. Le détail complet est conservé uniquement dans `HIDDEN`. Un test caché ne peut jamais être utilisé pour annoncer au joueur une vérité que Mehdi n’a pas découverte.
+
+---
+
+# 21. P15 — Fiches vivantes des compagnons
+
+## `COMP-LIVE-SHEETS` — Projection actuelle sans activation rétroactive
+
+Les profils `CHAR-*` de P14 restent des bases `STATIC_PREPARED`. Une fiche vivante n’existe dans `HIDDEN.companion_sheets` qu’après un événement canonique du tour : soit le premier test signé du personnage, soit un `companion_change` qui cite cet événement. Une opération OOC, l’existence d’une fiche préparée, une ancienne relation ou une localisation non résolue ne suffit jamais.
+
+À sa première activation légitime, le serveur initialise exactement Endurance maximale, Défense, Protection, capacités, maîtrises et techniques préparées du profil correspondant. Cette initialisation ne crée aucun ancien exploit, équipement, souvenir, secret, lien, blessure ou événement. Les écarts ultérieurs deviennent l’état vivant GitHub et prévalent sur la base P14.
+
+Les jets suivants d’un compagnon utilisent sa projection vivante `hidden:companion_sheets.<CHAR-ID>`. Ils prennent donc en compte blessures, progression et autres valeurs effectivement enregistrées, au lieu de revenir silencieusement au profil préparé.
+
+## `COMP-CAUSAL-CHANGES` — Mutation contrôlée et journal append-only
+
+Toute modification de fiche passe par `save_turn.companion_changes`. Chaque entrée nomme `change_id`, `profile_id`, `character_key`, domaine, chemin, opération, valeur `before`, valeur `after`, cause, `source_event_id` et durée ; l’événement source cite aussi le profil dans `companion_refs`. Le serveur vérifie l’identité nommée, l’existence de l’événement dans le tour, l’ancien état exact, les bornes mécaniques et la cohérence de durée ; il applique ensuite la mutation et ajoute une trace à `HIDDEN.companion_change_log`.
+
+Le client ne modifie jamais directement `companion_sheets` ou `companion_change_log`. Une écriture directe, un événement absent, un `before` faux, un identifiant réutilisé ou une progression artificiellement gonflée est refusé. Une capacité, une maîtrise, l’Endurance maximale, la Défense ou la Protection ne progresse pas de plus de +1 par événement ; une évolution supérieure exige plusieurs causes réellement jouées.
+
+Les domaines suivis sont : mécanique et ressources ; blessures et séquelles ; équipement ; techniques ; relations ; émotions ; objectifs personnels. Une réaction passagère sans conséquence future peut rester dans la scène. Dès qu’elle influe durablement sur la conduite, une relation ou un objectif, elle devient un changement causal sauvegardé.
+
+## `COMP-RELATION-EMOTION` — Mémoire relationnelle sans jauge magique
+
+Une relation persistante conserve au minimum sa cible, plusieurs dimensions éventuelles, ses événements-ancres, promesses, dettes et limites. Les nombres ne sont que des résumés internes bornés ; ils ne remplacent jamais les faits ni les objectifs du PNJ. Un geste positif n’efface donc pas automatiquement une humiliation, une dette, une divergence morale ou une peur antérieure.
+
+Les émotions momentanées et durables restent séparées. Toute émotion enregistrée cite son événement source et son intensité ; une émotion durable exige une durée durable ou permanente. Elle ne devient ni omniscience, ni obligation de romance, de pardon, de loyauté ou de trahison. Les objectifs personnels conservent leur propre statut et peuvent évoluer indépendamment de Mehdi.
+
+## `COMP-NO-CURRENT-STATE-CREATED` — État courant inchangé par P15
+
+L’intégration de P15 est strictement OOC et technique. Elle n’ajoute aujourd’hui aucune fiche à `state/HIDDEN.yaml`, ne localise aucun compagnon, ne crée aucune présence, alliance, blessure, émotion, relation ou objectif, et n’avance ni le tour ni le temps. Les registres vivants apparaîtront uniquement lorsqu’un futur tour canonique en fournira la cause.

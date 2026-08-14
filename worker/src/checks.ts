@@ -213,7 +213,11 @@ function resolveActor(context: CheckContext, actorRef: string, assignments: Prof
     const canonicalActorKeys = Array.isArray(profile.canonical_actor_keys)
       ? profile.canonical_actor_keys.filter((key): key is string => typeof key === "string")
       : [];
-    if (!actorKey || !canonicalActorKeys.includes(actorKey)) {
+    const companionSheetIdentityMatches = actorRef.toLowerCase().startsWith("hidden:companion_sheets.")
+      && actor.profile_id === profileId
+      && typeof actor.character_key === "string"
+      && canonicalActorKeys.includes(actor.character_key);
+    if ((!actorKey || !canonicalActorKeys.includes(actorKey)) && !companionSheetIdentityMatches) {
       throw new Error(`ACTOR_UNRESOLVED: le profil nommé ${String(profileId)} ne correspond pas à ${actorRef}`);
     }
   }

@@ -38,6 +38,8 @@ Avec Veyrune Cloud Save, préférer `save_turn` en `mode: patch`. Envoyer unique
 4. Ajouter les événements à la fin du fichier JSONL de la tranche concernée. Ne jamais modifier les lignes antérieures ; une correction est un nouvel événement.
 5. Créer `saves/<save_id>.yaml` avec le parent égal au `save_id` courant, un tour égal au tour courant plus un et l’identifiant de sauvegarde explicitement suivant dans la séquence. Le numéro du tour ne sert jamais à calculer l’identifiant de sauvegarde.
 6. Mettre à jour `CURRENT.yaml`, `WORLD.yaml`, `HIDDEN.yaml`, `MEHDI_SHEET.yaml`, `MEHDI_PROFILE.yaml` et `NARRATIVE_MEMORY.yaml` dans la même modification atomique. Toute modification de fiche cite un événement mécanique ; toute observation du profil cite une instruction OOC ou des événements joués ; tout résumé de chapitre cite ses événements.
+Les fiches vivantes `CHAR-*` passent exclusivement par `companion_changes`; le serveur applique leurs mutations causales et tient leur journal caché append-only. Une opération OOC ne crée aucune fiche vivante.
+
 7. Exécuter `npm test`. Une erreur de parent, de tour, de secret ou d’append-only bloque le commit.
 8. Commit et push seulement après validation réussie.
 
