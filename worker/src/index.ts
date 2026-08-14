@@ -107,7 +107,9 @@ const fullSaveTurnSchema = z.object({
   narrative_memory: z.record(z.string(), z.unknown()).optional(),
   mehdi_sheet: z.record(z.string(), z.unknown()).optional(),
   companion_changes: z.array(companionChangeSchema).max(20).default([]),
-  events: z.array(z.record(z.string(), z.unknown())).min(1).max(50),
+  events: z.array(z.record(z.string(), z.unknown())).min(1).max(50).describe(
+    "Événements atomiques nouveaux. Pour un test structuré, copier signed_check intact depuis roll_check; le serveur reconstruit et vérifie les autres champs signés.",
+  ),
 });
 
 const patchSaveTurnSchema = z.object({
@@ -140,7 +142,7 @@ const patchSaveTurnSchema = z.object({
     "Changements causaux des fiches vivantes CHAR-*. Le serveur vérifie before, applique after et exige cause + source_event_id; l’événement source doit lister le profile_id dans companion_refs. Le serveur inscrit ensuite le journal append-only dans HIDDEN. Ne jamais modifier companion_sheets directement dans hidden_patch.",
   ),
   events: z.array(z.record(z.string(), z.unknown())).min(1).max(50).describe(
-    "Événements atomiques nouveaux. Fournir event_id et les faits; le serveur ajoute automatiquement filiation, tour et horodatages. Pour un test structuré, reprendre exactement roll_id, notation, dice, roll_receipt et mechanical_check de roll_check. Pour un hasard brut, reprendre la sortie exacte de roll_dice.",
+    "Événements atomiques nouveaux. Fournir event_id et les faits; le serveur ajoute automatiquement filiation, tour et horodatages. Pour un test structuré, copier signed_check intact depuis roll_check; le serveur reconstruit les autres champs signés. Pour un hasard brut, reprendre la sortie exacte de roll_dice.",
   ),
 });
 
@@ -260,9 +262,9 @@ function assertOwner(env: VeyruneEnv) {
 
 function createVeyruneServer(env: VeyruneEnv) {
   const server = new McpServer(
-    { name: "veyrune-cloud-save", version: "1.8.0" },
+    { name: "veyrune-cloud-save", version: "1.8.1" },
     {
-      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Les statistiques viennent du canon serveur. Un PNJ vivant sans fiche peut recevoir avant le dé un profil NPC-* cohérent; un compagnon nommé réellement présent peut recevoir uniquement son profil CHAR-* correspondant. Le reçu verrouille le choix et save_turn impose sa persistance exacte dans HIDDEN. Une fiche vivante présente sous hidden.companion_sheets prévaut ensuite; tout changement durable passe par companion_changes et un événement qui cite le profil dans companion_refs. Sans preuve, seul NPC-CIVIL-ORDINARY est permis. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale.",
+      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Copier signed_check intact dans l’événement de save_turn: le serveur reconstruit lui-même notation, dés et mechanical_check depuis le reçu. Les statistiques viennent du canon serveur. Un PNJ vivant sans fiche peut recevoir avant le dé un profil NPC-* cohérent; un compagnon nommé réellement présent peut recevoir uniquement son profil CHAR-* correspondant. Le reçu verrouille le choix et save_turn impose sa persistance exacte dans HIDDEN. Une fiche vivante présente sous hidden.companion_sheets prévaut ensuite; tout changement durable passe par companion_changes et un événement qui cite le profil dans companion_refs. Sans preuve, seul NPC-CIVIL-ORDINARY est permis. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn avant d'afficher la narration finale.",
     },
   );
 
@@ -394,7 +396,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "roll_check",
     {
-      description: "Résout un test complet depuis les statistiques canoniques, lance 2d10 avec Web Crypto, calcule total, opposition, marge et degré, puis chiffre le reçu. Toute attribution générique est verrouillée avant les dés et doit être recopiée exactement de required_profile_persistence vers hidden_patch pendant save_turn.",
+      description: "Résout un test complet depuis les statistiques canoniques, lance 2d10 avec Web Crypto, calcule total, opposition, marge et degré, puis chiffre le reçu. Dans l’événement de save_turn, copier signed_check intact; le serveur hydrate et vérifie les autres champs du jet. Toute attribution générique est verrouillée avant les dés et doit être recopiée exactement de required_profile_persistence vers hidden_patch.",
       inputSchema: checkRequestSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: false },
     },
@@ -433,7 +435,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "save_turn",
     {
-      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch. Preserve mehdi_sheet unless an explicit mechanical event changes it. Put every lasting companion change in companion_changes with exact before/after, cause, duration and a source event; companion_sheets is server-managed. Every structured test must reuse the exact roll_check output. If required_profile_persistence is returned, hidden_patch must persist it exactly; later reassignment is rejected. Raw rolls must reuse roll_dice. If save_turn fails, the narrative turn is not committed.",
+      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch. Preserve mehdi_sheet unless an explicit mechanical event changes it. Put every lasting companion change in companion_changes with exact before/after, cause, duration and a source event; companion_sheets is server-managed. For each structured test, copy signed_check intact from roll_check into the event; the server reconstructs and verifies notation, dice and mechanical_check. If required_profile_persistence is returned, hidden_patch must persist it exactly; later reassignment is rejected. Raw rolls must reuse roll_dice. If save_turn fails, the narrative turn is not committed.",
       inputSchema: z.union([patchSaveTurnSchema, fullSaveTurnSchema]),
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true, idempotentHint: false },
     },

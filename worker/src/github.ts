@@ -1,6 +1,6 @@
 import { eventFileForTurn, materializeTurnPayload, parseDocument, validateTurnPayload } from "./validation.mjs";
 import { verifyEventRollReceipts } from "./dice.ts";
-import { verifyEventCheckReceipts, verifyPersistedProfileAssignments } from "./checks.ts";
+import { normalizeAndVerifyEventCheckReceipts, verifyPersistedProfileAssignments } from "./checks.ts";
 import { applyCompanionPersistence } from "./companions.ts";
 import type { CompanionChange } from "./companions.ts";
 
@@ -197,26 +197,29 @@ export async function commitTurn(env: GitHubEnv, payload: unknown) {
   const candidateSave = patchMode ? input : input.save as Json;
   const candidateSaveId = String(candidateSave.save_id);
   const candidateTurn = candidateSave.turn as number;
-  const candidateEvents = Array.isArray(input.events) ? input.events as Json[] : [];
-  const expectedEventId = candidateEvents[candidateEvents.length - 1]?.event_id as string | undefined;
+  const submittedEvents = Array.isArray(input.events) ? input.events as Json[] : [];
+  const expectedEventId = submittedEvents[submittedEvents.length - 1]?.event_id as string | undefined;
   const { headSha: actualHead, treeSha: baseTree } = await getHeadSnapshot(env);
   if (actualHead !== expectedHead) {
     const existing = await inspectSaveAtHead(env, actualHead, candidateSaveId, expectedEventId);
     if (existing.status === "committed" && existing.turn === candidateTurn) {
       console.log({ operation: "save_turn", status: "already_committed", save_id: candidateSaveId, turn: candidateTurn, duration_ms: Date.now() - startedAt });
-      return { ...existing, status: "already_committed", eventCount: candidateEvents.length };
+      return { ...existing, status: "already_committed", eventCount: submittedEvents.length };
     }
     console.warn({ operation: "save_turn", status: "conflict", expected_head_sha: expectedHead, actual_head_sha: actualHead, save_id: candidateSaveId });
     throw new Error(`conflit de continuité: HEAD attendu ${expectedHead}, HEAD actuel ${actualHead}`);
   }
 
-  await verifyEventRollReceipts(candidateEvents, env.DICE_RECEIPT_KEY || env.COOKIE_ENCRYPTION_KEY || "", expectedHead, candidateSaveId);
-  const requiredProfilePersistence = await verifyEventCheckReceipts(
-    candidateEvents,
+  const checkVerification = await normalizeAndVerifyEventCheckReceipts(
+    submittedEvents,
     env.DICE_RECEIPT_KEY || env.COOKIE_ENCRYPTION_KEY || "",
     expectedHead,
     candidateSaveId,
   );
+  const candidateEvents = checkVerification.events;
+  const requiredProfilePersistence = checkVerification.requiredProfilePersistence;
+  await verifyEventRollReceipts(candidateEvents, env.DICE_RECEIPT_KEY || env.COOKIE_ENCRYPTION_KEY || "", expectedHead, candidateSaveId);
+  const normalizedInput = { ...input, events: candidateEvents };
 
   const eventPath = eventFileForTurn(candidateSave.turn as number);
   const [baseCurrentText, baseWorldText, baseHiddenText, baseProfileText, baseMemoryText, baseSheetText, mechanicalProfilesText, existingEvents, existingSave] = await Promise.all([
@@ -251,7 +254,7 @@ export async function commitTurn(env: GitHubEnv, payload: unknown) {
     baseProfile,
     baseMemory,
     baseSheet,
-    payload,
+    normalizedInput,
   );
   materializedPayload.hidden = applyCompanionPersistence(
     baseHidden,

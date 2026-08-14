@@ -32,6 +32,7 @@
 - `RULE-SOCIAL-CHECKS` — dialogues à enjeu et oppositions ;
 - `MECH-SHEET-PERSISTENT` — fiche mécanique courante ;
 - `MECH-RANDOM-SERVER` — génération impartiale ;
+- `MECH-CHECK-SERVER` — résolution signée et transfert atomique par `signed_check` ;
 - `MECH-GENERIC-NPC-PROFILES` — huit profils génériques, du civil au maître/champion ;
 - `MECH-PREPARED-COMPANION-PROFILES` — onze fiches nommées sans activation implicite ;
 - `MECH-PUBLIC-DISPLAY` — présentation obligatoire ;

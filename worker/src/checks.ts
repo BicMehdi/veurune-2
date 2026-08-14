@@ -417,6 +417,7 @@ export async function issueMechanicalCheck(context: CheckContext, request: Check
     public_display: publicDisplay,
     required_profile_persistence: requiredProfilePersistence,
   };
+  const rollReceipt = await encryptJson(receiptPayload, secret, "veyrune:check-receipt:v1");
   return {
     roll_id: roll.roll_id,
     label: roll.label,
@@ -431,8 +432,89 @@ export async function issueMechanicalCheck(context: CheckContext, request: Check
     gm_resolution: gmResolution,
     public_display: publicDisplay,
     required_profile_persistence: requiredProfilePersistence,
-    roll_receipt: await encryptJson(receiptPayload, secret, "veyrune:check-receipt:v1"),
+    roll_receipt: rollReceipt,
+    signed_check: {
+      roll_id: roll.roll_id,
+      roll_receipt: rollReceipt,
+    },
   };
+}
+
+function suppliedValue(event: Json, signed: Json | undefined, key: string, eventId: string) {
+  const direct = event[key];
+  const nested = signed?.[key];
+  if (direct !== undefined && nested !== undefined && JSON.stringify(direct) !== JSON.stringify(nested)) {
+    throw new Error(`${eventId}: signed_check contredit le champ ${key}`);
+  }
+  return direct ?? nested;
+}
+
+export async function normalizeAndVerifyEventCheckReceipts(
+  events: Json[],
+  secret: string,
+  expectedHeadSha: string,
+  expectedSaveId: string,
+) {
+  const seen = new Set<string>();
+  const requiredProfilePersistence: PersistedProfileAssignment[] = [];
+  const normalizedEvents: Json[] = [];
+  for (const event of events) {
+    const signed = record(event.signed_check);
+    if (!("mechanical_check" in event) && !signed) {
+      normalizedEvents.push(event);
+      continue;
+    }
+    const eventId = String(event.event_id || "événement");
+    const receipt = suppliedValue(event, signed, "roll_receipt", eventId);
+    if (typeof receipt !== "string" || !receipt) {
+      throw new Error(`${eventId}: roll_receipt absent du test mécanique; recopier signed_check depuis roll_check`);
+    }
+    const payload = await decryptJson<MechanicalReceiptPayload>(receipt, secret, "veyrune:check-receipt:v1");
+    if (
+      (payload.version !== 1 && payload.version !== 2)
+      || payload.kind !== "mechanical_check"
+      || payload.expected_head_sha !== expectedHeadSha
+      || payload.expected_save_id !== expectedSaveId
+    ) {
+      throw new Error(`${eventId}: le reçu mécanique ne correspond pas au canon ou au tour attendu`);
+    }
+    const suppliedRollId = suppliedValue(event, signed, "roll_id", eventId);
+    const suppliedNotation = suppliedValue(event, signed, "notation", eventId);
+    const suppliedDice = suppliedValue(event, signed, "dice", eventId);
+    const suppliedDiceTotal = suppliedValue(event, signed, "dice_total", eventId);
+    const suppliedDisplay = suppliedValue(event, signed, "mechanical_check", eventId);
+    if (
+      (suppliedRollId !== undefined && suppliedRollId !== payload.roll_id)
+      || (suppliedNotation !== undefined && suppliedNotation !== payload.notation)
+      || (suppliedDice !== undefined && JSON.stringify(suppliedDice) !== JSON.stringify(payload.dice))
+      || (suppliedDiceTotal !== undefined && suppliedDiceTotal !== payload.dice_total)
+      || (suppliedDisplay !== undefined && JSON.stringify(suppliedDisplay) !== JSON.stringify(payload.public_display))
+    ) {
+      throw new Error(`${eventId}: le test mécanique ne correspond pas à son reçu serveur`);
+    }
+    if (seen.has(payload.roll_id)) throw new Error(`roll_id mécanique réutilisé dans le tour: ${payload.roll_id}`);
+    seen.add(payload.roll_id);
+    for (const assignment of payload.required_profile_persistence || []) {
+      if (
+        assignment.locked_by_roll_id !== payload.roll_id
+        || assignment.assigned_in_save_id !== expectedSaveId
+        || !assignment.target_ref.startsWith("hidden:")
+      ) {
+        throw new Error(`${eventId}: attribution de profil invalide dans le reçu`);
+      }
+      requiredProfilePersistence.push(assignment);
+    }
+    const normalized = { ...event };
+    delete normalized.signed_check;
+    normalized.roll_id = payload.roll_id;
+    normalized.notation = payload.notation;
+    normalized.dice = payload.dice;
+    normalized.dice_total = payload.dice_total;
+    normalized.roll_receipt = receipt;
+    normalized.mechanical_check = payload.public_display;
+    normalizedEvents.push(normalized);
+  }
+  return { events: normalizedEvents, requiredProfilePersistence };
 }
 
 export async function verifyEventCheckReceipts(
@@ -441,41 +523,8 @@ export async function verifyEventCheckReceipts(
   expectedHeadSha: string,
   expectedSaveId: string,
 ) {
-  const seen = new Set<string>();
-  const requiredProfilePersistence: PersistedProfileAssignment[] = [];
-  for (const event of events) {
-    if (!("mechanical_check" in event)) continue;
-    if (typeof event.roll_id !== "string" || typeof event.notation !== "string" || !Array.isArray(event.dice) || typeof event.roll_receipt !== "string" || !record(event.mechanical_check)) {
-      throw new Error(`${String(event.event_id || "événement")}: test mécanique signé incomplet`);
-    }
-    if (seen.has(event.roll_id)) throw new Error(`roll_id mécanique réutilisé dans le tour: ${event.roll_id}`);
-    seen.add(event.roll_id);
-    const payload = await decryptJson<MechanicalReceiptPayload>(event.roll_receipt, secret, "veyrune:check-receipt:v1");
-    if (
-      (payload.version !== 1 && payload.version !== 2)
-      || payload.kind !== "mechanical_check"
-      || payload.expected_head_sha !== expectedHeadSha
-      || payload.expected_save_id !== expectedSaveId
-      || payload.roll_id !== event.roll_id
-      || payload.notation !== event.notation
-      || JSON.stringify(payload.dice) !== JSON.stringify(event.dice)
-      || ("dice_total" in event && payload.dice_total !== event.dice_total)
-      || JSON.stringify(payload.public_display) !== JSON.stringify(event.mechanical_check)
-    ) {
-      throw new Error(`${String(event.event_id || "événement")}: le test mécanique ne correspond pas à son reçu serveur`);
-    }
-    for (const assignment of payload.required_profile_persistence || []) {
-      if (
-        assignment.locked_by_roll_id !== payload.roll_id
-        || assignment.assigned_in_save_id !== expectedSaveId
-        || !assignment.target_ref.startsWith("hidden:")
-      ) {
-        throw new Error(`${String(event.event_id || "événement")}: attribution de profil invalide dans le reçu`);
-      }
-      requiredProfilePersistence.push(assignment);
-    }
-  }
-  return requiredProfilePersistence;
+  const result = await normalizeAndVerifyEventCheckReceipts(events, secret, expectedHeadSha, expectedSaveId);
+  return result.requiredProfilePersistence;
 }
 
 function collectMechanicalProfiles(root: unknown, path = "", result = new Map<string, string>()) {

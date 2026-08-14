@@ -8,13 +8,15 @@ Serveur MCP personnel qui permet à ChatGPT mobile de charger et sauvegarder Vey
 - `load_game` : chargement des règles de persistance et de narration, de l’état courant, des événements récents et de l’état MJ ;
 - `roll_dice` : génération impartiale des dés, liée au canon chargé et accompagnée d’un reçu vérifié par `save_turn`, sans avancer la fiction ;
 - `validate_check` : validation sans dé des références d’acteur, caractéristiques, maîtrises, modificateurs et opposition ;
-- `roll_check` : résolution mécanique complète et reçu chiffré, avec projections MJ et joueur séparées ;
+- `roll_check` : résolution mécanique complète et reçu chiffré, avec projections MJ et joueur séparées ; son bloc minimal `signed_check` est directement transmissible à `save_turn` ;
 - `search_master` et `fetch_master_section` : consultation ciblée du Master MJ sans charger ses 154 Ko à chaque tour ;
 - `save_turn` : validation puis commit Git atomique d’un nouveau tour ;
 - `check_save_status` : résolution idempotente d’une réponse réseau perdue après un commit ;
 - `check_health` : vérification authentifiée de GitHub et de l’état courant.
 
 `save_turn` refuse les parents ou commits périmés, les tours discontinus, un mauvais `save_id`, les secrets dans les projections joueur, les reconstructions historiques injectées, toute modification non append-only du journal et tout calcul mécanique différent de son reçu serveur.
+
+Pour un test structuré, l’événement peut contenir seulement le bloc `signed_check` renvoyé par `roll_check`. Le Worker déchiffre et authentifie le reçu, vérifie son lien au `headSha` et au prochain `save_id`, puis hydrate lui-même `roll_id`, notation, dés, total et `mechanical_check` avant la validation et le commit. Les anciens événements détaillés restent compatibles ; tout champ détaillé fourni est comparé au reçu et la moindre altération est refusée.
 
 Les PNJ improvisés utilisent les profils génériques `NPC-*` de `reference/MECHANICAL_PROFILES.json`. L'attribution est fournie à `validate_check` et `roll_check` avant les dés, avec justification et références. `roll_check` renvoie `required_profile_persistence`; `save_turn` exige sa copie exacte dans `HIDDEN`, puis interdit toute réattribution. Sans preuve d'un niveau particulier, seul le profil civil ordinaire est accepté.
 
@@ -44,6 +46,7 @@ Si un ancien catalogue ne montre pas encore les nouveaux outils, `search("valida
 - la préservation de `HIDDEN`, de la fiche mécanique, du profil de Mehdi et de la mémoire narrative lorsqu’un ancien client les omet ;
 - la détection d’une sauvegarde déjà commitée après une réponse réseau perdue ;
 - la création causale d’une fiche vivante, son activation par jet signé et la lecture de ses statistiques par les jets suivants ;
+- la réparation automatique d’un événement mécanique incomplet à partir de son bloc `signed_check`, jusque dans le journal atomique ;
 - le refus d’une mutation directe, d’un événement source absent, d’un `before` faux ou d’une progression supérieure à +1 par événement.
 
 Ces simulations utilisent uniquement des données en mémoire et ne créent aucun tour narratif dans le dépôt canonique.

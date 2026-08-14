@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { issueMechanicalCheck, validateCheck, verifyEventCheckReceipts, verifyPersistedProfileAssignments } from "../src/checks.ts";
+import { issueMechanicalCheck, normalizeAndVerifyEventCheckReceipts, validateCheck, verifyEventCheckReceipts, verifyPersistedProfileAssignments } from "../src/checks.ts";
 import type { CheckContext, CheckRequest } from "../src/checks.ts";
 
 const HEAD = "a".repeat(40);
@@ -88,6 +88,37 @@ test("résout et authentifie le calcul mécanique complet", async () => {
   const altered = structuredClone(event) as Record<string, unknown>;
   (altered.mechanical_check as Record<string, unknown>).total = 99;
   await assert.rejects(() => verifyEventCheckReceipts([altered], SECRET, HEAD, SAVE_ID), /ne correspond pas/);
+});
+
+test("répare automatiquement l’événement signé incomplet observé en jeu", async () => {
+  const result = await issueMechanicalCheck(context(), request(), SECRET);
+  assert.deepEqual(result.signed_check, {
+    roll_id: result.roll_id,
+    roll_receipt: result.roll_receipt,
+  });
+  const incompleteEvent = {
+    event_id: "EVT-0734-0001",
+    roll_id: result.roll_id,
+    roll_receipt: result.roll_receipt,
+    mechanical_check: result.mechanical_check,
+  };
+  const repaired = await normalizeAndVerifyEventCheckReceipts([incompleteEvent], SECRET, HEAD, SAVE_ID);
+  assert.equal(repaired.events[0].notation, result.notation);
+  assert.deepEqual(repaired.events[0].dice, result.dice);
+  assert.equal(repaired.events[0].dice_total, result.dice_total);
+  assert.deepEqual(repaired.events[0].mechanical_check, result.mechanical_check);
+
+  const wrapped = await normalizeAndVerifyEventCheckReceipts([{
+    event_id: "EVT-0734-0002",
+    signed_check: result.signed_check,
+  }], SECRET, HEAD, SAVE_ID);
+  assert.equal(wrapped.events[0].roll_id, result.roll_id);
+  assert.equal(wrapped.events[0].signed_check, undefined);
+
+  await assert.rejects(() => normalizeAndVerifyEventCheckReceipts([{
+    event_id: "EVT-0734-0003",
+    mechanical_check: result.mechanical_check,
+  }], SECRET, HEAD, SAVE_ID), /roll_receipt absent/);
 });
 
 test("filtre l'opposition cachée et chiffre la résolution MJ", async () => {

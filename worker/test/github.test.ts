@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { issueMechanicalCheck } from "../src/checks.ts";
 import { checkSaveStatus, commitTurn, fetchMasterSection, loadGame, searchMaster, type GitHubEnv } from "../src/github.ts";
 
 const EXPECTED_HEAD = "a".repeat(40);
@@ -239,6 +240,82 @@ test("reconstruit un checkpoint complet depuis un patch compact", async (t) => {
   assert.equal(document("state/MEHDI_SHEET.yaml").endurance.current, 8);
   assert.deepEqual(document("saves/VEY-0720.yaml"), current);
   assert.equal(requests.filter((request) => request.url.endsWith("/git/blobs")).length, 0);
+});
+
+test("sauvegarde un test mécanique depuis le seul bloc signed_check", async (t) => {
+  const rolled = await issueMechanicalCheck({
+    current: {},
+    world: {},
+    hidden: {},
+    mehdiSheet: {
+      capabilities: { vigor: 5 },
+      masteries: { athletics: 3 },
+      defense: 13,
+    },
+    mechanicalProfiles: { profiles: {} },
+  }, {
+    actor_ref: "mehdi",
+    actor_visibility: "public",
+    action: "Maîtriser le contact",
+    capability: "vigor",
+    mastery: "athletics",
+    modifiers: [],
+    opposition: { kind: "difficulty", value: 15, visibility: "public", source: "RULE-NONLETHAL" },
+    expected_head_sha: EXPECTED_HEAD,
+    expected_save_id: "VEY-0720",
+  }, env.DICE_RECEIPT_KEY || "");
+
+  const requests: Array<{ url: string; method: string; body?: string | null }> = [];
+  t.mock.method(globalThis, "fetch", async (input, init) => {
+    const url = String(input);
+    const method = init?.method || "GET";
+    const body = typeof init?.body === "string" ? init.body : null;
+    requests.push({ url, method, body });
+
+    if (url.endsWith("/branches/main")) {
+      return Response.json({ commit: { sha: EXPECTED_HEAD, commit: { tree: { sha: "base-tree" } } } });
+    }
+    if (url.includes("/contents/state/CURRENT.yaml")) {
+      return new Response(JSON.stringify({
+        save_id: "VEY-0719R", turn: 709, last_event_id: "EVT-0719R-0008",
+        next_expected_save: { save_id: "VEY-0720", parent_save_id: "VEY-0719R", turn: 710 },
+      }));
+    }
+    if (url.includes("/contents/state/WORLD.yaml")) return new Response(JSON.stringify({ save_id: "VEY-0719R", turn: 709, audience: "player_visible" }));
+    if (url.includes("/contents/state/HIDDEN.yaml")) return new Response(JSON.stringify({ save_id: "VEY-0719R", turn: 709, audience: "gm_only", unresolved_secrets: [], invented_secret_values: [] }));
+    if (url.includes("/contents/state/MEHDI_PROFILE.yaml")) return new Response(JSON.stringify({ save_id: "VEY-0719R", turn: 709, audience: "gm_only" }));
+    if (url.includes("/contents/state/NARRATIVE_MEMORY.yaml")) return new Response(JSON.stringify({ save_id: "VEY-0719R", turn: 709, audience: "gm_only", chapters: [] }));
+    if (url.includes("/contents/state/MEHDI_SHEET.yaml")) return new Response(JSON.stringify({
+      save_id: "VEY-0719R", turn: 709, audience: "player_visible", authority: "current_mechanical_projection",
+      ruleset: "V3.2.2", formula: "2d10 + capability + mastery + modifiers",
+      endurance: { current: 8, max: 14 }, defense: 13, protection: 3, resolution: { current: 2, max: 2 },
+      capabilities: { vigor: 5, address: 1, instinct: 1, reason: 0, will: 2, presence: 1 },
+      masteries: { melee: 3, athletics: 3 }, techniques: [], mechanical_equipment: {}, wounds: {}, resources: {},
+    }));
+    if (url.includes("/contents/reference/MECHANICAL_PROFILES.json")) return new Response(JSON.stringify({ profiles: {} }));
+    if (url.includes("/contents/events/0700-0799.jsonl")) return new Response('{"event_id":"EVT-0719R-0008"}\n');
+    if (url.includes("/contents/saves/VEY-0720.yaml")) return new Response("not found", { status: 404 });
+    if (url.endsWith("/git/trees")) return Response.json({ sha: "new-tree" });
+    if (url.endsWith("/git/commits")) return Response.json({ sha: "c".repeat(40) });
+    if (url.endsWith("/git/refs/heads/main")) return Response.json({ object: { sha: "c".repeat(40) } });
+    throw new Error(`requête inattendue: ${method} ${url}`);
+  });
+
+  const submitted = payload();
+  submitted.events[0] = { ...submitted.events[0], signed_check: rolled.signed_check };
+  await assert.doesNotReject(() => commitTurn(env, submitted));
+
+  const treeRequest = requests.find((request) => request.method === "POST" && request.url.endsWith("/git/trees"));
+  assert.ok(treeRequest);
+  const entries = JSON.parse(treeRequest.body || "{}").tree;
+  const journal = entries.find((entry) => entry.path === "events/0700-0799.jsonl").content as string;
+  const savedEvent = JSON.parse(journal.trim().split("\n").at(-1) || "{}");
+  assert.equal(savedEvent.signed_check, undefined);
+  assert.equal(savedEvent.roll_id, rolled.roll_id);
+  assert.equal(savedEvent.notation, rolled.notation);
+  assert.deepEqual(savedEvent.dice, rolled.dice);
+  assert.equal(savedEvent.dice_total, rolled.dice_total);
+  assert.deepEqual(savedEvent.mechanical_check, rolled.mechanical_check);
 });
 
 test("retrouve une section ciblée du Master sans charger le Master dans load_game", async (t) => {
