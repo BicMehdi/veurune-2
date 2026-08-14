@@ -11,6 +11,7 @@ const memoryPath = new URL("../state/NARRATIVE_MEMORY.yaml", import.meta.url);
 const sheetPath = new URL("../state/MEHDI_SHEET.yaml", import.meta.url);
 const mechanicsEvalsPath = new URL("./mechanics-evals.json", import.meta.url);
 const mechanicalProfilesPath = new URL("../reference/MECHANICAL_PROFILES.json", import.meta.url);
+const npcDesignRegistryPath = new URL("../reference/NPC_DESIGN_REGISTRY.json", import.meta.url);
 const hiddenPath = new URL("../state/HIDDEN.yaml", import.meta.url);
 const masterPath = new URL("../reference/VEY_RUNE_MASTER.md", import.meta.url);
 
@@ -101,7 +102,28 @@ test("les huit profils génériques de PNJ restent bornés et non actifs par eux
   assert.equal(catalog.profiles["NPC-COMBATANT-ELITE"].mechanics.defense, 15);
   assert.equal(catalog.profiles["NPC-MASTER-CHAMPION"].mechanics.defense, 16);
   assert.equal(catalog.profiles["NPC-MASTER-CHAMPION"].minimum_evidence_refs, 3);
+  assert.equal(catalog.profiles["NPC-MASTER-CHAMPION"].hidden_conception_requires_registry_authorization, true);
   assert.match(catalog.policy, /avant le premier jet/);
+});
+
+test("P16 classe les PNJ par fonction sans présélectionner leur puissance", async () => {
+  const registry = JSON.parse(await readFile(npcDesignRegistryPath, "utf8"));
+  const master = await readFile(masterPath, "utf8");
+  const source = await readFile(projectSourcePath, "utf8");
+  assert.deepEqual(Object.keys(registry.classes), [
+    "incidental", "established", "important", "mysterious", "important_mysterious",
+  ]);
+  const contact = registry.classifications["hidden:bridge_contact"];
+  assert.equal(contact.npc_class, "important_mysterious");
+  assert.equal(contact.classified_before_roll, true);
+  assert.equal(contact.mechanical_profile_id, null);
+  assert.ok(contact.criteria.includes("durable_consequence_capacity"));
+  assert.ok(contact.criteria.includes("capabilities_unresolved"));
+  assert.ok(!JSON.stringify(contact).includes("NPC-MASTER-CHAMPION"));
+  assert.ok(master.includes("`MECH-NPC-FUNCTIONAL-CLASSIFICATION`"));
+  assert.match(master, /ne lui attribue aujourd’hui aucun profil mécanique/);
+  assert.match(source, /basis: hidden_conception/);
+  assert.match(source, /reclassification ou réattribution/);
 });
 
 test("les onze fiches préparées de compagnons ne créent aucun état vivant", async () => {

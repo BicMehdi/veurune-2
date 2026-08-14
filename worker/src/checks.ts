@@ -10,12 +10,53 @@ export type CheckModifier = {
   source: string;
 };
 
+export const NPC_CLASSES = [
+  "incidental",
+  "established",
+  "important",
+  "mysterious",
+  "important_mysterious",
+] as const;
+
+export type NpcClass = typeof NPC_CLASSES[number];
+
+export const NPC_CLASSIFICATION_CRITERIA = [
+  "immediate_interchangeable_function",
+  "stable_identity",
+  "established_role",
+  "durable_identity",
+  "recurring_role",
+  "personal_objectives",
+  "significant_relationship",
+  "faction_role",
+  "determinative_information_or_resource",
+  "durable_consequence_capacity",
+  "identity_unresolved",
+  "role_unresolved",
+  "capabilities_unresolved",
+  "affiliation_unresolved",
+  "intentions_unresolved",
+] as const;
+
+export type NpcClassificationCriterion = typeof NPC_CLASSIFICATION_CRITERIA[number];
+
+export type NpcClassification = {
+  npc_class: NpcClass;
+  classification_basis: "prepared_registry" | "ooc_explicit" | "gm_pre_roll_design";
+  classified_before_roll: true;
+  rationale: string;
+  criteria: NpcClassificationCriterion[];
+  evidence_refs: string[];
+  source_ref: string;
+};
+
 export type ProfileAssignment = {
   target_ref: string;
   profile_id: string;
-  basis: "established_fiction" | "minimal_default";
+  basis: "established_fiction" | "minimal_default" | "hidden_conception";
   rationale: string;
   evidence_refs: string[];
+  npc_classification?: NpcClassification;
 };
 
 export type CheckOpposition =
@@ -49,6 +90,7 @@ export type CheckContext = {
   hidden: Json;
   mehdiSheet: Json;
   mechanicalProfiles?: Json;
+  npcDesignRegistry?: Json;
 };
 
 type ActorMechanics = {
@@ -118,6 +160,127 @@ function unresolvedPath(hidden: Json, actorPath: string) {
   });
 }
 
+const NPC_CLASS_SET = new Set<string>(NPC_CLASSES);
+const NPC_CRITERION_SET = new Set<string>(NPC_CLASSIFICATION_CRITERIA);
+const IMPORTANT_CRITERIA = new Set<NpcClassificationCriterion>([
+  "durable_identity",
+  "recurring_role",
+  "personal_objectives",
+  "significant_relationship",
+  "faction_role",
+  "determinative_information_or_resource",
+  "durable_consequence_capacity",
+]);
+const MYSTERY_CRITERIA = new Set<NpcClassificationCriterion>([
+  "identity_unresolved",
+  "role_unresolved",
+  "capabilities_unresolved",
+  "affiliation_unresolved",
+  "intentions_unresolved",
+]);
+const HIDDEN_CONCEPTION_CLASSES = new Set<NpcClass>(["important", "mysterious", "important_mysterious"]);
+
+function classificationList(value: unknown, label: string, allowed: Set<string>, min: number, max: number) {
+  if (!Array.isArray(value) || value.length < min || value.length > max
+    || value.some((item) => typeof item !== "string" || !allowed.has(item))) {
+    throw new Error(`PROFILE_ASSIGNMENT_INVALID: ${label} invalide`);
+  }
+  if (new Set(value).size !== value.length) {
+    throw new Error(`PROFILE_ASSIGNMENT_INVALID: ${label} contient un doublon`);
+  }
+  return value as string[];
+}
+
+function validatedNpcClassification(value: unknown, label: string): NpcClassification {
+  const classification = record(value);
+  if (!classification) throw new Error(`PROFILE_ASSIGNMENT_INVALID: classification PNJ absente pour ${label}`);
+  if (typeof classification.npc_class !== "string" || !NPC_CLASS_SET.has(classification.npc_class)) {
+    throw new Error(`PROFILE_ASSIGNMENT_INVALID: npc_class invalide pour ${label}`);
+  }
+  if (!["prepared_registry", "ooc_explicit", "gm_pre_roll_design"].includes(String(classification.classification_basis))) {
+    throw new Error(`PROFILE_ASSIGNMENT_INVALID: classification_basis invalide pour ${label}`);
+  }
+  if (classification.classified_before_roll !== true) {
+    throw new Error(`PROFILE_ASSIGNMENT_INVALID: le classement de ${label} doit précéder le premier jet`);
+  }
+  for (const [field, limit] of [["rationale", 800], ["source_ref", 240]] as const) {
+    const text = classification[field];
+    if (typeof text !== "string" || !text.trim() || text.length > limit) {
+      throw new Error(`PROFILE_ASSIGNMENT_INVALID: ${field} de classement invalide pour ${label}`);
+    }
+  }
+  const criteria = classificationList(classification.criteria, `criteria de ${label}`, NPC_CRITERION_SET, 1, 10) as NpcClassificationCriterion[];
+  const evidenceRefs = classification.evidence_refs;
+  if (!Array.isArray(evidenceRefs) || evidenceRefs.length < 1 || evidenceRefs.length > 8
+    || evidenceRefs.some((reference) => typeof reference !== "string" || !reference.trim() || reference.length > 180)) {
+    throw new Error(`PROFILE_ASSIGNMENT_INVALID: références de classement invalides pour ${label}`);
+  }
+  const hasImportantCriterion = criteria.some((criterion) => IMPORTANT_CRITERIA.has(criterion));
+  const hasMysteryCriterion = criteria.some((criterion) => MYSTERY_CRITERIA.has(criterion));
+  const npcClass = classification.npc_class as NpcClass;
+  if (npcClass === "incidental" && !criteria.includes("immediate_interchangeable_function")) {
+    throw new Error(`PROFILE_ASSIGNMENT_INVALID: incidental exige une fonction immédiate interchangeable pour ${label}`);
+  }
+  if (npcClass === "established" && !criteria.some((criterion) => criterion === "stable_identity" || criterion === "established_role")) {
+    throw new Error(`PROFILE_ASSIGNMENT_INVALID: established exige une identité ou un rôle stable pour ${label}`);
+  }
+  if (npcClass === "important" && !hasImportantCriterion) {
+    throw new Error(`PROFILE_ASSIGNMENT_INVALID: important exige un critère durable pour ${label}`);
+  }
+  if (npcClass === "mysterious" && !hasMysteryCriterion) {
+    throw new Error(`PROFILE_ASSIGNMENT_INVALID: mysterious exige un élément volontairement non résolu pour ${label}`);
+  }
+  if (npcClass === "important_mysterious" && (!hasImportantCriterion || !hasMysteryCriterion)) {
+    throw new Error(`PROFILE_ASSIGNMENT_INVALID: important_mysterious exige importance et mystère pour ${label}`);
+  }
+  return {
+    npc_class: npcClass,
+    classification_basis: classification.classification_basis as NpcClassification["classification_basis"],
+    classified_before_roll: true,
+    rationale: classification.rationale as string,
+    criteria,
+    evidence_refs: [...evidenceRefs] as string[],
+    source_ref: classification.source_ref as string,
+  };
+}
+
+function resolvedNpcClassification(context: CheckContext, assignment: ProfileAssignment, targetPath: string) {
+  const hiddenActor = record(valueAt(context.hidden, targetPath));
+  const hiddenValue = hiddenActor?.npc_classification;
+  const registry = record(context.npcDesignRegistry?.classifications);
+  const registryValue = registry?.[assignment.target_ref];
+  const candidates = [
+    hiddenValue === undefined ? null : { origin: "hidden" as const, value: hiddenValue },
+    registryValue === undefined ? null : { origin: "registry" as const, value: registryValue },
+    assignment.npc_classification === undefined ? null : { origin: "request" as const, value: assignment.npc_classification },
+  ].filter((candidate): candidate is NonNullable<typeof candidate> => candidate !== null);
+  if (candidates.length === 0) return undefined;
+  const normalized = candidates.map((candidate) => ({
+    origin: candidate.origin,
+    classification: validatedNpcClassification(candidate.value, assignment.target_ref),
+    raw: record(candidate.value) || {},
+  }));
+  const first = normalized[0].classification;
+  for (const candidate of normalized.slice(1)) {
+    if (JSON.stringify(candidate.classification) !== JSON.stringify(first)) {
+      throw new Error(`PROFILE_ASSIGNMENT_INVALID: classements contradictoires pour ${assignment.target_ref}`);
+    }
+  }
+  if (hiddenActor?.npc_class !== undefined && hiddenActor.npc_class !== first.npc_class) {
+    throw new Error(`PROFILE_ASSIGNMENT_INVALID: npc_class verrouillé incohérent pour ${assignment.target_ref}`);
+  }
+  const registryCandidate = normalized.find((candidate) => candidate.origin === "registry");
+  const allowedProfileIds = registryCandidate && Array.isArray(registryCandidate.raw.allowed_profile_ids)
+    ? registryCandidate.raw.allowed_profile_ids.filter((id): id is string => typeof id === "string")
+    : undefined;
+  return {
+    classification: first,
+    origin: normalized[0].origin,
+    registry_authorized: Boolean(registryCandidate),
+    allowed_profile_ids: allowedProfileIds,
+  };
+}
+
 function actorObject(context: CheckContext, actorRef: string) {
   if (actorRef.toLowerCase() === "mehdi") return { object: context.mehdiSheet, source: "state/MEHDI_SHEET.yaml" };
   const match = actorRef.match(/^(current|world|hidden):(.+)$/i);
@@ -136,6 +299,7 @@ function prepareProfileAssignments(context: CheckContext, request: CheckRequest)
   if (assignments.length > 2) throw new Error("deux attributions de profil au maximum par test");
   const profiles = record(context.mechanicalProfiles?.profiles) || {};
   const seen = new Set<string>();
+  const preparedAssignments: ProfileAssignment[] = [];
   const allowedTargets = new Set([request.actor_ref]);
   if (request.opposition.kind !== "difficulty") allowedTargets.add(request.opposition.target_ref);
   for (const assignment of assignments) {
@@ -172,8 +336,33 @@ function prepareProfileAssignments(context: CheckContext, request: CheckRequest)
         throw new Error("PROFILE_ASSIGNMENT_INVALID: une fiche préparée nommée exige une présence établie");
       }
     }
+    const classificationResolution = genericAssignable
+      ? resolvedNpcClassification(context, assignment, targetPath)
+      : undefined;
+    if (genericAssignable && !classificationResolution) {
+      throw new Error(`PROFILE_ASSIGNMENT_INVALID: npc_class doit être décidé avant le premier jet pour ${assignment.target_ref}`);
+    }
+    if (assignment.basis === "hidden_conception") {
+      if (!genericAssignable || !classificationResolution
+        || !HIDDEN_CONCEPTION_CLASSES.has(classificationResolution.classification.npc_class)) {
+        throw new Error("PROFILE_ASSIGNMENT_INVALID: hidden_conception exige un PNJ important, mystérieux ou important_mysterious");
+      }
+      if (classificationResolution.allowed_profile_ids
+        && !classificationResolution.allowed_profile_ids.includes(assignment.profile_id)) {
+        throw new Error(`PROFILE_ASSIGNMENT_INVALID: ${assignment.profile_id} sort de l'enveloppe préparée de ${assignment.target_ref}`);
+      }
+      if (profile.rare_profile === true
+        && (!classificationResolution.registry_authorized
+          || !classificationResolution.allowed_profile_ids?.includes(assignment.profile_id))) {
+        throw new Error("PROFILE_ASSIGNMENT_INVALID: un maître/champion exige une autorisation préparée explicite antérieure au jet");
+      }
+    }
     if (assignment.basis === "minimal_default" && profile.minimal_default_allowed !== true) {
       throw new Error("PROFILE_ASSIGNMENT_INVALID: seul le profil civil ordinaire peut servir de défaut minimal");
+    }
+    if (assignment.basis === "minimal_default" && classificationResolution
+      && HIDDEN_CONCEPTION_CLASSES.has(classificationResolution.classification.npc_class)) {
+      throw new Error("PROFILE_ASSIGNMENT_INVALID: un PNJ important ou mystérieux ne peut pas être déclaré faible par défaut");
     }
     if (!assignment.rationale?.trim() || assignment.rationale.length > 500) {
       throw new Error("PROFILE_ASSIGNMENT_INVALID: justification canonique absente ou trop longue");
@@ -186,8 +375,12 @@ function prepareProfileAssignments(context: CheckContext, request: CheckRequest)
     if (assignment.evidence_refs.length < minimumEvidenceRefs) {
       throw new Error(`PROFILE_ASSIGNMENT_INVALID: ${assignment.profile_id} exige au moins ${minimumEvidenceRefs} preuves établies`);
     }
+    preparedAssignments.push({
+      ...assignment,
+      ...(classificationResolution ? { npc_classification: classificationResolution.classification } : {}),
+    });
   }
-  return assignments;
+  return preparedAssignments;
 }
 
 function resolveActor(context: CheckContext, actorRef: string, assignments: ProfileAssignment[]): ActorMechanics {
@@ -538,6 +731,19 @@ function collectMechanicalProfiles(root: unknown, path = "", result = new Map<st
   return result;
 }
 
+function collectNpcClassifications(root: unknown, path = "", result = new Map<string, string>()) {
+  const object = record(root);
+  if (!object) return result;
+  if (typeof object.npc_class === "string") {
+    result.set(path, JSON.stringify({ npc_class: object.npc_class, npc_classification: object.npc_classification }));
+  }
+  for (const [key, value] of Object.entries(object)) {
+    if (["mechanical_profile_assignment", "npc_classification"].includes(key)) continue;
+    if (record(value)) collectNpcClassifications(value, path ? `${path}.${key}` : key, result);
+  }
+  return result;
+}
+
 export function verifyPersistedProfileAssignments(
   requiredAssignments: PersistedProfileAssignment[],
   baseHiddenValue: unknown,
@@ -547,6 +753,8 @@ export function verifyPersistedProfileAssignments(
   const nextHidden = record(nextHiddenValue) || {};
   const before = collectMechanicalProfiles(baseHidden);
   const after = collectMechanicalProfiles(nextHidden);
+  const beforeClasses = collectNpcClassifications(baseHidden);
+  const afterClasses = collectNpcClassifications(nextHidden);
   const requiredByPath = new Map<string, PersistedProfileAssignment>();
   for (const assignment of requiredAssignments) {
     const path = assignment.target_ref.replace(/^hidden:/, "");
@@ -566,11 +774,32 @@ export function verifyPersistedProfileAssignments(
       throw new Error(`nouveau profil mécanique non autorisé par un roll_check: hidden:${path}`);
     }
   }
+  for (const [path, classification] of beforeClasses) {
+    if (afterClasses.get(path) !== classification) {
+      throw new Error(`reclassement ou suppression interdite du npc_class hidden:${path}`);
+    }
+  }
+  for (const [path, classification] of afterClasses) {
+    if (beforeClasses.has(path)) continue;
+    const required = requiredByPath.get(path);
+    const requiredClassification = required?.npc_classification;
+    if (!requiredClassification || classification !== JSON.stringify({
+      npc_class: requiredClassification.npc_class,
+      npc_classification: requiredClassification,
+    })) {
+      throw new Error(`nouveau npc_class non autorisé par un roll_check: hidden:${path}`);
+    }
+  }
   for (const [path, assignment] of requiredByPath) {
     const actor = record(valueAt(nextHidden, path));
     if (!actor || actor.mechanical_profile_id !== assignment.profile_id
       || JSON.stringify(actor.mechanical_profile_assignment) !== JSON.stringify(assignment)) {
       throw new Error(`save_turn doit persister exactement l'attribution signée pour hidden:${path}`);
+    }
+    if (assignment.npc_classification
+      && (actor.npc_class !== assignment.npc_classification.npc_class
+        || JSON.stringify(actor.npc_classification) !== JSON.stringify(assignment.npc_classification))) {
+      throw new Error(`save_turn doit persister exactement le npc_class signé pour hidden:${path}`);
     }
   }
 }

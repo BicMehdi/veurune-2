@@ -6,7 +6,7 @@ import { canonicalUrl, checkSaveStatus, commitTurn, fetchMasterSection, getHeadS
 import { GitHubHandler } from "./github-handler";
 import type { VeyruneEnv } from "./env";
 import { issueDiceRoll } from "./dice.ts";
-import { issueMechanicalCheck, validateCheck } from "./checks.ts";
+import { issueMechanicalCheck, NPC_CLASSES, NPC_CLASSIFICATION_CRITERIA, validateCheck } from "./checks.ts";
 import type { CheckRequest } from "./checks.ts";
 import { WORKER_VERSION, compatibilityToolHelp, encodeCompatibilityRequest, parseCompatibilityRequest, parseCompatibilitySearch, runtimeManifest } from "./catalog.ts";
 import { eventFileForTurn, parseDocument, validateHiddenState, validateMehdiSheet } from "./validation.mjs";
@@ -37,12 +37,25 @@ const checkModifierSchema = z.object({
   source: z.string().min(1).max(240),
 });
 
+const npcClassificationSchema = z.object({
+  npc_class: z.enum(NPC_CLASSES).describe("Fonction narrative et degré de préconstruction; ne mesure jamais la puissance."),
+  classification_basis: z.enum(["prepared_registry", "ooc_explicit", "gm_pre_roll_design"]),
+  classified_before_roll: z.literal(true),
+  rationale: z.string().min(1).max(800),
+  criteria: z.array(z.enum(NPC_CLASSIFICATION_CRITERIA)).min(1).max(10),
+  evidence_refs: z.array(z.string().min(1).max(180)).min(1).max(8),
+  source_ref: z.string().min(1).max(240),
+});
+
 const profileAssignmentSchema = z.object({
   target_ref: z.string().regex(/^hidden:.+/).describe("Référence HIDDEN stable du PNJ; cette même cible recevra le profil dans hidden_patch."),
   profile_id: z.string().min(1).max(100).describe("Profil NPC-* générique ou CHAR-* préparé autorisé par MECHANICAL_PROFILES."),
-  basis: z.enum(["established_fiction", "minimal_default"]),
-  rationale: z.string().min(1).max(500).describe("Pourquoi les faits déjà établis justifient ce niveau, avant de connaître les dés."),
-  evidence_refs: z.array(z.string().min(1).max(180)).min(1).max(8).describe("event_id, chemin d'état ou fait courant qui fonde l'attribution."),
+  basis: z.enum(["established_fiction", "minimal_default", "hidden_conception"]),
+  rationale: z.string().min(1).max(500).describe("Pourquoi les faits établis ou la conception cachée antérieure au dé justifient ce profil."),
+  evidence_refs: z.array(z.string().min(1).max(180)).min(1).max(8).describe("event_id, chemin d'état, registre préparé ou autorisation OOC qui fonde l'attribution."),
+  npc_classification: npcClassificationSchema.optional().describe(
+    "Classement pré-jet requis pour un profil NPC-* s'il n'existe ni dans HIDDEN ni dans NPC_DESIGN_REGISTRY.",
+  ),
 });
 
 const checkOppositionSchema = z.discriminatedUnion("kind", [
@@ -75,7 +88,7 @@ const checkRequestSchema = z.object({
   mastery: z.string().min(1).max(80),
   modifiers: z.array(checkModifierSchema).max(10).default([]),
   profile_assignments: z.array(profileAssignmentSchema).max(2).default([]).describe(
-    "Secours pour un PNJ sans fiche. Choisir avant le dé; roll_check verrouille l'attribution et save_turn exige sa persistance exacte dans HIDDEN.",
+    "Secours pour un PNJ sans fiche. Classer par fonction narrative puis choisir le profil avant le dé; roll_check verrouille les deux et save_turn exige leur persistance exacte dans HIDDEN.",
   ),
   opposition: checkOppositionSchema,
   expected_head_sha: z.string().regex(/^[0-9a-f]{40}$/i),
@@ -128,7 +141,7 @@ const patchSaveTurnSchema = z.object({
     "Uniquement les changements visibles du monde. Ne jamais inclure de secret. Même sémantique de fusion.",
   ),
   hidden_patch: z.record(z.string(), z.unknown()).describe(
-    "Uniquement les changements MJ cachés. Même sémantique de fusion. Si roll_check renvoie required_profile_persistence, enregistrer mechanical_profile_id et l'objet mechanical_profile_assignment exact sous la cible hidden correspondante.",
+    "Uniquement les changements MJ cachés. Même sémantique de fusion. Si roll_check renvoie required_profile_persistence, enregistrer npc_class, npc_classification, mechanical_profile_id et mechanical_profile_assignment exacts sous la cible hidden correspondante.",
   ),
   mehdi_profile_patch: z.record(z.string(), z.unknown()).optional().describe(
     "Observations descriptives fondées sur une instruction OOC explicite ou des événements canoniques cités; jamais un choix majeur futur.",
@@ -224,12 +237,13 @@ async function canonicalCheckContext(env: VeyruneEnv, request: CheckRequest) {
   if (actualHeadSha !== request.expected_head_sha) {
     throw new Error(`canon modifié avant le test: HEAD attendu ${request.expected_head_sha}, HEAD actuel ${actualHeadSha}; recharger avec load_game`);
   }
-  const [currentText, worldText, hiddenText, sheetText, profilesText] = await Promise.all([
+  const [currentText, worldText, hiddenText, sheetText, profilesText, npcDesignText] = await Promise.all([
     readFile(env, "state/CURRENT.yaml", actualHeadSha),
     readFile(env, "state/WORLD.yaml", actualHeadSha),
     readFile(env, "state/HIDDEN.yaml", actualHeadSha),
     readFile(env, "state/MEHDI_SHEET.yaml", actualHeadSha),
     readFile(env, "reference/MECHANICAL_PROFILES.json", actualHeadSha),
+    readFile(env, "reference/NPC_DESIGN_REGISTRY.json", actualHeadSha),
   ]);
   const current = parseDocument(currentText, "CURRENT avant test");
   const nextSave = current.next_expected_save as Record<string, unknown> | undefined;
@@ -242,6 +256,7 @@ async function canonicalCheckContext(env: VeyruneEnv, request: CheckRequest) {
     hidden: parseDocument(hiddenText, "HIDDEN avant test"),
     mehdiSheet: validateMehdiSheet(parseDocument(sheetText, "MEHDI_SHEET avant test"), "MEHDI_SHEET avant test"),
     mechanicalProfiles: parseDocument(profilesText, "MECHANICAL_PROFILES"),
+    npcDesignRegistry: parseDocument(npcDesignText, "NPC_DESIGN_REGISTRY"),
   };
 }
 
@@ -254,13 +269,14 @@ async function resolveCanonicalCheck(env: VeyruneEnv, request: CheckRequest, rol
 
 async function runHealthCheck(env: VeyruneEnv) {
   const headSha = await getHeadSha(env);
-  const [currentText, hiddenText, profileText, memoryText, sheetText, mechanicalProfilesText] = await Promise.all([
+  const [currentText, hiddenText, profileText, memoryText, sheetText, mechanicalProfilesText, npcDesignText] = await Promise.all([
     readFile(env, "state/CURRENT.yaml", headSha),
     readFile(env, "state/HIDDEN.yaml", headSha),
     readFile(env, "state/MEHDI_PROFILE.yaml", headSha),
     readFile(env, "state/NARRATIVE_MEMORY.yaml", headSha),
     readFile(env, "state/MEHDI_SHEET.yaml", headSha),
     readFile(env, "reference/MECHANICAL_PROFILES.json", headSha),
+    readFile(env, "reference/NPC_DESIGN_REGISTRY.json", headSha),
   ]);
   const current = parseDocument(currentText, "CURRENT");
   const hidden = validateHiddenState(parseDocument(hiddenText, "HIDDEN"), "HIDDEN");
@@ -268,7 +284,9 @@ async function runHealthCheck(env: VeyruneEnv) {
   const memory = parseDocument(memoryText, "NARRATIVE_MEMORY");
   const sheet = validateMehdiSheet(parseDocument(sheetText, "MEHDI_SHEET"), "MEHDI_SHEET");
   const mechanicalProfiles = parseDocument(mechanicalProfilesText, "MECHANICAL_PROFILES");
+  const npcDesignRegistry = parseDocument(npcDesignText, "NPC_DESIGN_REGISTRY");
   if (!mechanicalProfiles.profiles || typeof mechanicalProfiles.profiles !== "object") throw new Error("MECHANICAL_PROFILES invalide");
+  if (!npcDesignRegistry.classes || !npcDesignRegistry.classifications) throw new Error("NPC_DESIGN_REGISTRY invalide");
   const synchronizedProjections: Array<[Record<string, unknown>, string]> = [
     [hidden, "HIDDEN"],
     [profile, "MEHDI_PROFILE"],
@@ -289,6 +307,7 @@ async function runHealthCheck(env: VeyruneEnv) {
     narrativeMemoryLoaded: true,
     mehdiSheetLoaded: true,
     mechanicalProfilesLoaded: true,
+    npcDesignRegistryLoaded: true,
     ...runtimeManifest(),
     canon: {
       head_sha: headSha,
@@ -306,6 +325,7 @@ async function runHealthCheck(env: VeyruneEnv) {
       narrative_memory: "ok",
       mehdi_sheet: "ok",
       mechanical_profiles: "ok",
+      npc_design_registry: "ok",
       projection_synchronization: "ok",
       signed_checks: "available",
       patch_saves: "available",
@@ -329,7 +349,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   const server = new McpServer(
     { name: "veyrune-cloud-save", version: WORKER_VERSION },
     {
-      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. load_game annonce runtime et capabilities. Si cette conversation n'affiche que cinq outils, appeler search avec capabilities ou le nom de l'outil, puis fetch sur l'id renvoyé. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Copier signed_check intact dans l’événement de save_turn: le serveur reconstruit lui-même notation, dés et mechanical_check depuis le reçu. Les statistiques viennent du canon serveur. Un PNJ vivant sans fiche peut recevoir avant le dé un profil NPC-* cohérent; un compagnon nommé réellement présent peut recevoir uniquement son profil CHAR-* correspondant. Le reçu verrouille le choix et save_turn impose sa persistance exacte dans HIDDEN. Une fiche vivante présente sous hidden.companion_sheets prévaut ensuite; tout changement durable passe par companion_changes et un événement qui cite le profil dans companion_refs. Sans preuve, seul NPC-CIVIL-ORDINARY est permis. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn directement avant d'afficher la narration finale.",
+      instructions: "Mémoire canonique et règles MJ de Veyrune. Avant une reprise ou un tour, appeler load_game et appliquer persistence puis narration_rules; utiliser mehdi_sheet pour chaque test et mehdi_profile/narrative_memory pour la continuité. load_game annonce runtime et capabilities. Si cette conversation n'affiche que cinq outils, appeler search avec capabilities ou le nom de l'outil, puis fetch sur l'id renvoyé. Pour un test mécanique, appeler validate_check puis roll_check; réserver roll_dice au hasard sans résolution structurée. Copier signed_check intact dans l’événement de save_turn: le serveur reconstruit lui-même notation, dés et mechanical_check depuis le reçu. Les statistiques viennent du canon serveur. Un PNJ vivant sans fiche est d'abord classé par fonction narrative et degré de préconstruction, jamais par puissance. Un PNJ important ou mystérieux peut recevoir un profil NPC-* choisi secrètement par le MJ selon sa conception antérieure au dé; un banal sans preuve reste au défaut minimal. Le reçu verrouille npc_class et profil, et save_turn impose leur persistance exacte dans HIDDEN. Un compagnon nommé réellement présent peut recevoir uniquement son profil CHAR-* correspondant. Une fiche vivante présente sous hidden.companion_sheets prévaut ensuite; tout changement durable passe par companion_changes et un événement qui cite le profil dans companion_refs. Afficher public_display et ne jamais révéler gm_resolution ni hidden. Après chaque tour narratif résolu, appeler save_turn directement avant d'afficher la narration finale.",
     },
   );
 
@@ -485,7 +505,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "validate_check",
     {
-      description: "Vérifie sans lancer de dé qu'un test est résoluble depuis le même commit canonique: acteur, caractéristique, maîtrise, modificateurs et opposition. Un PNJ sans fiche peut recevoir un profile_assignment NPC-* justifié; un compagnon nommé présent peut recevoir uniquement son CHAR-* correspondant. Sinon OPPOSITION_UNRESOLVED est retourné.",
+      description: "Vérifie sans lancer de dé qu'un test est résoluble depuis le même commit canonique: acteur, caractéristique, maîtrise, modificateurs et opposition. Un PNJ sans fiche reçoit d'abord un npc_class fonctionnel; important ou mystérieux autorise un choix NPC-* secret antérieur au dé, ensuite verrouillé. Un compagnon nommé présent peut recevoir uniquement son CHAR-* correspondant. Sinon OPPOSITION_UNRESOLVED est retourné.",
       inputSchema: checkRequestSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: true },
     },
@@ -498,7 +518,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "roll_check",
     {
-      description: "Résout un test complet depuis les statistiques canoniques, lance 2d10 avec Web Crypto, calcule total, opposition, marge et degré, puis chiffre le reçu. Dans l’événement de save_turn, copier signed_check intact; le serveur hydrate et vérifie les autres champs du jet. Toute attribution générique est verrouillée avant les dés et doit être recopiée exactement de required_profile_persistence vers hidden_patch.",
+      description: "Résout un test complet depuis les statistiques canoniques, lance 2d10 avec Web Crypto, calcule total, opposition, marge et degré, puis chiffre le reçu. Dans l’événement de save_turn, copier signed_check intact; le serveur hydrate et vérifie les autres champs du jet. Tout npc_class et profil générique sont verrouillés avant les dés et doivent être recopiés exactement de required_profile_persistence vers hidden_patch.",
       inputSchema: checkRequestSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false, idempotentHint: false },
     },
@@ -537,7 +557,7 @@ function createVeyruneServer(env: VeyruneEnv) {
   server.registerTool(
     "save_turn",
     {
-      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch. Preserve mehdi_sheet unless an explicit mechanical event changes it. Put every lasting companion change in companion_changes with exact before/after, cause, duration and a source event; companion_sheets is server-managed. For each structured test, copy signed_check intact from roll_check into the event; the server reconstructs and verifies notation, dice and mechanical_check. If required_profile_persistence is returned, hidden_patch must persist it exactly; later reassignment is rejected. Raw rolls must reuse roll_dice. If save_turn fails, the narrative turn is not committed.",
+      description: "Use this exactly once after resolving a narrative turn and before presenting its final narration. Prefer mode=patch. Preserve mehdi_sheet unless an explicit mechanical event changes it. Put every lasting companion change in companion_changes with exact before/after, cause, duration and a source event; companion_sheets is server-managed. For each structured test, copy signed_check intact from roll_check into the event; the server reconstructs and verifies notation, dice and mechanical_check. If required_profile_persistence is returned, hidden_patch must persist mechanical_profile_id, mechanical_profile_assignment, npc_class and npc_classification exactly; later reassignment or reclassification is rejected. Raw rolls must reuse roll_dice. If save_turn fails, the narrative turn is not committed.",
       inputSchema: z.union([patchSaveTurnSchema, fullSaveTurnSchema]),
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true, idempotentHint: false },
     },

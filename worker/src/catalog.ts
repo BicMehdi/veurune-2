@@ -1,5 +1,5 @@
-export const WORKER_VERSION = "1.8.3";
-export const API_SCHEMA_VERSION = "P15.2";
+export const WORKER_VERSION = "1.9.0";
+export const API_SCHEMA_VERSION = "P16.0";
 
 const AVAILABLE_ACTIONS = Object.freeze([
   "search",
@@ -23,6 +23,8 @@ const FEATURE_FLAGS = Object.freeze({
   patch_saves: true,
   hidden_rolls: true,
   signed_hidden_redactions: true,
+  npc_functional_classification: true,
+  gm_hidden_profile_choice: true,
   master_targeted_access: true,
   save_idempotency_check: true,
   legacy_five_tool_bridge: true,
@@ -33,7 +35,7 @@ export function runtimeManifest() {
     runtime: {
       worker_version: WORKER_VERSION,
       api_schema_version: API_SCHEMA_VERSION,
-      rules_compatibility: "P15",
+      rules_compatibility: "P16",
       git_branch: "main",
     },
     capabilities: {
@@ -88,8 +90,8 @@ export function parseCompatibilityRequest(id: string) {
 
 export function compatibilityToolHelp(action: string) {
   const usage: Record<string, string> = {
-    validate_check: "search avec `validate_check <JSON conforme au schéma P15>`, puis fetch sur l'id retourné.",
-    roll_check: "search avec `roll_check <JSON conforme au schéma P15>`, puis fetch sur l'id retourné. Copier ensuite signed_check dans l'événement.",
+    validate_check: "search avec `validate_check <JSON conforme au schéma P16>`, puis fetch sur l'id retourné.",
+    roll_check: "search avec `roll_check <JSON conforme au schéma P16>`, puis fetch sur l'id retourné. Copier ensuite signed_check dans l'événement.",
     roll_dice: "search avec `roll_dice 2d10 <headSha> <next_save_id> <libellé>`, puis fetch sur l'id retourné.",
     search_master: "search avec `search_master <termes>`, puis fetch sur l'id retourné.",
     fetch_master_section: "search avec `fetch_master_section <SECTION_ID>`, puis fetch sur l'id retourné.",

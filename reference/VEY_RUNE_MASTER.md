@@ -1,7 +1,7 @@
 # VEY_RUNE MASTER — Architecture de consolidation
 
 > **Statut :** consolidation complète auditée, persistance et résolution renforcées — document MJ uniquement
-> **Version de référence :** `MASTER-P14-ROLLS`
+> **Version de référence :** `MASTER-P16-NPC-DESIGN`
 > **Sources consolidées :** corpus V3.2, bootstrap d’autorité GitHub, extensions de worldbuilding validées dans la conversation « Reprendre aventure chat »  
 > **Portée actuelle :** toutes les couches prévues sont intégrées et auditées. Les fichiers `sources/` restent inchangés et ne doivent faire l’objet d’aucune suppression ou migration sans décision OOC distincte.
 
@@ -1724,7 +1724,7 @@ Les numéros renvoient aux blocs `# FICHIER` du corpus concaténé `VEY_RUNE_V3.
 | procédure détaillée archivée | règle spécialisée du Master, puis bloc ciblé de `VEY_RUNE_REFERENCE_DETAILS_P12.md` |
 | alias et arbitrages | `REF-ALIAS`, registres `CON-*` et `DUP-*` |
 
-Les 154 identifiants de section sont uniques après l’extension mécanique P14.4. Les identifiants de contenu scellé — 60 nœuds, 40 storylets et 12 antagonistes — ont leur propre cardinalité contrôlée.
+Les 165 identifiants de section sont uniques après l’extension P16. Les identifiants de contenu scellé — 60 nœuds, 40 storylets et 12 antagonistes — ont leur propre cardinalité contrôlée.
 
 ## `QA-GLOBAL-MATRIX` — Résultats de l’audit P9, complétés en P11/P12
 
@@ -2097,9 +2097,27 @@ Le Worker annonce ses versions, capacités et onze actions dans `load_game` et `
 
 `reference/MECHANICAL_PROFILES.json` est un index lisible par le serveur, strictement subordonné aux profils numériques du Master. Une entrée de cet index ne crée jamais une personne ou une créature dans la campagne. Elle devient applicable seulement lorsqu’un acteur vivant de `state/` référence explicitement son `mechanical_profile_id` ou lorsque P15 crée causalement sa fiche nommée exacte ; les valeurs directes et états sauvegardés de cette instance prévalent.
 
+## `MECH-NPC-FUNCTIONAL-CLASSIFICATION` — Fonction narrative avant puissance
+
+Avant le premier test mécanique d’un PNJ sans fiche, le MJ le classe selon sa **fonction narrative et son degré de préconstruction**, jamais selon la difficulté souhaitée, la puissance de Mehdi ou le résultat des dés. Les catégories peuvent représenter des propriétés qui se chevauchent dans la fiction, mais le champ serveur conserve une valeur unique parmi :
+
+| `npc_class` | Définition opératoire |
+|---|---|
+| `incidental` | fonction immédiate et interchangeable : garde de porte, marchand anonyme, passant, ouvrier ou bandit sans identité propre ; sa disparition ne modifie pas durablement le monde |
+| `established` | identité ou rôle stable, sans critère actuel d’importance durable ni mystère préparé |
+| `important` | au moins un élément durable : identité propre, rôle récurrent, objectifs personnels, relation ou faction significative, information ou ressource déterminante, ou décisions capables de modifier durablement un arc, une faction ou la situation locale |
+| `mysterious` | identité, rôle réel, capacités, affiliation ou intentions volontairement laissés non résolus pour être découverts en jeu |
+| `important_mysterious` | cumule au moins un critère d’importance et un critère de mystère |
+
+Le classement ne fournit aucune statistique et ne prouve ni identité, ni affiliation, ni intention, ni présence. Il est établi avant le dé depuis `reference/NPC_DESIGN_REGISTRY.json`, une décision OOC explicite ou la conception pré-jet du MJ. Pour un PNJ banal, l’absence de compétence établie permet uniquement le défaut minimal. Pour `important`, `mysterious` ou `important_mysterious`, le MJ peut choisir secrètement un profil générique cohérent avec sa conception réelle, même si Mehdi n’en possède encore aucune preuve. Le choix a lieu avant `roll_check`, puis le reçu lie ensemble `npc_class`, profil et jet.
+
+Le même `save_turn` persiste exactement `npc_class`, `npc_classification`, `mechanical_profile_id` et `mechanical_profile_assignment` dans `HIDDEN`. Toute omission, reclassification ou réattribution ultérieure est refusée. `NPC-MASTER-CHAMPION` conserve une protection supplémentaire : une simple déclaration pré-jet ne suffit pas ; son emploi caché exige une autorisation préparée explicite antérieure au jet.
+
+Le contact du Pont des Trois Chaînes est classé `important_mysterious` par autorisation OOC explicite : il se trouve au centre d’une rencontre préparée et de plusieurs fils actifs, tandis que son identité, son rôle exact, son affiliation, ses intentions et ses capacités demeurent non résolus. Cette classification est enregistrée dans `reference/NPC_DESIGN_REGISTRY.json`. Elle **ne lui attribue aujourd’hui aucun profil mécanique**, ne confirme pas qu’il est Meren, chef, vétéran ou combattant et ne change aucun événement déjà joué. Son profil réel sera choisi secrètement par le MJ au premier besoin mécanique, avant les dés, puis verrouillé par le premier `save_turn` réussi.
+
 ## `MECH-GENERIC-NPC-PROFILES` — Secours persistant pour PNJ improvisés
 
-Un PNJ vivant sans fiche individuelle peut recevoir un profil générique avant son premier test mécanique. Ce choix se fonde sur ce que la fiction a déjà établi, jamais sur les valeurs de Mehdi ni sur l'issue désirée. L'attribution fournit `target_ref`, `profile_id`, `basis`, `rationale` et `evidence_refs` à `validate_check`, puis à `roll_check`.
+Un PNJ vivant sans fiche individuelle peut recevoir un profil générique avant son premier test mécanique. Avec `basis: established_fiction`, le choix se fonde sur des faits déjà établis. Avec `basis: hidden_conception`, il se fonde sur la conception réelle antérieure au dé d’un PNJ classé `important`, `mysterious` ou `important_mysterious`. Dans les deux cas, il ne dépend jamais des valeurs de Mehdi ni de l’issue désirée. L’attribution fournit `target_ref`, `profile_id`, `basis`, `rationale`, `evidence_refs` et son classement résolu à `validate_check`, puis à `roll_check`.
 
 | Profil | E/D/P | Capacités utiles | Maîtrises utiles | Condition d'emploi |
 |---|---:|---|---|---|
@@ -2114,7 +2132,7 @@ Un PNJ vivant sans fiche individuelle peut recevoir un profil générique avant 
 
 `E/D/P` signifie Endurance, Défense et Protection. Toute capacité ou maîtrise non indiquée vaut 0. Un profil est un socle, pas une identité ni une présence. Les valeurs individuelles déjà sauvegardées prévalent.
 
-Lorsque le profil est utilisé pour lancer les dés, `roll_check` le verrouille dans le reçu et renvoie `required_profile_persistence`. Le même `save_turn` doit enregistrer sous la cible `HIDDEN` le `mechanical_profile_id` et l'objet `mechanical_profile_assignment` exact. Une omission, une attribution sans reçu, une altération ou une réattribution future est bloquée. Si les faits ne permettent aucun choix légitime, `OPPOSITION_UNRESOLVED` demeure la bonne réponse.
+Lorsque le profil est utilisé pour lancer les dés, `roll_check` verrouille classement et profil dans le reçu puis renvoie `required_profile_persistence`. Le même `save_turn` doit enregistrer sous la cible `HIDDEN` les quatre champs exacts : `npc_class`, `npc_classification`, `mechanical_profile_id` et `mechanical_profile_assignment`. Une omission, une attribution sans reçu, une altération, une reclassification ou une réattribution future est bloquée. Si aucune base légitime n’existe, `OPPOSITION_UNRESOLVED` demeure la bonne réponse.
 
 ## `MECH-PREPARED-COMPANION-PROFILES` — Fiches mécaniques préparées sans activation
 

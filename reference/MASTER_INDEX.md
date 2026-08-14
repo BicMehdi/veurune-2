@@ -24,6 +24,7 @@
 - `P13` — mémoire persistante, HIDDEN non destructif, profil, chapitres et reprise idempotente ;
 - `P14` — fiche mécanique, difficultés, marges, jets sociaux, dés serveur, profils génériques persistants et fiches préparées des compagnons.
 - `P15` — fiches vivantes des compagnons, blessures, équipement, progression, relations, émotions, objectifs et journal causal serveur.
+- `P16` — classement fonctionnel des PNJ, conception cachée pré-jet et verrouillage conjoint de la classe et du profil.
 
 ## Accès mécanique rapide
 
@@ -33,6 +34,7 @@
 - `MECH-SHEET-PERSISTENT` — fiche mécanique courante ;
 - `MECH-RANDOM-SERVER` — génération impartiale ;
 - `MECH-CHECK-SERVER` — résolution signée et transfert atomique par `signed_check` ;
+- `MECH-NPC-FUNCTIONAL-CLASSIFICATION` — `incidental`, `established`, `important`, `mysterious` et `important_mysterious` sans présumer la puissance ;
 - `MECH-GENERIC-NPC-PROFILES` — huit profils génériques, du civil au maître/champion ;
 - `MECH-PREPARED-COMPANION-PROFILES` — onze fiches nommées sans activation implicite ;
 - `MECH-PUBLIC-DISPLAY` — présentation obligatoire ;

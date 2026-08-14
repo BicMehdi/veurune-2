@@ -1,7 +1,7 @@
 {
   "authority": "machine_readable_index_subordinate_to_VEY_RUNE_MASTER",
-  "policy": "Un profil ne prouve jamais la présence d'un acteur. Il devient utilisable seulement lorsqu'un acteur vivant de state/ le référence explicitement. Un profil générique ou une fiche préparée est choisi avant le premier jet, verrouillé par son reçu et persisté dans HIDDEN par le même save_turn. Une fiche préparée ne devient jamais un état vivant.",
-  "source": "reference/VEY_RUNE_MASTER.md#RULE-HUMAN-PROFILES, #BESTIARY-STATS, #MECH-GENERIC-NPC-PROFILES et #MECH-PREPARED-COMPANION-PROFILES",
+  "policy": "Un profil ne prouve jamais la présence d'un acteur. Il devient utilisable seulement lorsqu'un acteur vivant de state/ le référence explicitement. Pour un PNJ générique, npc_class décrit d'abord sa fonction narrative et son degré de préconstruction, jamais sa puissance. Le profil est ensuite choisi avant le premier jet, verrouillé avec ce classement par son reçu et persisté dans HIDDEN par le même save_turn. Une fiche préparée ne devient jamais un état vivant.",
+  "source": "reference/VEY_RUNE_MASTER.md#RULE-HUMAN-PROFILES, #BESTIARY-STATS, #MECH-NPC-FUNCTIONAL-CLASSIFICATION, #MECH-GENERIC-NPC-PROFILES et #MECH-PREPARED-COMPANION-PROFILES",
   "profiles": {
     "NPC-CIVIL-ORDINARY": {
       "label": "civil ordinaire", "fallback_assignable": true, "minimal_default_allowed": true,
@@ -61,7 +61,7 @@
     },
     "NPC-MASTER-CHAMPION": {
       "label": "maître d'armes ou champion", "fallback_assignable": true, "minimal_default_allowed": false,
-      "rare_profile": true, "minimum_evidence_refs": 3,
+      "rare_profile": true, "minimum_evidence_refs": 3, "hidden_conception_requires_registry_authorization": true,
       "mechanics": {
         "endurance": 16, "defense": 16, "protection": 4,
         "capabilities": { "vigor": 4, "address": 4, "instinct": 4, "reason": 2, "will": 4, "presence": 3 },

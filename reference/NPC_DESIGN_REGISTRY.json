@@ -1,0 +1,44 @@
+{
+  "authority": "ooc_npc_design_registry_subordinate_to_live_state",
+  "policy": "Le classement décrit la fonction narrative et le degré de préconstruction, jamais la puissance, l'identité réelle, l'affiliation, l'intention ou la présence. Un profil mécanique reste indéterminé jusqu'à son choix pré-jet signé, puis devient état vivant uniquement par save_turn.",
+  "classes": {
+    "incidental": "Fonction immédiate, interchangeable et sans conséquence durable propre.",
+    "established": "Identité ou rôle stable, sans critère actuel d'importance durable ni mystère préparé.",
+    "important": "Au moins un critère durable : identité propre, récurrence, objectifs, relation ou faction significative, information ou ressource déterminante, ou décisions à conséquence durable.",
+    "mysterious": "Identité, rôle, capacités, affiliation ou intentions volontairement non résolus pour être découverts en jeu.",
+    "important_mysterious": "Cumule au moins un critère d'importance et un critère de mystère, sans présumer aucune puissance."
+  },
+  "classifications": {
+    "hidden:bridge_contact": {
+      "npc_class": "important_mysterious",
+      "classification_basis": "ooc_explicit",
+      "classified_before_roll": true,
+      "rationale": "Le contact est au centre d'une rencontre préparée et de plusieurs fils immédiats, tandis que son identité, son rôle exact, son affiliation, ses intentions et ses capacités restent volontairement non résolus.",
+      "criteria": [
+        "determinative_information_or_resource",
+        "durable_consequence_capacity",
+        "identity_unresolved",
+        "role_unresolved",
+        "capabilities_unresolved",
+        "affiliation_unresolved",
+        "intentions_unresolved"
+      ],
+      "evidence_refs": [
+        "state/CURRENT.yaml#open_threads.immediate",
+        "state/HIDDEN.yaml#unresolved_secrets.bridge_contact",
+        "OOC:player-authorized-important_mysterious-2026-08-14"
+      ],
+      "source_ref": "OOC:player-authorized-important_mysterious-2026-08-14",
+      "allowed_profile_ids": [
+        "NPC-CIVIL-ORDINARY",
+        "NPC-WORKER-ROBUST",
+        "NPC-GUARD-AVERAGE",
+        "NPC-MERCENARY-TRAINED",
+        "NPC-VETERAN",
+        "NPC-SPECIALIST-AGILE",
+        "NPC-COMBATANT-ELITE"
+      ],
+      "mechanical_profile_id": null
+    }
+  }
+}
