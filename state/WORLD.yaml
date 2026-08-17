@@ -1,12 +1,12 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0739",
-  "turn": 729,
+  "save_id": "VEY-0740",
+  "turn": 730,
   "time": {
     "year": 347,
     "day": 513,
-    "clock": "01:27"
+    "clock": "01:28"
   },
   "scene": {
     "region": "Valdorne",
@@ -21,7 +21,7 @@
   "last_action": {
     "actor": "Mehdi",
     "dialogue_sequence": [],
-    "intent": "complete_delivery_to_Vask"
+    "intent": "negotiate_high_payment_for_completed_operation"
   },
   "bridge_contact": {
     "response": {
@@ -63,6 +63,12 @@
       "caravan_marking_objective_details_unresolved": true,
       "contact_claims_came_alone": true,
       "contact_actual_alone_status_unresolved": true
+    },
+    "payment_negotiation_with_Vask": {
+      "active": true,
+      "payment_agreed": false,
+      "payment_received": false,
+      "high_price_accepted": false
     }
   },
   "information_firewall": {

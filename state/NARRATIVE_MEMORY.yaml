@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "gm_only",
-  "save_id": "VEY-0739",
-  "turn": 729,
+  "save_id": "VEY-0740",
+  "turn": 730,
   "policy": {
     "role": "fast_recall_index_only",
     "event_log_remains_authoritative": true,
@@ -11,7 +11,7 @@
     "summary_requires_event_evidence": true
   },
   "history_coverage": {
-    "campaign_turns_known": 729,
+    "campaign_turns_known": 730,
     "structured_event_history_complete_from_turn": 709,
     "earlier_history": "partial_snapshot_only"
   },
