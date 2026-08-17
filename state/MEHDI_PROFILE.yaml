@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "gm_only",
-  "save_id": "VEY-0736",
-  "turn": 726,
+  "save_id": "VEY-0737",
+  "turn": 727,
   "authority": "descriptive_only_player_final_authority",
   "update_policy": {
     "allowed_sources": [
@@ -67,7 +67,7 @@
   ],
   "counterexamples_and_evolution": [],
   "history_coverage": {
-    "known_campaign_length_turns": 726,
+    "known_campaign_length_turns": 727,
     "structured_evidence_available_from_turn": 709,
     "older_behavior_must_not_be_invented": true
   }

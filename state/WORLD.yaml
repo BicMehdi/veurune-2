@@ -1,12 +1,12 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0736",
-  "turn": 726,
+  "save_id": "VEY-0737",
+  "turn": 727,
   "time": {
     "year": 347,
     "day": 513,
-    "clock": "01:25"
+    "clock": "01:26"
   },
   "scene": {
     "region": "Valdorne",
@@ -15,15 +15,13 @@
     "time_of_day": "night",
     "combat_active": false,
     "tactical_alert": "very_high",
-    "meeting_active": true,
-    "physical_confrontation_active": true
+    "meeting_active": false,
+    "physical_confrontation_active": false
   },
   "last_action": {
     "actor": "Mehdi",
-    "dialogue_sequence": [
-      "À ce rendez-vous ? Oui. Je suis venu seul."
-    ],
-    "intent": "compel_true_identity_under_finger_mutilation_threat"
+    "dialogue_sequence": [],
+    "intent": "knock_out_bound_contact_and_begin_transfer_to_Vask_under_Aveline_cover"
   },
   "bridge_contact": {
     "response": {
@@ -38,15 +36,15 @@
       "claim_establishes_objective_site_status": false,
       "physically_restrained": true,
       "hostile_counterattack_started": false,
-      "leaves_meeting": false,
+      "leaves_meeting": true,
       "bound_with_cord": true,
       "claims_identity_Meren": true,
-      "identity_claim_is_unverified": true
+      "identity_claim_is_unverified": true,
+      "unconscious": true,
+      "alive": true,
+      "grave_injury_established": false
     },
-    "dialogue": [
-      "Je suis Meren.",
-      "Maintenant éloigne ce couteau de mes mains."
-    ],
+    "dialogue": [],
     "identity": {
       "whether_Meren": "unresolved",
       "true_identity": "unresolved",
