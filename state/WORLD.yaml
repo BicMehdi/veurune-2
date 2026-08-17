@@ -1,12 +1,12 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0737",
-  "turn": 727,
+  "save_id": "VEY-0738",
+  "turn": 728,
   "time": {
     "year": 347,
     "day": 513,
-    "clock": "01:26"
+    "clock": "01:27"
   },
   "scene": {
     "region": "Valdorne",
@@ -20,8 +20,10 @@
   },
   "last_action": {
     "actor": "Mehdi",
-    "dialogue_sequence": [],
-    "intent": "knock_out_bound_contact_and_begin_transfer_to_Vask_under_Aveline_cover"
+    "dialogue_sequence": [
+      "Ça va ?"
+    ],
+    "intent": "continue_transfer_and_check_on_Aveline"
   },
   "bridge_contact": {
     "response": {
