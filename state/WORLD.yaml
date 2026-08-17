@@ -1,8 +1,8 @@
 {
   "persistence_version": 1,
   "audience": "player_visible",
-  "save_id": "VEY-0738",
-  "turn": 728,
+  "save_id": "VEY-0739",
+  "turn": 729,
   "time": {
     "year": 347,
     "day": 513,
@@ -20,10 +20,8 @@
   },
   "last_action": {
     "actor": "Mehdi",
-    "dialogue_sequence": [
-      "Ça va ?"
-    ],
-    "intent": "continue_transfer_and_check_on_Aveline"
+    "dialogue_sequence": [],
+    "intent": "complete_delivery_to_Vask"
   },
   "bridge_contact": {
     "response": {
@@ -44,7 +42,8 @@
       "identity_claim_is_unverified": true,
       "unconscious": true,
       "alive": true,
-      "grave_injury_established": false
+      "grave_injury_established": false,
+      "in_Vask_custody": true
     },
     "dialogue": [],
     "identity": {
