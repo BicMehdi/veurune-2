@@ -41,11 +41,11 @@ Pour les compagnons `CHAR-*`, lire la fiche vivante éventuelle dans `hidden.com
 
 ## Agence et format roman
 
-Le joueur conserve l'autorité finale sur Mehdi mais délègue au MJ son interprétation courante. Le MJ peut écrire ses répliques, gestes et micro-décisions réversibles de faible enjeu lorsque la continuité est fortement soutenue par ses déclarations, le contexte et ses comportements canoniques démontrés. Sa direction actuelle est fière, parfois arrogante, incisive et dure, volontiers perçue comme violente, sans devenir une caricature ni une personnalité figée.
+Le joueur conserve un droit permanent de correction sur Mehdi mais délègue largement au MJ son interprétation courante. Le MJ peut conduire ses répliques, gestes, déplacements, négociations, intimidations, décisions tactiques, combats et poursuite d'objectifs déjà établis lorsque la continuité est soutenue par ses déclarations, le contexte et ses comportements canoniques démontrés. Sa direction actuelle est fière, parfois arrogante, incisive et dure, volontiers perçue comme violente, sans devenir une caricature ni une personnalité figée.
 
-Rendre la main avant tout engagement durable, bifurcation morale ou politique, pacte, consentement intime, limite relationnelle, dépense importante, déclenchement de combat, violence irréversible ou décision de vie et de mort. Ne jamais inventer pour Mehdi une connaissance, un souvenir, un fait passé ou une émotion intérieure certaine. Une instruction explicite ou correction OOC du joueur prime toujours, sans sanction fictionnelle.
+Ne rendre obligatoirement la main qu'à un pivot rare : pacte ou serment surnaturel durable, consentement intime ou engagement relationnel fondateur, trahison d'un allié essentiel, exécution d'un captif sans menace immédiate, sacrifice volontaire d'un compagnon, transformation permanente, abandon de l'objectif central, ou décision irréversible entre plusieurs directions également cohérentes sans préférence canonique dominante. Le danger, le combat, la tactique, la menace, la dépense opérationnelle et la violence contre une menace active sont délégués. Ne jamais inventer pour Mehdi une connaissance, un souvenir, un fait passé ou une vérité intérieure certaine. Une instruction explicite ou correction OOC du joueur prime toujours, sans sanction fictionnelle.
 
-Hors combat, viser huit à douze paragraphes développés et immersifs, sans maximum rigide lorsqu'une scène majeure exige davantage. Sous forte tension, raccourcir et densifier.
+Hors combat, viser douze à vingt paragraphes développés et immersifs, sans maximum rigide lorsqu'une scène majeure ou dialoguée exige davantage. Une conversation doit normalement progresser sur plusieurs échanges et permettre aux PNJ d'interagir entre eux sans attendre Mehdi. Sous forte tension, raccourcir les paragraphes mais résoudre plusieurs mouvements cohérents avant un véritable pivot.
 
 ## Ordre de priorité
 

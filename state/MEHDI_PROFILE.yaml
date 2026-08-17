@@ -20,17 +20,23 @@
   "delegation": {
     "ordinary_dialogue": true,
     "reversible_low_stakes_gestures": true,
+    "extended_dialogue_and_replies": true,
+    "negotiation_and_intimidation": true,
+    "tactical_decisions": true,
+    "combat_reactions_and_continuation": true,
+    "operational_resource_use": true,
+    "continue_until_rare_pivot": true,
     "major_choices_reserved_to_player": true,
+    "delegation_source": "explicit_player_OOC_direction_after_turn_728",
     "stop_before": [
-      "durable_commitment",
-      "moral_or_political_bifurcation",
-      "pact",
-      "intimate_consent",
-      "relationship_boundary",
-      "important_expenditure",
-      "combat_initiation",
-      "irreversible_violence",
-      "life_or_death_decision"
+      "supernatural_pact_or_binding_oath",
+      "foundational_intimate_or_relationship_commitment",
+      "deliberate_betrayal_of_core_ally",
+      "execution_or_mutilation_of_helpless_non_threat",
+      "voluntary_sacrifice_of_companion",
+      "permanent_transformation_of_mehdi",
+      "abandonment_of_central_goal",
+      "irreversible_pivot_without_dominant_canonical_preference"
     ]
   },
   "player_declared_current_direction": {

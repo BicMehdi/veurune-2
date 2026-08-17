@@ -21,10 +21,11 @@ test("les règles Dark Fantasy permanentes conservent les invariants du jeu", as
   for (const required of [
     "dark_fantasy_brutal_equilibre",
     "activation : permanente",
-    "huit à douze paragraphes développés",
-    "Le joueur autorise le MJ à faire parler et réagir Mehdi dans les échanges ordinaires",
-    "Rendre immédiatement la main avant un engagement durable",
-    "l'autorité finale du joueur sur Mehdi",
+    "douze à vingt paragraphes développés",
+    "Le joueur autorise le MJ à interpréter activement Mehdi entre ses interventions",
+    "Ne rendre obligatoirement la main qu'à un **pivot réservé**",
+    "plusieurs allers-retours se développer avant l'arrêt",
+    "le droit du joueur d'interrompre, corriger ou reprendre immédiatement Mehdi",
     "FER_NOIR_STRICT",
     "OOC: PAUSE",
     "limites de sécurité obligatoires de ChatGPT",
@@ -47,6 +48,8 @@ test("le bootstrap ChatGPT désigne GitHub main et load_game comme autorité", a
   assert.match(text, /appliquer `persistence` et `narration_rules`/);
   assert.match(text, /appeler exactement une fois `save_turn`/);
   assert.match(text, /success_target\.dd/);
+  assert.match(text, /douze à vingt paragraphes/);
+  assert.match(text, /Le danger, le combat, la tactique/);
   assert.match(text, /ne jamais restaurer automatiquement `VEY_SAVE_V1`/);
 });
 
@@ -68,6 +71,8 @@ test("le document narratif est exposé par search et fetch", async () => {
   assert.match(text, /runtimeManifest/);
   assert.match(text, /legacy five-tool bridge/i);
   assert.match(text, /state\/MEHDI_SHEET\.yaml/);
+  assert.match(text, /mode roman délégué étendu/);
+  assert.match(text, /rendre la main seulement devant un pivot rare/);
 });
 
 test("la fiche mécanique de Mehdi reste complète, visible et synchronisée", async () => {
@@ -164,15 +169,30 @@ test("P15 prépare les fiches vivantes sans modifier l’état courant", async (
   assert.match(source, /OOC.*aucun tour/s);
 });
 
-test("la matrice de délégation réserve toutes les décisions majeures au joueur", async () => {
+test("la matrice de délégation poursuit le roman et réserve seulement les pivots rares au joueur", async () => {
   const fixtures = JSON.parse(await readFile(evalsPath, "utf8"));
   const delegable = fixtures.cases.filter((entry) => entry.expected === "delegable");
   const reserved = fixtures.cases.filter((entry) => entry.expected === "player_required");
-  assert.ok(delegable.length >= 4);
-  assert.ok(reserved.length >= 6);
-  for (const id of ["accept-pact", "start-combat", "kill-captive", "betray-ally", "spend-fortune", "intimate-consent"]) {
+  assert.ok(delegable.length >= 9);
+  assert.ok(reserved.length <= 6);
+  for (const id of ["extended-dialogue", "coherent-intimidation", "reactive-combat", "continue-combat", "operational-spend"]) {
+    assert.equal(fixtures.cases.find((entry) => entry.id === id)?.expected, "delegable");
+  }
+  for (const id of ["accept-pact", "kill-captive", "betray-core-ally", "sacrifice-companion", "permanent-transformation", "intimate-consent"]) {
     assert.equal(fixtures.cases.find((entry) => entry.id === id)?.expected, "player_required");
   }
+});
+
+test("P17 verrouille le mode roman délégué étendu sans créer d'histoire rétroactive", async () => {
+  const master = await readFile(masterPath, "utf8");
+  const source = await readFile(projectSourcePath, "utf8");
+  assert.match(master, /MASTER-P17-DELEGATED-NOVEL/);
+  for (const id of ["NOVEL-DELEGATION-DEFAULT", "NOVEL-RARE-PIVOTS", "NOVEL-DIALOGUE-MOMENTUM", "NOVEL-LENGTH-P17", "NOVEL-CORRECTION-RIGHT"]) {
+    assert.ok(master.includes(`\`${id}\``), `section P17 absente: ${id}`);
+  }
+  assert.match(master, /il ne crée aucun souvenir, événement, choix passé, émotion ou connaissance rétroactive/);
+  assert.match(source, /Le danger, le combat, la tactique/);
+  assert.match(source, /douze à vingt paragraphes/);
 });
 
 test("le profil de Mehdi et la mémoire narrative restent descriptifs et sourcés", async () => {
@@ -180,6 +200,10 @@ test("le profil de Mehdi et la mémoire narrative restent descriptifs et sourcé
   const memory = JSON.parse(await readFile(memoryPath, "utf8"));
   assert.equal(profile.authority, "descriptive_only_player_final_authority");
   assert.equal(profile.delegation.major_choices_reserved_to_player, true);
+  assert.equal(profile.delegation.extended_dialogue_and_replies, true);
+  assert.equal(profile.delegation.combat_reactions_and_continuation, true);
+  assert.equal(profile.delegation.continue_until_rare_pivot, true);
+  assert.ok(!profile.delegation.stop_before.includes("combat_initiation"));
   assert.ok(profile.observed_patterns.every((entry) => entry.evidence_event_ids.length > 0));
   assert.equal(memory.policy.event_log_remains_authoritative, true);
   assert.ok(memory.chapters.every((entry) => entry.evidence_event_ids.length > 0 || entry.status === "summary_due"));

@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { compatibilityToolHelp, parseCompatibilitySearch, runtimeManifest } from "../src/catalog.ts";
 
-test("annonce le catalogue P16 complet même à un ancien client", () => {
+test("annonce le catalogue P17 complet même à un ancien client", () => {
   const manifest = runtimeManifest();
-  assert.equal(manifest.runtime.worker_version, "1.9.2");
-  assert.equal(manifest.runtime.api_schema_version, "P16.2");
+  assert.equal(manifest.runtime.worker_version, "1.10.0");
+  assert.equal(manifest.runtime.api_schema_version, "P17");
   assert.deepEqual(manifest.capabilities.actions, [
     "search", "fetch", "load_game", "roll_dice", "validate_check", "roll_check",
     "search_master", "fetch_master_section", "save_turn", "check_save_status", "check_health",
@@ -17,6 +17,8 @@ test("annonce le catalogue P16 complet même à un ancien client", () => {
   assert.equal(manifest.capabilities.features.structured_check_handoff, true);
   assert.equal(manifest.capabilities.features.compressed_check_receipts, true);
   assert.equal(manifest.capabilities.features.public_perceptible_difficulty_class, true);
+  assert.equal(manifest.capabilities.features.extended_delegated_novel_mode, true);
+  assert.equal(manifest.capabilities.features.rare_player_intervention_pivots, true);
   assert.equal(manifest.capabilities.features.companion_changes, true);
   assert.equal(manifest.capabilities.features.legacy_five_tool_bridge, true);
 });

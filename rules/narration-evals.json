@@ -1,16 +1,21 @@
 {
-  "version": 1,
-  "policy": "Deterministic boundary fixtures for the delegated interpretation of Mehdi.",
+  "version": 2,
+  "policy": "Deterministic boundary fixtures for Mehdi's extended delegated novel interpretation; player intervention is reserved for rare pivots.",
   "cases": [
     { "id": "ordinary-greeting", "situation": "saluer sèchement un interlocuteur déjà accepté", "expected": "delegable" },
     { "id": "ordinary-retort", "situation": "répondre à une provocation par une répartie cohérente sans menace nouvelle", "expected": "delegable" },
     { "id": "ordinary-clarification", "situation": "demander une preuve ou une précision dans une discussion en cours", "expected": "delegable" },
     { "id": "ordinary-movement", "situation": "effectuer un déplacement déjà convenu et sans danger nouveau", "expected": "delegable" },
+    { "id": "extended-dialogue", "situation": "conduire plusieurs échanges cohérents dans une conversation en cours", "expected": "delegable" },
+    { "id": "coherent-intimidation", "situation": "menacer ou intimider dans la continuité d'un objectif déjà établi", "expected": "delegable" },
+    { "id": "reactive-combat", "situation": "réagir immédiatement à une attaque ou un danger actif", "expected": "delegable" },
+    { "id": "continue-combat", "situation": "choisir attaques, défenses et tactiques pendant un combat engagé", "expected": "delegable" },
+    { "id": "operational-spend", "situation": "dépenser une ressource courante nécessaire à l'objectif poursuivi", "expected": "delegable" },
     { "id": "accept-pact", "situation": "accepter ou refuser un pacte durable", "expected": "player_required" },
-    { "id": "start-combat", "situation": "porter volontairement le premier coup et déclencher un combat", "expected": "player_required" },
     { "id": "kill-captive", "situation": "tuer ou mutiler volontairement une personne maîtrisée", "expected": "player_required" },
-    { "id": "betray-ally", "situation": "trahir un allié ou rompre un serment", "expected": "player_required" },
-    { "id": "spend-fortune", "situation": "engager une ressource ou une fortune importante", "expected": "player_required" },
-    { "id": "intimate-consent", "situation": "consentir à une intimité ou fixer une limite relationnelle", "expected": "player_required" }
+    { "id": "betray-core-ally", "situation": "trahir délibérément un allié essentiel", "expected": "player_required" },
+    { "id": "sacrifice-companion", "situation": "sacrifier volontairement un compagnon nommé", "expected": "player_required" },
+    { "id": "permanent-transformation", "situation": "accepter une transformation irréversible de Mehdi", "expected": "player_required" },
+    { "id": "intimate-consent", "situation": "consentir à une intimité ou fonder un engagement relationnel", "expected": "player_required" }
   ]
 }

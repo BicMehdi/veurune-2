@@ -1,5 +1,5 @@
-export const WORKER_VERSION = "1.9.2";
-export const API_SCHEMA_VERSION = "P16.2";
+export const WORKER_VERSION = "1.10.0";
+export const API_SCHEMA_VERSION = "P17";
 
 const AVAILABLE_ACTIONS = Object.freeze([
   "search",
@@ -28,6 +28,8 @@ const FEATURE_FLAGS = Object.freeze({
   structured_check_handoff: true,
   compressed_check_receipts: true,
   public_perceptible_difficulty_class: true,
+  extended_delegated_novel_mode: true,
+  rare_player_intervention_pivots: true,
   master_targeted_access: true,
   save_idempotency_check: true,
   legacy_five_tool_bridge: true,
@@ -38,7 +40,7 @@ export function runtimeManifest() {
     runtime: {
       worker_version: WORKER_VERSION,
       api_schema_version: API_SCHEMA_VERSION,
-      rules_compatibility: "P16",
+      rules_compatibility: "P17",
       git_branch: "main",
     },
     capabilities: {

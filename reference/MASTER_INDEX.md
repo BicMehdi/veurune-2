@@ -27,6 +27,7 @@
 - `P16` — classement fonctionnel des PNJ, conception cachée pré-jet et verrouillage conjoint de la classe et du profil.
 - `P16.1` — transfert MCP structuré de `signed_check`, reçu compressé et lecture rétrocompatible des reçus P16.
 - `P16.2` — DD signé et public pour toute opposition directement perceptible, sans révéler le profil source.
+- `P17` — mode roman délégué étendu : dialogues et actions continus, intervention du joueur limitée aux pivots rares, cible de douze à vingt paragraphes.
 
 ## Accès mécanique rapide
 
